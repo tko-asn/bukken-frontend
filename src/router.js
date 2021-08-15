@@ -1,0 +1,134 @@
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import store from '@/store';
+
+const Home = () => import(
+  /* webpackChankName: 'Home' */ './mains/Home'
+);
+const LoginForm = () => import(
+  /* webpackChankName: 'LoginForm' */ './mains/LoginForm'
+);
+const SignUpForm = () => import(
+  /* webpackChankName: 'SignUpForm' */ './mains/SignUpForm'
+);
+const UserView = () => import(
+  /* webpackChankName: 'UserView' */ './mains/UserView'
+);
+const EditProfileForm = () => import(
+  /* webpackChankName: 'EditProfileForm' */ './mains/EditProfileForm'
+);
+const PostList = () => import(
+  /* webpackChankName: 'PostList' */ './components/PostList'
+);
+const AuthInfo = () => import(
+  /* webpackChankName: 'AuthInfo' */ './components/AuthInfo'
+);
+const ChangePassword = () => import(
+  /* webpackChankName: 'ChangePassword' */ './components/ChangePassword'
+);
+
+Vue.use(VueRouter);
+
+const router = new VueRouter({
+  mode: 'history',
+  routes: [
+    { path: '/', component: Home, name: 'home' },
+    { path: '/login', component: LoginForm, name: 'login' },
+    { path: '/signup', component: SignUpForm, name: 'signUp' },
+    {
+      path: '/user/:id',
+      component: UserView,
+      props: true,
+      children: [
+        { path: '', component: PostList, name: 'userView' },
+        {
+          path: 'auth/info',
+          component: AuthInfo,
+          name: 'authInfo',
+          meta: { requiredAuth: true, myPageOnly: true },
+        },
+        { 
+          path: 'change/password', 
+          component: ChangePassword, 
+          name: 'changePassword', 
+          meta: { requiredAuth: true, myPageOnly: true }
+        },
+        // { path: 'favorite/users', component: FavoriteUsers, name: 'favoriteUsers' },
+        // { path: 'favorite/posts', component: FavoritePosts, name: 'favoritePosts' },
+      ]
+    },
+    {
+      path: '/profile/edit',
+      component: EditProfileForm,
+      name: 'editProfile',
+      meta: { requiredAuth: true }
+    },
+    { path: '*', redirect: '/' },
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+    return { x: 0, y: 0 };
+  },
+});
+
+router.beforeEach((to, from, next) => {
+  // ログイン状態
+  const isLoggedIn = store.getters['auth/isLoggedIn'];
+
+  // トークン
+  const token = localStorage.getItem('token');
+
+  // ログイン状態であればどのページへも遷移可能
+  if (isLoggedIn) {
+    next();
+
+    // 認証が必要ないページの場合
+  } else if (!to.matched.some(record => record.meta.requiredAuth)) {
+
+    //トークンが存在する場合
+    if (token) {
+      // トークンの検証
+      store.dispatch('auth/verify').then(() => {
+        next();
+      }).catch(() => {
+        // トークンを削除
+        store.dispatch('auth/logout');
+        // 検証に失敗しても遷移可能
+        next();
+      });
+
+      // トークンが存在しない場合
+    } else {
+      next();
+    }
+
+    // 認証が必要なページでトークンがある場合
+  } else if (token) {
+    // トークン検証に成功したら遷移
+    store.dispatch('auth/verify').then(() => {
+      next();
+    })
+      .catch(() => {
+        // トークンを削除
+        store.dispatch('auth/logout');
+        // トークンの検証に失敗したらログインページへ
+        forceUserToLogin(to, from, next);
+      });
+
+    // 認証が必要なページでトークンがない場合
+  } else {
+    forceUserToLogin(to, from, next);
+  }
+});
+
+// ログインページへ移動させる関数
+const forceUserToLogin = (to, from, next) => {
+  next({
+    path: '/login',
+    query: { next: to.path }
+  });
+};
+
+export default router;
