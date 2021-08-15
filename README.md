@@ -1,4 +1,4 @@
-# yobo
+# Practice-app-vue2
 
 ## Project setup
 ```
