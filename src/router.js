@@ -29,6 +29,9 @@ const ChangePassword = () => import(
 const FollowList = () => import(
   /* webpackChankName: 'FollowList' */ './components/FollowList'
 );
+const FollowerList = () => import(
+  /* webpackChankName: 'FollowerList' */ './components/FollowerList'
+);
 
 Vue.use(VueRouter);
 
@@ -57,7 +60,7 @@ const router = new VueRouter({
           meta: { requiredAuth: true, myPageOnly: true }
         },
         { path: 'follow/list', component: FollowList, name: 'followList' },
-        // { path: 'favorite/posts', component: FavoritePosts, name: 'favoritePosts' },
+        { path: 'follower/list', component: FollowerList, name: 'followerList' },
       ]
     },
     {

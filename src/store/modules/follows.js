@@ -9,7 +9,7 @@ const state = { // ログインユーザーのフォロー・フォロワーを�
 const getters = {
   follow: state => state.follow,
   follower: state => state.follower,
-}
+};
 
 const mutations = {
   // followの置き換え
@@ -20,8 +20,9 @@ const mutations = {
   addFollow(state, payload) {
     state.follow.push(payload);
   },
-  addFollower(state, payload) {
-    state.follower.push(payload);
+  // followerの置き換え
+  setFollower(state, payload) {
+    state.follower = payload;
   }
 };
 
@@ -61,12 +62,16 @@ const actions = {
         context.commit('setFollow', newFollow);
       });
   },
-  async getFollow({ commit, dispatch }, { userId, isMe }) { // フォローしている側のユーザーのid
+  // フォローしているユーザーのリストを取得
+  async getFollow({ commit, dispatch }, { userId, isMe }) { // フォローしている側のユーザーのidがuserId
     // フォローデータのリストを取得
     const res = await apiClient.get('/follows/follow/' + userId);
 
     // フォローリストの要素のfollowの値をparse(破壊的処理)
-    dispatch('loopAndParseFollowJSONData', res.data);
+    dispatch(
+      'loopAndParseFollowJSONData', 
+      { objList: res.data, type: 'follow' }
+    );
 
     if (isMe) { // ログインユーザーのフォローデータのリストの場合
       commit('setFollow', res.data);
@@ -75,12 +80,36 @@ const actions = {
     // 他のユーザーのフォローデータの場合
     return Promise.resolve(res.data);
   },
-  getFollower(context, followerId) { // フォローされている側のユーザーのid
-    return apiClient.get('/follows/follower/' + followerId)
+  // フォロワーのリストを取得
+  async getFollower({ commit, dispatch }, { followId, isMe }) { // フォローされている側のユーザーのidがfollowId
+    // フォロワーデータのリストを取得
+    const res = await apiClient.get('/follows/follower/' + followId);
+
+    // フォロワーリストの要素のuserの値をparse(破壊的処理)
+    dispatch(
+      'loopAndParseFollowJSONData', 
+      { objList: res.data, type: 'follower' }
+    );
+
+    if (isMe) { // ログインユーザーのフォロワーデータのリストの場合
+      commit('setFollower', res.data);
+    }
+
+    // 他のユーザーのフォロワーデータの場合
+    return Promise.resolve(res.data);
   },
-  loopAndParseFollowJSONData(context, followObjList) {
-    for (const i in followObjList) {
-      followObjList[i].follow = JSON.parse(followObjList[i].follow);
+  loopAndParseFollowJSONData(context, { objList, type }) {
+    // フォローデータを扱う場合
+    if (type === 'follow') {
+      for (const i in objList) {
+        objList[i].follow = JSON.parse(objList[i].follow);
+      }
+
+    // フォロワーデータを扱う場合
+    } else if (type === 'follower') {
+      for (const i in objList) {
+        objList[i].user = JSON.parse(objList[i].user);
+      }
     }
   }
 };
