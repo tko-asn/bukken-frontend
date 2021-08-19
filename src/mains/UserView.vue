@@ -72,7 +72,12 @@
           <div
             :class="{ body_content_list: true, scroll_content_list: isScroll }"
           >
-            <router-view :isMe="isMe" :userId="id" :follow="follow" />
+            <router-view
+              :isMe="isMe"
+              :userId="id"
+              :follow="follow"
+              :follower="follower"
+            />
           </div>
         </section>
 
@@ -114,7 +119,9 @@
               <router-link :to="{ name: 'followList' }"
                 >フォローしているユーザー</router-link
               >
-              <a>フォロワー</a>
+              <router-link :to="{ name: 'followerList' }"
+                >フォロワー</router-link
+              >
             </div>
           </div>
 
@@ -211,6 +218,7 @@ export default {
         authInfo: "認証情報",
         changePassword: "パスワードの変更",
         followList: "フォロー",
+        followerList: "フォロワー"
       },
     };
   },
@@ -224,7 +232,7 @@ export default {
       "iconURL",
     ]),
     // ログインユーザーのフォローしているユーザーのリスト
-    ...mapGetters("follows", ["follow"]),
+    ...mapGetters("follows", ["follow", "follower"]),
     // ログインユーザーかどうか判定
     isMe() {
       if (this.userId === this.id) {
