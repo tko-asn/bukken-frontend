@@ -26,6 +26,9 @@ const AuthInfo = () => import(
 const ChangePassword = () => import(
   /* webpackChankName: 'ChangePassword' */ './components/ChangePassword'
 );
+const FollowList = () => import(
+  /* webpackChankName: 'FollowList' */ './components/FollowList'
+);
 
 Vue.use(VueRouter);
 
@@ -47,13 +50,13 @@ const router = new VueRouter({
           name: 'authInfo',
           meta: { requiredAuth: true, myPageOnly: true },
         },
-        { 
-          path: 'change/password', 
-          component: ChangePassword, 
-          name: 'changePassword', 
+        {
+          path: 'change/password',
+          component: ChangePassword,
+          name: 'changePassword',
           meta: { requiredAuth: true, myPageOnly: true }
         },
-        // { path: 'favorite/users', component: FavoriteUsers, name: 'favoriteUsers' },
+        { path: 'follow/list', component: FollowList, name: 'followList' },
         // { path: 'favorite/posts', component: FavoritePosts, name: 'favoritePosts' },
       ]
     },

@@ -9,7 +9,10 @@
           <div class="left_profile">
             <!-- アイコン画像 -->
             <div class="icon">
-              <img :src="anotherIconURL || iconURL" />
+              <img
+                :src="anotherIconURL || iconURL"
+                v-show="anotherIconURL || iconURL"
+              />
             </div>
           </div>
 
@@ -32,10 +35,16 @@
 
             <!-- フォローボタン -->
             <div class="option_right_profile" v-else>
-              <a class="btn_follow_user" v-show="!isYourFavoriteUser"
+              <a
+                class="btn_follow_user"
+                v-show="!isYourFavoriteUser"
+                @click="followUser"
                 >フォローする</a
               >
-              <a class="btn_follow_user" v-show="isYourFavoriteUser"
+              <a
+                class="btn_follow_user"
+                v-show="isYourFavoriteUser"
+                @click="unfollowUser"
                 >フォローを解除</a
               >
             </div>
@@ -63,7 +72,7 @@
           <div
             :class="{ body_content_list: true, scroll_content_list: isScroll }"
           >
-            <router-view />
+            <router-view :isMe="isMe" :userId="id" :follow="follow" />
           </div>
         </section>
 
@@ -102,8 +111,10 @@
               >フォロー</a
             >
             <div id="" class="item_following" v-show="items.following">
-              <a href="">フォローしているユーザー</a>
-              <a href="">フォロワー</a>
+              <router-link :to="{ name: 'followList' }"
+                >フォローしているユーザー</router-link
+              >
+              <a>フォロワー</a>
             </div>
           </div>
 
@@ -155,7 +166,9 @@
 
           <!-- ボタン -->
           <div class="bottom_modal">
-            <button @click.prevent="deleteAccount" :disabled="isDisabled">アカウントを閉鎖</button>
+            <button @click.prevent="deleteAccount" :disabled="isDisabled">
+              アカウントを閉鎖
+            </button>
           </div>
         </div>
       </template>
@@ -192,22 +205,26 @@ export default {
         slotName: "", // 表示するモーダルウィンドウ
         showWindow: false, // モーダルウィンドウの表示・非表示
       },
-      deleteText: '', // アカウント閉鎖確認用
+      deleteText: "", // アカウント閉鎖確認用
       contentListTitle: {
-        userView: '最新の投稿',
-        authInfo: '認証情報',
-        changePassword: 'パスワードの変更'
+        userView: "最新の投稿",
+        authInfo: "認証情報",
+        changePassword: "パスワードの変更",
+        followList: "フォロー",
       },
     };
   },
   computed: {
     ...mapGetters("auth", [
+      // ログインユーザーの認証情報・プロフィール
+      "isLoggedIn",
       "userId",
       "username",
       "selfIntroduction",
-      "favoriteUsers",
       "iconURL",
     ]),
+    // ログインユーザーのフォローしているユーザーのリスト
+    ...mapGetters("follows", ["follow"]),
     // ログインユーザーかどうか判定
     isMe() {
       if (this.userId === this.id) {
@@ -217,14 +234,14 @@ export default {
     },
     // フォローしているユーザーか判定
     isYourFavoriteUser() {
-      if (!this.isMe && this.favoriteUsers.includes(this.id)) {
+      if (!this.isMe && this.follow.find((el) => el.follow.id === this.id)) {
         return true;
       }
       return false;
     },
     isScroll() {
       // コンテンツリストにスクロールバーを表示しないルート
-      const notScrollRoutes = ["authInfo", 'changePassword'];
+      const notScrollRoutes = ["authInfo", "changePassword"];
 
       // スクロールバーを表示しない場合
       if (notScrollRoutes.includes(this.$route.name)) {
@@ -234,11 +251,23 @@ export default {
       return true;
     },
     isDisabled() {
-      if (this.deleteText === '完全に削除') {
+      if (this.deleteText === "完全に削除") {
         return false;
       }
       return true;
-    }
+    },
+    userInfo() {
+      // マイページではないときにユーザーの情報のオブジェクトを返す
+      if (!this.isMe) {
+        const userInfo = {
+          id: this.id,
+          username: this.anotherUsername,
+          iconURL: this.anotherIconURL,
+        };
+        return userInfo;
+      }
+      return undefined;
+    },
   },
   created() {
     // 他のユーザーの場合
@@ -282,20 +311,59 @@ export default {
     },
     // アカウント削除
     deleteAccount() {
-      this.$store.dispatch('auth/delete').then(() => {
+      this.$store.dispatch("auth/delete").then(() => {
         // ホームページへ
-        this.$router.replace('/');
+        this.$router.replace("/");
       });
-    }
+    },
+    // ユーザーをフォロー
+    followUser() {
+      if (!this.isLoggedIn) {
+        // ログインしていなければログインページへ
+        this.$router.push("/login");
+        return;
+      }
+      this.$store.dispatch("follows/followUser", this.userInfo);
+    },
+    // ユーザーのフォローを解除
+    unfollowUser() {
+      if (!this.isLoggedIn) {
+        this.$router.push("/login");
+        return;
+      }
+
+      // followリストからユーザーのidを使ってフォローデータを検索
+      const targetObj = this.follow.find((el) => el.follow.id === this.id);
+
+      this.$store.dispatch("follows/unfollowUser", targetObj.id);
+    },
   },
   beforeRouteEnter(to, from, next) {
     // myPageOnlyがmetaにある場合
-    if (to.matched.some(record => record.meta.myPageOnly)) {
+    if (to.matched.some((record) => record.meta.myPageOnly)) {
       // マイページ内でしか洋画できないコンポーネントはURLからの直接のアクセスを禁止
-      next('/');
+      next("/");
     }
     next();
-  }
+  },
+  watch: {
+    id(val) {
+      // URLのidが更新されたとき
+      if (!this.isMe) {
+        // 自分以外のユーザーのidの場合
+        this.$store.dispatch("users/retrieve", val).then((response) => {
+          this.anotherUsername = response.data.username;
+          this.anotherIntroduction = response.data.self_introduction;
+          this.anotherIconURL = response.data.icon_url;
+        });
+      } else {
+        // idがログインユーザー自身のものの場合
+        this.anotherUsername = "";
+        this.anotherIntroduction = "";
+        this.anotherIconURL = "";
+      }
+    },
+  },
 };
 </script>
 
@@ -370,8 +438,8 @@ p {
 
 /* ユーザー名 */
 .username {
-  overflow: hidden;
   width: 100%;
+  overflow: hidden;
   font-size: 1.7em;
   letter-spacing: 2px;
 }
@@ -390,6 +458,7 @@ p {
   border-radius: 3px;
   background: rgb(42, 85, 226);
   font-size: 1.08em;
+  cursor: pointer;
 }
 
 .option_right_profile > a:hover {
@@ -545,5 +614,5 @@ p {
 
 .bottom_modal > button[disabled] {
   background: rgba(241, 153, 150, 0.829);
-} 
+}
 </style>
