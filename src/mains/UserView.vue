@@ -154,30 +154,7 @@
     >
       <!-- アカウント閉鎖 -->
       <template v-slot:deleteAccount>
-        <div class="delete_account">
-          <!-- タイトル -->
-          <div class="top_modal">
-            <p>アカウントを閉鎖する</p>
-          </div>
-
-          <!-- メッセージ＆フォーム -->
-          <div class="middle_modal">
-            <p>アカウントを閉鎖しますか？</p>
-            <p class="warning_text">
-              アカウントを閉鎖すると二度と復元できなくなります。
-            </p>
-            <p class="warning_text">投稿はすべて削除されます。</p>
-            <p>閉鎖する場合は「完全に削除」と入力して下さい。</p>
-            <input type="text" placeholder="完全に削除" v-model="deleteText" />
-          </div>
-
-          <!-- ボタン -->
-          <div class="bottom_modal">
-            <button @click.prevent="deleteAccount" :disabled="isDisabled">
-              アカウントを閉鎖
-            </button>
-          </div>
-        </div>
+        <DeleteAccount />
       </template>
     </ModalWindow>
   </div>
@@ -186,10 +163,12 @@
 <script>
 import { mapGetters } from "vuex";
 import ModalWindow from "@/components/ModalWindow";
+import DeleteAccount from "@/components/DeleteAccount";
 
 export default {
   components: {
     ModalWindow,
+    DeleteAccount,
   },
   props: {
     // URLのparam
@@ -212,7 +191,7 @@ export default {
         slotName: "", // 表示するモーダルウィンドウ
         showWindow: false, // モーダルウィンドウの表示・非表示
       },
-      deleteText: "", // アカウント閉鎖確認用
+      // deleteText: "", // アカウント閉鎖確認用
       contentListTitle: {
         userView: "最新の投稿",
         authInfo: "認証情報",
@@ -256,12 +235,6 @@ export default {
         return false;
       }
       // スクロールバーを表示する場合
-      return true;
-    },
-    isDisabled() {
-      if (this.deleteText === "完全に削除") {
-        return false;
-      }
       return true;
     },
     userInfo() {
@@ -316,13 +289,6 @@ export default {
         slotName: "deleteAccount",
         showWindow: true,
       };
-    },
-    // アカウント削除
-    deleteAccount() {
-      this.$store.dispatch("auth/delete").then(() => {
-        // ホームページへ
-        this.$router.replace("/");
-      });
     },
     // ユーザーをフォロー
     followUser() {
@@ -565,62 +531,5 @@ p {
 
 [class*="item"] > a:hover {
   background: rgb(36, 41, 138);
-}
-
-/* モーダルウィンドウ */
-/* モーダルトップの題名部分 */
-.top_modal {
-  display: flex;
-  align-items: center;
-  height: 60px;
-  padding-left: 20px;
-  background: rgb(52, 52, 80);
-  color: #fff;
-  font-size: 1.5em;
-}
-
-/* モーダル中部の文章とインプット */
-.middle_modal {
-  margin-top: 30px;
-}
-
-.middle_modal > input {
-  width: 70%;
-  height: 40px;
-  margin-top: 10px;
-  padding-left: 10px;
-  font-size: 1.1em;
-}
-
-/* 警告文 */
-.warning_text {
-  color: red;
-  font-size: 0.9em;
-}
-
-.warning_text + .warning_text {
-  margin-bottom: 50px;
-}
-
-/* モーダル下部のボタン */
-.bottom_modal {
-  display: flex;
-  flex-direction: row-reverse;
-  margin-top: 30px;
-  padding-right: 20px;
-}
-
-.bottom_modal > button {
-  padding: 10px;
-  border-color: #fff;
-  border-radius: 8px;
-  background: rgba(247, 18, 10, 0.829);
-  color: #fff;
-  font-size: 1.1em;
-  cursor: pointer;
-}
-
-.bottom_modal > button[disabled] {
-  background: rgba(241, 153, 150, 0.829);
 }
 </style>
