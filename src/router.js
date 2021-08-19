@@ -26,11 +26,11 @@ const AuthInfo = () => import(
 const ChangePassword = () => import(
   /* webpackChankName: 'ChangePassword' */ './components/ChangePassword'
 );
-const FollowList = () => import(
-  /* webpackChankName: 'FollowList' */ './components/FollowList'
+const Follow = () => import(
+  /* webpackChankName: 'Follow' */ './components/Follow'
 );
-const FollowerList = () => import(
-  /* webpackChankName: 'FollowerList' */ './components/FollowerList'
+const Follower = () => import(
+  /* webpackChankName: 'Follower' */ './components/Follower'
 );
 
 Vue.use(VueRouter);
@@ -59,8 +59,8 @@ const router = new VueRouter({
           name: 'changePassword',
           meta: { requiredAuth: true, myPageOnly: true }
         },
-        { path: 'follow/list', component: FollowList, name: 'followList' },
-        { path: 'follower/list', component: FollowerList, name: 'followerList' },
+        { path: 'follow/list', component: Follow, name: 'followList' },
+        { path: 'follower/list', component: Follower, name: 'followerList' },
       ]
     },
     {
