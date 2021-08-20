@@ -17,6 +17,9 @@ const UserView = () => import(
 const EditProfileForm = () => import(
   /* webpackChankName: 'EditProfileForm' */ './mains/EditProfileForm'
 );
+const PostForm = () => import(
+  /* webpackChankName: 'PostForm' */ './mains/PostForm'
+);
 const PostList = () => import(
   /* webpackChankName: 'PostList' */ './components/PostList'
 );
@@ -41,6 +44,12 @@ const router = new VueRouter({
     { path: '/', component: Home, name: 'home' },
     { path: '/login', component: LoginForm, name: 'login' },
     { path: '/signup', component: SignUpForm, name: 'signUp' },
+    { 
+      path: '/post/form', 
+      component: PostForm, 
+      name: 'postForm', 
+      meta: { requiredAuth: true },
+    },
     {
       path: '/user/:id',
       component: UserView,

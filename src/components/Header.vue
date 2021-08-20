@@ -42,7 +42,7 @@
 
             <!-- 投稿ボタン -->
             <li>
-              <router-link class="btn_post" to="/post">投稿する</router-link>
+              <router-link class="btn_post" to="/post/form">投稿する</router-link>
             </li>
           </template>
 
