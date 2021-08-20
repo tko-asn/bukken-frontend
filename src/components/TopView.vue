@@ -13,7 +13,7 @@
 
         <!-- ログイン済み -->
         <template v-if="isLoggedIn">
-          <router-link class="btn_post" to="/post">投稿する</router-link>
+          <router-link class="btn_post" to="/post/form">投稿する</router-link>
         </template>
 
         <!-- 未ログイン -->
