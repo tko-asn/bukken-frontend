@@ -20,8 +20,8 @@ const EditProfileForm = () => import(
 const PostForm = () => import(
   /* webpackChankName: 'PostForm' */ './mains/PostForm'
 );
-const PostList = () => import(
-  /* webpackChankName: 'PostList' */ './components/PostList'
+const SelfIntroduction = () => import(
+  /* webpackChankName: 'SelfIntroduction' */ './components/SelfIntroduction'
 );
 const AuthInfo = () => import(
   /* webpackChankName: 'AuthInfo' */ './components/AuthInfo'
@@ -55,7 +55,7 @@ const router = new VueRouter({
       component: UserView,
       props: true,
       children: [
-        { path: '', component: PostList, name: 'userView' },
+        { path: '', component: SelfIntroduction, name: 'userView' },
         {
           path: 'auth/info',
           component: AuthInfo,
