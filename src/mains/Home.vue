@@ -1,103 +1,139 @@
 <template>
-  <main>
-    <!-- トップビュー -->
-    <TopView />
+  <div class="container">
+    <!-- サイドバー -->
+    <aside class="side_bar">
+      <nav>
+        <ul>
+          <li class="list_side_bar"><a href="">ホーム</a></li>
+          <li class="list_side_bar"><a href="">ユーザーの投稿</a></li>
+          <li class="list_side_bar"><a href="">お気に入りの投稿</a></li>
+          <li class="list_side_bar"><a href="">自分の投稿</a></li>
+        </ul>
+      </nav>
+      <nav>
+        <ul>
+          <li class="list_side_bar ttl">フォロー</li>
+          <li class="list_side_bar"><a href="">フォロー</a></li>
+          <li class="list_side_bar"><a href="">フォロワー</a></li>
+        </ul>
+      </nav>
+      <div class="side_footer">
+        <ul>
+          <li class="list_side_bar"><a href="">サイト概要</a></li>
+        </ul>
+      </div>
+    </aside>
 
-    <!-- ボディー部分 -->
-    <div class="body_home">
-      <div class="container">
-        <div class="layout_2_section">
-
-          <!-- 最新の投稿 -->
-          <section class="post_list">
-            <div class="head_section">
-              <h3 class="ttl">最新の投稿</h3>
-            </div>
-            <div class="body_section">
-              <PostList />
-            </div>
-          </section>
-
-          <!-- サイドバー -->
-          <section class="side_bar">
-            <div class="head_section">
-              <h3 class="ttl">メニュー</h3>
-            </div>
-            <div class="body_section"></div>
-          </section>
-        </div>
+    <!-- メイン -->
+    <div class="main">
+      <div class="main_container">
+        <PostList />
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>
-import TopView from "@/components/TopView";
 import PostList from "@/components/PostList";
 
 export default {
   components: {
-    TopView,
     PostList,
   },
 };
 </script>
 
 <style scoped>
-/* ボディー部分 */
-.body_home {
-  min-height: 300px;
-  margin: 20px 0 0;
-  color: #fff;
+/* 基本設定 */
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.body_home > .container {
-  max-width: 1160px;
-  margin: 0 auto;
+a {
+  color: white;
+  text-decoration: none;
 }
 
-/* 二分割レイアウト */
-.layout_2_section {
+.container {
   display: flex;
-  min-height: 300px;
-}
-
-/* セクション */
-.head_section {
-  display: flex;
-  justify-content: center;
-}
-
-.body_section {
-  width: 90%;
-  margin: 0 auto;
-}
-
-/* 最新の投稿 */
-.post_list {
-  width: 70%;
-  padding: 0 0 100px;
-  background: navajowhite;
+  height: 100vh;
+  font-size: 1.1em;
 }
 
 /* サイドバー */
 .side_bar {
-  width: 30%;
-  margin: 0 0 0 15px;
-  background: blue;
+  display: flex;
+  flex-direction: column;
+  width: 25%;
+  min-width: 250px;
+  margin-top: 50px;
+  overflow-y: scroll;
+  background: rgb(76, 26, 92);
 }
 
-/* タイトル */
-.layout_2_section .ttl {
-  position: relative;
-  font-size: 1.6em;
+.list_side_bar {
+  height: 50px;
 }
 
-.layout_2_section .ttl:after {
-  content: "";
-  display: block;
+.ttl {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  padding-left: 30px;
+  color: white;
+  font-size: 1.2em;
+}
+
+nav a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-left: 30px;
+}
+
+nav a:hover {
+  background: rgba(124, 46, 150, 0.918);
+  cursor: pointer;
+}
+
+.side_footer {
+  flex: 1;
+  min-height: 300px;
+  padding: 30px 30px;
+  background: rgb(76, 26, 92);
+  color: white;
+  font-size: 0.8em;
+}
+
+nav {
+  border-bottom: 2px solid gray;
+}
+
+/* メイン部分 */
+.main {
   width: 100%;
-  height: 5px;
-  background: rgb(233, 88, 177);
+  margin-top: 50px;
+  overflow-y: scroll;
+}
+
+.main_container {
+  width: 90%;
+  margin: 0 auto;
+}
+
+/* スクロールバー */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: rgba(168, 89, 194, 0.795);
+}
+
+.main::-webkit-scrollbar-thumb {
+  background: rgba(139, 130, 130, 0.747);
 }
 </style>
