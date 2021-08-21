@@ -1,9 +1,6 @@
 <template>
   <div class="my_page">
-    <!-- 背景 -->
-    <div class="area_top_profile"></div>
-
-    <div class="area_middle_profile">
+    <div class="area_head_profile">
       <div class="container">
         <div class="layout_2_div">
           <div class="left_profile">
@@ -50,100 +47,89 @@
             </div>
           </div>
         </div>
-
-        <!-- 自己紹介 -->
-        <div
-          class="self_introduction"
-          v-if="anotherIntroduction || selfIntroduction"
-        >
-          <p>{{ anotherIntroduction || selfIntroduction }}</p>
-        </div>
       </div>
     </div>
 
-    <div class="area_bottom_profile">
-      <div class="container">
-        <!-- ユーザーの投稿一覧 -->
-        <section class="content_list">
-          <div class="head_content_list">
-            <p class="ttl">{{ contentListTitle[$route.name] }}</p>
-          </div>
+    <div class="area_body_profile">
+      <!-- ユーザーの投稿一覧 -->
+      <section class="content_list">
+        <div class="head_content_list">
+          <p class="ttl">{{ contentListTitle[$route.name] }}</p>
+        </div>
 
-          <div
-            :class="{ body_content_list: true, scroll_content_list: isScroll }"
+        <div
+          :class="{ body_content_list: true, scroll_content_list: isScroll }"
+        >
+          <router-view
+            :isMe="isMe"
+            :userId="id"
+            :follow="follow"
+            :follower="follower"
+            :selfIntroduction="anotherIntroduction || selfIntroduction"
+          />
+        </div>
+      </section>
+
+      <!-- メニュー -->
+      <aside class="side_menu">
+        <!-- 投稿一覧 -->
+        <div>
+          <!-- マイページの場合 -->
+          <template v-if="isMe">
+            <a
+              href=""
+              class="ttl"
+              @click.prevent="openSideMenu('posts', $event)"
+              >投稿一覧</a
+            >
+            <div id="" class="item_posts" v-show="items.posts">
+              <a href="">自分の投稿</a>
+              <a href="">お気に入りの投稿</a>
+            </div>
+          </template>
+
+          <!-- ログインユーザー以外の場合 -->
+          <template v-else>
+            <a href="" class="ttl" @click.prevent="openSideMenu('posts')"
+              >ユーザーの投稿</a
+            >
+          </template>
+        </div>
+
+        <!-- フォロー -->
+        <div>
+          <a
+            href=""
+            class="ttl"
+            @click.prevent="openSideMenu('following', $event)"
+            >フォロー</a
           >
-            <router-view
-              :isMe="isMe"
-              :userId="id"
-              :follow="follow"
-              :follower="follower"
-            />
-          </div>
-        </section>
-
-        <!-- メニュー -->
-        <aside class="side_menu">
-          <!-- 投稿一覧 -->
-          <div>
-            <!-- マイページの場合 -->
-            <template v-if="isMe">
-              <a
-                href=""
-                class="ttl"
-                @click.prevent="openSideMenu('posts', $event)"
-                >投稿一覧</a
-              >
-              <div id="" class="item_posts" v-show="items.posts">
-                <a href="">自分の投稿</a>
-                <a href="">お気に入りの投稿</a>
-              </div>
-            </template>
-
-            <!-- ログインユーザー以外の場合 -->
-            <template v-else>
-              <a href="" class="ttl" @click.prevent="openSideMenu('posts')"
-                >ユーザーの投稿</a
-              >
-            </template>
-          </div>
-
-          <!-- フォロー -->
-          <div>
-            <a
-              href=""
-              class="ttl"
-              @click.prevent="openSideMenu('following', $event)"
-              >フォロー</a
+          <div id="" class="item_following" v-show="items.following">
+            <router-link :to="{ name: 'followList' }"
+              >フォローしているユーザー</router-link
             >
-            <div id="" class="item_following" v-show="items.following">
-              <router-link :to="{ name: 'followList' }"
-                >フォローしているユーザー</router-link
-              >
-              <router-link :to="{ name: 'followerList' }"
-                >フォロワー</router-link
-              >
-            </div>
+            <router-link :to="{ name: 'followerList' }">フォロワー</router-link>
           </div>
+        </div>
 
-          <!-- 設定 -->
-          <div v-if="isMe">
-            <a
-              href=""
-              class="ttl"
-              @click.prevent="openSideMenu('settings', $event)"
-              >設定</a
+        <!-- 設定 -->
+        <div v-if="isMe">
+          <a
+            href=""
+            class="ttl"
+            @click.prevent="openSideMenu('settings', $event)"
+            >設定</a
+          >
+          <div id="" class="item_settings" v-show="items.settings">
+            <router-link :to="{ name: 'editProfile' }"
+              >プロフィール編集</router-link
             >
-            <div id="" class="item_settings" v-show="items.settings">
-              <router-link :to="{ name: 'editProfile' }"
-                >プロフィール編集</router-link
-              >
-              <router-link :to="{ name: 'authInfo' }">認証情報</router-link>
-              <a href="" @click.prevent="logout">ログアウト</a>
-              <a href="" @click.prevent="showDeleteAccount">アカウントを閉鎖</a>
-            </div>
+            <router-link :to="{ name: 'authInfo' }">認証情報</router-link>
+            <a href="" @click.prevent="logout">ログアウト</a>
+            <a href="" @click.prevent="showDeleteAccount">アカウントを閉鎖</a>
           </div>
-        </aside>
-      </div>
+        </div>
+      </aside>
     </div>
 
     <!-- モーダルウィンドウ -->
@@ -193,11 +179,11 @@ export default {
       },
       // deleteText: "", // アカウント閉鎖確認用
       contentListTitle: {
-        userView: "最新の投稿",
+        userView: "プロフィール",
         authInfo: "認証情報",
         changePassword: "パスワードの変更",
         followList: "フォロー",
-        followerList: "フォロワー"
+        followerList: "フォロワー",
       },
     };
   },
@@ -353,22 +339,23 @@ p {
   margin: 0;
 }
 
-/* ページ全体 */
-.my_page {
-  padding-bottom: 30px;
+.container {
+  width: 90%;
+  margin: 0 auto;
 }
 
-/* トップ部分 背景 */
-.area_top_profile {
-  height: 250px;
-  padding-top: 50px;
-  background: #cfcece;
+/* ページ全体 */
+.my_page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0 auto;
 }
 
 /* ミドル部分 */
-.area_middle_profile > .container {
-  max-width: 1300px;
-  margin: 0 auto;
+.area_head_profile {
+  width: 100%;
+  padding: 80px 0 10px;
   box-shadow: 0 3px 5px rgb(165, 164, 164);
   background: #fff;
 }
@@ -377,7 +364,6 @@ p {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  width: 100%;
 }
 
 /* プロフィールの左部分 */
@@ -407,7 +393,7 @@ p {
 /* プロフィールの右部分 */
 .right_profile {
   width: 600px;
-  margin: 10px 30px;
+  margin: 10px 10%;
 }
 
 /* ユーザー名 */
@@ -439,22 +425,16 @@ p {
   background: rgb(25, 47, 119);
 }
 
-/* 自己紹介 */
-.self_introduction {
-  padding: 10px 50px 30px;
-  overflow-wrap: break-word;
-}
-
 /* ボトム部分 */
-.area_bottom_profile > .container {
+.area_body_profile {
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
-  max-width: 1200px;
+  width: 95%;
   margin: 40px auto 0;
 }
 
-.area_bottom_profile > .container > * {
+.area_body_profile > * {
   box-shadow: 0 5px 5px rgb(165, 164, 164);
 }
 
@@ -487,12 +467,21 @@ p {
 }
 
 .body_content_list {
-  max-height: 500px;
+  max-height: 300px;
 }
 
 /* スクロールバー */
 .scroll_content_list {
   overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: rgba(158, 154, 154, 0.781);
 }
 
 /* サイドメニュー */
