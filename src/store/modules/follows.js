@@ -63,15 +63,9 @@ const actions = {
       });
   },
   // フォローしているユーザーのリストを取得
-  async getFollow({ commit, dispatch }, { userId, isMe }) { // フォローしている側のユーザーのidがuserId
+  async getFollow({ commit }, { userId, isMe }) { // フォローしている側のユーザーのidがuserId
     // フォローデータのリストを取得
     const res = await apiClient.get('/follows/follow/' + userId);
-
-    // フォローリストの要素のfollowの値をparse(破壊的処理)
-    dispatch(
-      'loopAndParseFollowJSONData', 
-      { objList: res.data, type: 'follow' }
-    );
 
     if (isMe) { // ログインユーザーのフォローデータのリストの場合
       commit('setFollow', res.data);
@@ -81,15 +75,9 @@ const actions = {
     return Promise.resolve(res.data);
   },
   // フォロワーのリストを取得
-  async getFollower({ commit, dispatch }, { followId, isMe }) { // フォローされている側のユーザーのidがfollowId
+  async getFollower({ commit }, { followId, isMe }) { // フォローされている側のユーザーのidがfollowId
     // フォロワーデータのリストを取得
     const res = await apiClient.get('/follows/follower/' + followId);
-
-    // フォロワーリストの要素のuserの値をparse(破壊的処理)
-    dispatch(
-      'loopAndParseFollowJSONData', 
-      { objList: res.data, type: 'follower' }
-    );
 
     if (isMe) { // ログインユーザーのフォロワーデータのリストの場合
       commit('setFollower', res.data);
@@ -98,20 +86,6 @@ const actions = {
     // 他のユーザーのフォロワーデータの場合
     return Promise.resolve(res.data);
   },
-  loopAndParseFollowJSONData(context, { objList, type }) {
-    // フォローデータを扱う場合
-    if (type === 'follow') {
-      for (const i in objList) {
-        objList[i].follow = JSON.parse(objList[i].follow);
-      }
-
-    // フォロワーデータを扱う場合
-    } else if (type === 'follower') {
-      for (const i in objList) {
-        objList[i].user = JSON.parse(objList[i].user);
-      }
-    }
-  }
 };
 
 export default {
