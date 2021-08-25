@@ -6,10 +6,7 @@
           <div class="left_profile">
             <!-- アイコン画像 -->
             <div class="icon">
-              <img
-                :src="anotherIconURL || iconURL"
-                v-show="anotherIconURL || iconURL"
-              />
+              <img :src="displayedIconURL" v-show="displayedIconURL" />
             </div>
           </div>
 
@@ -17,7 +14,7 @@
             <!-- ユーザー名 -->
             <div class="username">
               <p>
-                {{ anotherUsername || username }}
+                {{ displayedUsername }}
               </p>
             </div>
 
@@ -65,7 +62,7 @@
             :userId="id"
             :follow="follow"
             :follower="follower"
-            :selfIntroduction="anotherIntroduction || selfIntroduction"
+            :selfIntroduction="displayedSelfIntroduction"
           />
         </div>
       </section>
@@ -162,10 +159,10 @@ export default {
   },
   data() {
     return {
-      // ログインユーザー以外のユーザーの情報
-      anotherUsername: "",
-      anotherIntroduction: "",
-      anotherIconURL: "",
+      // テンプレートに表示する情報
+      displayedUsername: "",
+      displayedSelfIntroduction: "",
+      displayedIconURL: "",
       // サイドメニューのv-show用boolean
       items: {
         posts: false,
@@ -228,8 +225,8 @@ export default {
       if (!this.isMe) {
         const userInfo = {
           id: this.id,
-          username: this.anotherUsername,
-          iconURL: this.anotherIconURL,
+          username: this.displayedUsername,
+          iconURL: this.displayedIconURL,
         };
         return userInfo;
       }
@@ -241,10 +238,16 @@ export default {
     if (!this.isMe) {
       // ユーザーの情報を取得
       this.$store.dispatch("users/retrieve", this.id).then((response) => {
-        this.anotherUsername = response.data.username;
-        this.anotherIntroduction = response.data.self_introduction;
-        this.anotherIconURL = response.data.icon_url;
+        this.displayedUsername = response.data.username;
+        this.displayedSelfIntroduction = response.data.self_introduction;
+        this.displayedIconURL = response.data.icon_url;
       });
+
+      // ログインユーザー自身の情報をセット
+    } else {
+      this.displayedUsername = this.username;
+      this.displayedSelfIntroduction = this.selfIntroduction;
+      this.displayedIconURL = this.iconURL;
     }
   },
   methods: {
@@ -312,15 +315,15 @@ export default {
       if (!this.isMe) {
         // 自分以外のユーザーのidの場合
         this.$store.dispatch("users/retrieve", val).then((response) => {
-          this.anotherUsername = response.data.username;
-          this.anotherIntroduction = response.data.self_introduction;
-          this.anotherIconURL = response.data.icon_url;
+          this.displayedUsername = response.data.username;
+          this.displayedSelfIntroduction = response.data.self_introduction;
+          this.displayedIconURL = response.data.icon_url;
         });
       } else {
         // idがログインユーザー自身のものの場合
-        this.anotherUsername = "";
-        this.anotherIntroduction = "";
-        this.anotherIconURL = "";
+        this.displayedUsername = this.username;
+        this.displayedSelfIntroduction = this.selfIntroduction;
+        this.displayedIconURL = this.iconURL;
       }
     },
   },
