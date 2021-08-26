@@ -4,13 +4,23 @@
     <aside class="side_bar">
       <nav>
         <ul>
-          <li class="list_side_bar"><a href="">ホーム</a></li>
-          <li class="list_side_bar"><a href="">ユーザーの投稿</a></li>
-          <li class="list_side_bar"><a href="">お気に入りの投稿</a></li>
-          <li class="list_side_bar"><a href="">自分の投稿</a></li>
+          <li class="list_side_bar">
+            <a href="" @click.prevent="displayLatestPosts">ホーム</a>
+          </li>
+          <li class="list_side_bar" v-if="isLoggedIn">
+            <a href="" @click.prevent="displayFolloweePosts"
+              >フォローユーザーの投稿</a
+            >
+          </li>
+          <li class="list_side_bar" v-if="isLoggedIn">
+            <a href="" @click.prevent="displayMyFavoritePosts">お気に入りの投稿</a>
+          </li>
+          <li class="list_side_bar" v-if="isLoggedIn">
+            <a href="" @click.prevent="displayMyPosts">自分の投稿</a>
+          </li>
         </ul>
       </nav>
-      <nav>
+      <nav v-if="isLoggedIn">
         <ul>
           <li class="list_side_bar ttl">フォロー</li>
           <li class="list_side_bar"><a href="">フォロー</a></li>
@@ -27,18 +37,57 @@
     <!-- メイン -->
     <div class="main">
       <div class="main_container">
-        <PostList />
+        <PostList :postList="displayedPosts" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import apiClient from "@/axios";
 import PostList from "@/components/PostList";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
     PostList,
+  },
+  data() {
+    return {
+      latestPosts: [], // 最新の投稿
+      displayedPosts: [], // 表示する投稿
+    };
+  },
+  computed: {
+    ...mapGetters("posts", ["followeePosts", "myPosts", "myFavoritePosts"]),
+    ...mapGetters("auth", ["isLoggedIn"])
+  },
+  created() {
+    Promise.all([
+      apiClient.get("/posts/"),
+      this.$store.dispatch("posts/getFolloweePosts"), // フォロイーの投稿をVuexに保存
+    ]).then((values) => {
+      this.latestPosts = values[0].data; // 最新の投稿を取得
+      this.displayedPosts = this.latestPosts; // 初期は最新の投稿を表示
+    });
+  },
+  methods: {
+    // フォローしているユーザーの投稿一覧表示
+    displayFolloweePosts() {
+      this.displayedPosts = this.followeePosts;
+    },
+    // 自分の投稿一覧表示
+    displayMyPosts() {
+      this.displayedPosts = this.myPosts;
+    },
+    // 最新の投稿を表示
+    displayLatestPosts() {
+      this.displayedPosts = this.latestPosts;
+    },
+    // お気に入りの投稿を表示
+    displayMyFavoritePosts() {
+      this.displayedPosts = this.myFavoritePosts;
+    }
   },
 };
 </script>

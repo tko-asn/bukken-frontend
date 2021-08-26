@@ -63,17 +63,18 @@ const actions = {
   async login({ commit, state }, payload) {
     // APIを実行
     const res = await apiClient.post('/auth/login/', payload).catch(err => Promise.reject(err));
-
+    
     // トークンを保存
     localStorage.setItem('token', res.data.token);
-
+    
     // id, username, email, selfIntroduciton, iconURLを保存
     commit('set', res.data);
-
-    // followsのstateにフォロー・フォロワーデータのリストを保存
+    
     await Promise.all([
-      store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }),
-      store.dispatch('follows/getFollower', { followId: state.userId, isMe: true}),
+      store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }), // フォローデータ
+      store.dispatch('follows/getFollower', { followId: state.userId, isMe: true}), // フォロワーデータ
+      store.dispatch('posts/getMyPosts'), // 自分の投稿
+      store.dispatch('posts/getMyFavoritePosts') // お気に入りの投稿
     ]);
   },
   // サインアップ
@@ -90,10 +91,11 @@ const actions = {
     // ユーザー情報をセット(stateが初期化されている状態でトークンが残っている場合)
     commit('set', res.data);
     
-    // followsのstateにフォロー・フォロワーデータのリストを保存
     await Promise.all([
-      store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }),
-      store.dispatch('follows/getFollower', { followId: state.userId, isMe: true}),
+      store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }), // フォローデータ
+      store.dispatch('follows/getFollower', { followId: state.userId, isMe: true}), // フォロワーデータ
+      store.dispatch('posts/getMyPosts'), // 自分の投稿
+      store.dispatch('posts/getMyFavoritePosts') // お気に入りの投稿
     ]);
   },
   // ログアウト
