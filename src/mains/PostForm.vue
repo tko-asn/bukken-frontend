@@ -59,8 +59,11 @@ export default {
         authorId: this.$store.getters["auth/userId"],
       };
 
-      // APIを実行
+      // 投稿を作成
       await apiClient.post("/posts/post/new", postData);
+
+      // Vuexの自分の投稿を更新
+      await this.$store.dispatch('posts/getMyPosts');
 
       // ホームページへ
       this.$router.push("/");
