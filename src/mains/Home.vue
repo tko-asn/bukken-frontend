@@ -13,7 +13,9 @@
             >
           </li>
           <li class="list_side_bar" v-if="isLoggedIn">
-            <a href="" @click.prevent="displayMyFavoritePosts">お気に入りの投稿</a>
+            <a href="" @click.prevent="displayMyFavoritePosts"
+              >お気に入りの投稿</a
+            >
           </li>
           <li class="list_side_bar" v-if="isLoggedIn">
             <a href="" @click.prevent="displayMyPosts">自分の投稿</a>
@@ -60,11 +62,11 @@ export default {
   },
   computed: {
     ...mapGetters("posts", ["followeePosts", "myPosts", "myFavoritePosts"]),
-    ...mapGetters("auth", ["isLoggedIn"])
+    ...mapGetters("auth", ["isLoggedIn"]),
   },
   created() {
     Promise.all([
-      apiClient.get("/posts/"),
+      apiClient.get("/posts/page/1"), // 1ページ目の投稿を取得
       this.$store.dispatch("posts/getFolloweePosts"), // フォロイーの投稿をVuexに保存
     ]).then((values) => {
       this.latestPosts = values[0].data; // 最新の投稿を取得
@@ -87,7 +89,7 @@ export default {
     // お気に入りの投稿を表示
     displayMyFavoritePosts() {
       this.displayedPosts = this.myFavoritePosts;
-    }
+    },
   },
 };
 </script>
