@@ -1,53 +1,51 @@
 <template>
-  <div class="area_login_form">
-    <div class="container">
-      <!-- ログインフォーム -->
-      <form @submit.prevent="login" class="login_form">
-        <!-- ラベル -->
-        <div class="head_login_form">
-          <p class="ttl">Login</p>
-        </div>
-
-        <!-- フォーム -->
-        <div class="body_login_form">
-          <!-- ユーザー名 -->
-          <input
-            class="input_username"
-            type="text"
-            placeholder="ユーザー名またはメールアドレス"
-            v-model="username"
-          />
-
-          <!-- ユーザー名のバリデーションメッセージ -->
-          <ValidationMessage :messages="usernameMessage" />
-
-          <!-- パスワード -->
-          <input
-            class="input_password"
-            type="password"
-            placeholder="パスワード"
-            v-model="password"
-          />
-
-          <!-- パスワードのバリデーションメッセージ -->
-          <ValidationMessage :messages="passwordMessage" />
-
-          <!-- ボタン -->
-          <button ref="login_button" class="btn_login">ログイン</button>
-        </div>
-      </form>
-
-      <!-- サインアップフォームのリンク -->
-      <div class="link_sign_up">
-        <p>アカウントを持っていない場合</p>
-        <router-link to="/signup">アカウントを作成</router-link>
+  <div class="container">
+    <!-- ログインフォーム -->
+    <form @submit.prevent="login" class="login_form">
+      <!-- ラベル -->
+      <div class="head_login_form">
+        <p class="ttl">Login</p>
       </div>
+
+      <!-- フォーム -->
+      <div class="body_login_form">
+        <!-- ユーザー名 -->
+        <input
+          class="input_username"
+          type="text"
+          placeholder="ユーザー名またはメールアドレス"
+          v-model="username"
+        />
+
+        <!-- ユーザー名のバリデーションメッセージ -->
+        <ValidationMessage :messages="usernameMessage" />
+
+        <!-- パスワード -->
+        <input
+          class="input_password"
+          type="password"
+          placeholder="パスワード"
+          v-model="password"
+        />
+
+        <!-- パスワードのバリデーションメッセージ -->
+        <ValidationMessage :messages="passwordMessage" />
+
+        <!-- ボタン -->
+        <button ref="login_button" class="btn_login">ログイン</button>
+      </div>
+    </form>
+
+    <!-- サインアップフォームのリンク -->
+    <div class="link_sign_up">
+      <p>アカウントを持っていない場合</p>
+      <router-link to="/signup">アカウントを作成</router-link>
     </div>
   </div>
 </template>
 
 <script>
-import ValidationMessage from '@/components/ValidationMessage';
+import ValidationMessage from "@/components/ValidationMessage";
 
 export default {
   components: {
@@ -79,8 +77,8 @@ export default {
 
       // バリデーションメッセージが格納されている場合は終了
       if (
-        this.usernameMessage.length || 
-        this.emailMessage.length || 
+        this.usernameMessage.length ||
+        this.emailMessage.length ||
         this.passwordMessage.length
       ) {
         // ボタンを有効化
@@ -94,23 +92,24 @@ export default {
         password: this.password,
       };
 
-      this.$store.dispatch("auth/login", payload)
-      .then(() => {
-        // 遷移先のパス
-        let nextPage = '/';
+      this.$store
+        .dispatch("auth/login", payload)
+        .then(() => {
+          // 遷移先のパス
+          let nextPage = "/";
 
-        // クエリパラメータが設定されている場合
-        if (this.$route.query.next) {
-          nextPage = this.$route.query.next;
-        }
-        
-        // ホームページへ
-        this.$router.replace(nextPage);
-      })
-      .catch(() => {
-        // ボタンの有効化
-        buttonElement.disabled = false;
-      });
+          // クエリパラメータが設定されている場合
+          if (this.$route.query.next) {
+            nextPage = this.$route.query.next;
+          }
+
+          // ホームページへ
+          this.$router.replace(nextPage);
+        })
+        .catch(() => {
+          // ボタンの有効化
+          buttonElement.disabled = false;
+        });
     },
     validate() {
       // ユーザー名のバリデーション（最大1個）
@@ -126,7 +125,7 @@ export default {
       if (!this.password) {
         this.passwordMessage.push("パスワードを入力して下さい。");
       }
-    }
+    },
   },
 };
 </script>
@@ -139,8 +138,6 @@ a {
 }
 
 .container {
-  max-width: 1160px;
-  margin: 0 auto;
   padding: 190px 0 0;
 }
 
@@ -149,6 +146,7 @@ a {
   max-width: 510px;
   height: 400px;
   margin: 0 auto;
+  border: 4px solid rgb(143, 141, 141);
   border-radius: 7px;
   background: #fff;
 }
