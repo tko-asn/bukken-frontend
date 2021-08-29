@@ -54,6 +54,28 @@ const actions = {
 
     // Vuexにセット
     commit('setFolloweePosts', res.data);
+  },
+  // お気に入りの投稿追加
+  async addFavoritePost({ dispatch }, { userId, postId }) {
+    const params = {
+      userId, // お気に入りに追加するユーザーのID
+      postId, // お気に入りの投稿のID
+    };
+    
+    // お気に入りの投稿を追加
+    await apiClient.post('/posts/create/favorite/', params).catch(err => Promise.reject(err));
+    
+    // お気に入りの投稿リストを更新
+    await dispatch('getMyFavoritePosts').catch(err => Promise.reject(err));
+  },
+  // お気に入りの投稿削除
+  async removeFavoritePost({ dispatch }, { userId, postId }) {
+    // お気に入りの投稿を削除
+    await apiClient.delete('/posts/' + postId + '/remove/favorite/' + userId + '/')
+    .catch(err => Promise.reject(err))
+    
+    // お気に入りの投稿リストを更新
+    await dispatch('getMyFavoritePosts').catch(err => Promise.reject(err));
   }
 };
 
