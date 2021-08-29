@@ -4,7 +4,12 @@
     <!-- 投稿がある場合 -->
     <template v-if="postList.length">
       <!-- 投稿 -->
-      <section class="post_card" v-for="post in postList" :key="post.id">
+      <section
+        class="post_card"
+        v-for="post in postList"
+        :key="post.id"
+        @click="moveToPostPage(post.id)"
+      >
         <div class="card_container">
           <!-- タイトル -->
           <h3 class="ttl">
@@ -41,6 +46,11 @@ export default {
   props: {
     postList: Array, // 投稿リスト
   },
+  methods: {
+    moveToPostPage(id) {
+      this.$router.push({ name: "postDetails", params: { postId: id } });
+    },
+  },
 };
 </script>
 
@@ -70,6 +80,7 @@ p {
   border-radius: 5px;
   box-shadow: 0 4px 6px rgb(70, 69, 69);
   background: #fff;
+  cursor: pointer;
 }
 
 .card_container {

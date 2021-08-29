@@ -20,6 +20,9 @@ const EditProfileForm = () => import(
 const PostForm = () => import(
   /* webpackChankName: 'PostForm' */ './mains/PostForm'
 );
+const PostDetails = () => import(
+  /* webpackChankName: 'PostDetails' */ './mains/PostDetails'
+);
 const SelfIntroduction = () => import(
   /* webpackChankName: 'SelfIntroduction' */ './components/SelfIntroduction'
 );
@@ -77,6 +80,12 @@ const router = new VueRouter({
       component: EditProfileForm,
       name: 'editProfile',
       meta: { requiredAuth: true }
+    },
+    {
+      path: '/post/:postId',
+      component: PostDetails,
+      name: 'postDetails',
+      props: true,
     },
     { path: '*', redirect: '/' },
   ],
