@@ -24,10 +24,14 @@
             <p class="sub_ttl">{{ post.user.username }}</p>
           </div>
 
-          <!-- 内容 -->
-          <div class="content">
-            <p class="sub_ttl">{{ post.text }}</p>
-          </div>
+          <!-- 物件情報 -->
+          <section class="property">
+            <h4>質問対象の物件</h4>
+            <p class="sub_ttl">{{ post.property }}</p>
+            <p class="sub_ttl">
+              {{ addressData(post) }}
+            </p>
+          </section>
         </div>
       </section>
     </template>
@@ -46,6 +50,19 @@ export default {
   props: {
     postList: Array, // 投稿リスト
   },
+  computed: {
+    // 住所のデータ
+    addressData() {
+      return (post) => {
+        return (
+          post.address.prefecture +
+          post.address.municipality +
+          post.address.townName +
+          post.address.buildingName
+        );
+      };
+    },
+  },
   methods: {
     moveToPostPage(id) {
       this.$router.push({ name: "postDetails", params: { postId: id } });
@@ -57,6 +74,7 @@ export default {
 <style scoped>
 /* 基本設定 */
 h3,
+h4,
 p {
   margin: 0;
 }
@@ -93,14 +111,18 @@ p {
 
 /* タイトル */
 .ttl {
+  max-height: 30px;
+  overflow: hidden;
   font-size: 1.3em;
 }
 
 /* 投稿者表示部分 */
 .author {
+  max-height: 40px;
   display: flex;
+  overflow: hidden;
   align-items: center;
-  margin-top: 10px;
+  margin: 10px 0;
 }
 
 .icon {
@@ -116,15 +138,14 @@ p {
   object-fit: cover;
 }
 
-/* 投稿内容部分 */
-.content {
-  margin-top: 20px;
-  overflow-wrap: break-word;
-}
-
 .sub_ttl {
+  overflow: hidden;
   color: rgb(78, 76, 76);
   font-size: 1.1em;
+}
+
+.property > h4 {
+  color: rgb(97, 97, 97);
 }
 
 /* 投稿がない場合 */
