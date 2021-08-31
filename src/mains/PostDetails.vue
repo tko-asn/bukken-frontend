@@ -4,6 +4,17 @@
       <article class="content">
         <!-- タイトル -->
         <h6 class="ttl">{{ post.title }}</h6>
+        <!-- 物件情報 -->
+        <div class="property">
+          <h4>対象物件</h4>
+          <!-- 物件名 -->
+          <p>{{ post.property }}</p>
+          <!-- 物件住所 -->
+          <p>
+            {{ addressData("prefecture") }}{{ addressData("municipality") }}
+            {{ addressData("townName") }}{{ addressData("buildingName") }}
+          </p>
+        </div>
         <p class="updated_at">{{ post.updatedAt }}</p>
         <!-- 内容 -->
         <p class="text">{{ post.text }}</p>
@@ -167,6 +178,10 @@ export default {
       }
       return false;
     },
+    // 住所のデータ
+    addressData() {
+      return (key) => this.post.address?.[key];
+    },
   },
   methods: {
     // お気に入りの投稿を追加
@@ -311,6 +326,20 @@ a {
 .text {
   min-height: 50px;
   margin: 30px 0;
+}
+
+/* 物件情報 */
+.property {
+  margin: 20px 0 5px;
+}
+
+.property > h4,
+p {
+  margin: 0;
+}
+
+.property > p {
+  font-size: 0.9em;
 }
 
 /* 投稿日時 */
