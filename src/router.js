@@ -17,11 +17,14 @@ const UserView = () => import(
 const EditProfileForm = () => import(
   /* webpackChankName: 'EditProfileForm' */ './mains/EditProfileForm'
 );
-const PostForm = () => import(
-  /* webpackChankName: 'PostForm' */ './mains/PostForm'
-);
 const PostDetails = () => import(
   /* webpackChankName: 'PostDetails' */ './mains/PostDetails'
+);
+const PostForm = () => import(
+  /* webpackChankName: 'PostForm' */ './components/PostForm'
+);
+const PostList = () => import(
+  /* webpackChankName: 'PostList' */ './components/PostList'
 );
 const SelfIntroduction = () => import(
   /* webpackChankName: 'SelfIntroduction' */ './components/SelfIntroduction'
@@ -44,15 +47,21 @@ Vue.use(VueRouter);
 const router = new VueRouter({
   mode: 'history',
   routes: [
-    { path: '/', component: Home, name: 'home' },
+    {
+      path: '/',
+      component: Home,
+      children: [
+        { path: '', component: PostList, name: 'home' },
+        {
+          path: 'post/form',
+          component: PostForm,
+          name: 'postForm',
+          meta: { requiredAuth: true }
+        }
+      ]
+    },
     { path: '/login', component: LoginForm, name: 'login' },
     { path: '/signup', component: SignUpForm, name: 'signUp' },
-    { 
-      path: '/post/form', 
-      component: PostForm, 
-      name: 'postForm', 
-      meta: { requiredAuth: true },
-    },
     {
       path: '/user/:id',
       component: UserView,

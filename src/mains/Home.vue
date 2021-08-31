@@ -39,7 +39,9 @@
     <!-- メイン -->
     <div class="main">
       <div class="main_container">
-        <PostList :postList="displayedPosts" />
+        <router-view
+          :postList="displayedPosts"
+        />
       </div>
     </div>
   </div>
@@ -47,13 +49,9 @@
 
 <script>
 import apiClient from "@/axios";
-import PostList from "@/components/PostList";
 import { mapGetters } from "vuex";
 
 export default {
-  components: {
-    PostList,
-  },
   data() {
     return {
       latestPosts: [], // 最新の投稿
@@ -74,23 +72,47 @@ export default {
     });
   },
   methods: {
+    // 投稿を表示する画面に遷移
+    switchRoute() {
+      if (this.$route.name !== 'home') {
+        this.$router.push('/');
+      }
+    },
     // フォローしているユーザーの投稿一覧表示
     displayFolloweePosts() {
+      this.switchRoute();
       this.displayedPosts = this.followeePosts;
     },
     // 自分の投稿一覧表示
     displayMyPosts() {
+      this.switchRoute();
       this.displayedPosts = this.myPosts;
     },
     // 最新の投稿を表示
     displayLatestPosts() {
+      this.switchRoute();
       this.displayedPosts = this.latestPosts;
     },
     // お気に入りの投稿を表示
     displayMyFavoritePosts() {
+      this.switchRoute();
       this.displayedPosts = this.myFavoritePosts;
-    },
+    }
   },
+  beforeRouteUpdate(to, from, next) {
+    // 投稿画面から遷移したとき
+    if (to.name === "home") {
+      Promise.all([
+        apiClient.get("/posts/page/1"), // 1ページ目の投稿を取得
+        this.$store.dispatch("posts/getFolloweePosts"), // フォロイーの投稿をVuexに保存
+      ]).then((values) => {
+        this.latestPosts = values[0].data; // 最新の投稿を取得
+        this.displayedPosts = this.latestPosts; // 初期は最新の投稿を表示
+        next();
+      });
+    }
+    next();
+  }
 };
 </script>
 
