@@ -4,34 +4,85 @@
     <aside class="side_bar">
       <nav>
         <ul>
-          <li class="list_side_bar">
+          <li>
             <a href="" @click.prevent="displayLatestPosts">ホーム</a>
           </li>
-          <li class="list_side_bar" v-if="isLoggedIn">
+          <li v-if="isLoggedIn">
             <a href="" @click.prevent="displayFolloweePosts"
               >フォローユーザーの投稿</a
             >
           </li>
-          <li class="list_side_bar" v-if="isLoggedIn">
+          <li v-if="isLoggedIn">
             <a href="" @click.prevent="displayMyFavoritePosts"
               >お気に入りの投稿</a
             >
           </li>
-          <li class="list_side_bar" v-if="isLoggedIn">
+          <li v-if="isLoggedIn">
             <a href="" @click.prevent="displayMyPosts">自分の投稿</a>
           </li>
         </ul>
       </nav>
-      <nav v-if="isLoggedIn">
+      <nav class="follow_list">
         <ul>
-          <li class="list_side_bar ttl">フォロー</li>
-          <li class="list_side_bar"><a href="">フォロー</a></li>
-          <li class="list_side_bar"><a href="">フォロワー</a></li>
+          <!-- フォローしているユーザーのリストを表示 -->
+          <template v-if="isLoggedIn">
+            <li class="ttl">フォロー</li>
+            <li>
+              <a href="" @click.prevent="toggleUser('followee')">フォロー</a>
+              <!-- ドロップダウンメニュー -->
+              <ul class="list_user" v-show="showFolloweeList">
+                <li v-for="followObj in follow" :key="followObj.id">
+                  <router-link to="home">
+                    <div class="icon">
+                      <img :src="followObj.follow.iconURL" />
+                    </div>
+                    <p>{{ followObj.follow.username }}</p>
+                  </router-link>
+                </li>
+                <a
+                  class="btn_close"
+                  href=""
+                  @click.prevent="closeUserList('followee')"
+                  >閉じる</a
+                >
+              </ul>
+            </li>
+
+            <!-- フォロワーのリストを表示 -->
+            <li>
+              <a href="" @click.prevent="toggleUser('follower')">フォロワー</a>
+              <!-- ドロップダウンメニュー -->
+              <ul class="list_user" v-show="showFollowerList">
+                <li v-for="followerObj in follower" :key="followerObj.id">
+                  <router-link to="home">
+                    <div class="icon">
+                      <img :src="followerObj.user.iconURL" />
+                    </div>
+                    <p>{{ followerObj.user.username }}</p>
+                  </router-link>
+                </li>
+                <a
+                  class="btn_close"
+                  href=""
+                  @click.prevent="closeUserList('follower')"
+                  >閉じる</a
+                >
+              </ul>
+            </li>
+          </template>
+          <template v-else>
+            <li class="list_no_login">
+              <p>ログインするとフォロー機能を使用できます</p>
+              <router-link to="/login" class="btn_login" tag="button"
+                >ログイン</router-link
+              >
+            </li>
+          </template>
         </ul>
       </nav>
       <div class="side_footer">
         <ul>
-          <li class="list_side_bar"><a href="">サイト概要</a></li>
+          <li><a href="">サイト概要</a></li>
         </ul>
       </div>
     </aside>
@@ -39,9 +90,7 @@
     <!-- メイン -->
     <div class="main">
       <div class="main_container">
-        <router-view
-          :postList="displayedPosts"
-        />
+        <router-view :postList="displayedPosts" />
       </div>
     </div>
   </div>
@@ -56,11 +105,14 @@ export default {
     return {
       latestPosts: [], // 最新の投稿
       displayedPosts: [], // 表示する投稿
+      showFolloweeList: false,
+      showFollowerList: false,
     };
   },
   computed: {
     ...mapGetters("posts", ["followeePosts", "myPosts", "myFavoritePosts"]),
     ...mapGetters("auth", ["isLoggedIn"]),
+    ...mapGetters("follows", ["follow", "follower"]),
   },
   created() {
     Promise.all([
@@ -74,8 +126,8 @@ export default {
   methods: {
     // 投稿を表示する画面に遷移
     switchRoute() {
-      if (this.$route.name !== 'home') {
-        this.$router.push('/');
+      if (this.$route.name !== "home") {
+        this.$router.push("/");
       }
     },
     // フォローしているユーザーの投稿一覧表示
@@ -97,7 +149,26 @@ export default {
     displayMyFavoritePosts() {
       this.switchRoute();
       this.displayedPosts = this.myFavoritePosts;
-    }
+    },
+    // フォローしているユーザーの表示を切り替える
+    toggleUser(userType) {
+      // フォローしているユーザーのドロップダウンメニュー
+      if (userType === "followee") {
+        this.showFolloweeList = !this.showFolloweeList;
+
+        // フォロワーのドロップダウンメニュー
+      } else if (userType === "follower") {
+        this.showFollowerList = !this.showFollowerList;
+      }
+    },
+    // ユーザーのドロップダウンメニューを閉じる
+    closeUserList(userType) {
+      if (userType === "followee") {
+        this.showFolloweeList = false;
+      } else if (userType === "follower") {
+        this.showFollowerList = false;
+      }
+    },
   },
   beforeRouteUpdate(to, from, next) {
     // 投稿画面から遷移したとき
@@ -112,7 +183,7 @@ export default {
       });
     }
     next();
-  }
+  },
 };
 </script>
 
@@ -146,14 +217,10 @@ a {
   background: rgb(76, 26, 92);
 }
 
-.list_side_bar {
-  height: 50px;
-}
-
 .ttl {
   display: flex;
   align-items: center;
-  height: 60px;
+  height: 50px;
   padding-left: 30px;
   color: white;
   font-size: 1.2em;
@@ -162,7 +229,7 @@ a {
 nav a {
   display: flex;
   align-items: center;
-  height: 100%;
+  height: 50px;
   padding-left: 30px;
 }
 
@@ -171,9 +238,38 @@ nav a:hover {
   cursor: pointer;
 }
 
+/* フォロイー・フォロワー表示部分 */
+.follow_list {
+  padding: 10px 0;
+}
+
+.list_user a {
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+.list_user a > p {
+  margin-left: 20px;
+  overflow: hidden;
+  color: white;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  background: silver;
+}
+
+.icon > img {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+}
+
 .side_footer {
   flex: 1;
-  min-height: 300px;
+  min-height: 250px;
   padding: 30px 30px;
   background: rgb(76, 26, 92);
   color: white;
@@ -182,6 +278,35 @@ nav a:hover {
 
 nav {
   border-bottom: 2px solid gray;
+}
+
+.btn_close {
+  padding: 5px 30px;
+  font-size: 0.9em;
+}
+
+/* ログインしていない場合のフォロー部分 */
+.list_no_login {
+  min-height: 100px;
+  padding: 20px;
+}
+
+.list_no_login > p {
+  color: silver;
+  font-size: 0.7em;
+}
+
+.btn_login {
+  display: block;
+  width: 130px;
+  height: 40px;
+  margin: 0 auto;
+  border-radius: 3px;
+  border-color: rgb(76, 26, 92);
+  background: rgba(168, 129, 168, 0.966);
+  color: white;
+  font-size: 1.1em;
+  cursor: pointer;
 }
 
 /* メイン部分 */
