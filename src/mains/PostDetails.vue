@@ -1,72 +1,92 @@
 <template>
   <div class="container">
-    <div class="post_details">
-      <article class="content">
+    <div class="container__item-post-details">
+      <article class="block-content">
         <!-- タイトル -->
-        <h6 class="ttl">{{ post.title }}</h6>
+        <p class="block-content__title">{{ post.title }}</p>
         <!-- 物件情報 -->
-        <div class="property">
-          <h4>対象物件</h4>
+        <div class="item-property">
+          <h4 class="item-property__title">対象物件</h4>
           <!-- 物件名 -->
-          <p>{{ post.property }}</p>
+          <p class="item-property__text">{{ post.property }}</p>
           <!-- 物件住所 -->
-          <p>
-            {{ addressData("prefecture") }}{{ addressData("municipality") }}
-            {{ addressData("townName") }}{{ addressData("buildingName") }}
+          <p class="item-property__text">
+            {{ addressData(post.address) }}
           </p>
         </div>
-        <p class="updated_at">{{ post.updatedAt }}</p>
+        <p class="block-content__updated-at">{{ post.updatedAt }}</p>
         <!-- 内容 -->
-        <p class="text">{{ post.text }}</p>
-        <div class="bottom">
+        <p class="block-content__text">{{ post.text }}</p>
+        <!-- 下部 -->
+        <div class="item-bottom">
           <!-- お気に入りボタン -->
           <a
-            class="btn_content"
+            class="item-bottom__btn"
             href=""
             @click.prevent="createFavoritePost"
             v-show="!isYourFavoritePost"
             >お気に入りに追加</a
           >
           <a
-            class="btn_content"
+            class="item-bottom__btn"
             href=""
             @click.prevent="deleteFavoritePost"
             v-show="isYourFavoritePost"
             >お気に入り解除</a
           >
           <!-- 投稿者 -->
-          <div class="author" @click="moveToUserPage">
+          <div class="item-bottom__author" @click="moveToUserPage">
             <!-- アイコン -->
-            <div class="icon">
-              <img :src="post.user.icon_url" v-if="post.user.icon_url" />
+            <div class="block-icon">
+              <img
+                class="block-icon__img"
+                :src="post.user.icon_url"
+                v-if="post.user.icon_url"
+              />
             </div>
             <!-- ユーザー名 -->
-            <p class="username">{{ post.user.username }}</p>
+            <p class="item-bottom__username">{{ post.user.username }}</p>
           </div>
+        </div>
+        <!-- カテゴリ― -->
+        <div class="item-category">
+          <p class="item-category__title" v-show="categoryLength(post)">
+            カテゴリ―
+          </p>
+          <span
+            class="item-category__item"
+            v-for="category in post.categories"
+            :key="category.secondCategory"
+          >
+            {{ category.firstCategory }}/{{ category.secondCategory }}
+          </span>
         </div>
 
         <!-- 回答フォーム -->
-        <div class="answer_form">
+        <div class="form-answer">
           <!-- ログイン済み -->
           <template v-if="isLoggedIn">
             <textarea
+              class="form-answer__textarea"
               cols="30"
               rows="10"
               placeholder="回答を投稿する"
               v-model="newAnswer"
             ></textarea>
             <ValidationMessage
-              class="validation"
+              class="form-answer__validation"
               :messages="answerValidations"
               v-show="answerValidations.length"
             />
-            <button class="btn_answer" @click="postAnswer">回答</button>
+            <button class="form-answer__btn" @click="postAnswer">回答</button>
           </template>
 
           <!-- 未ログイン -->
           <template v-else>
-            <p>回答するにはログインする必要があります</p>
-            <button class="btn_answer" @click="postAnswer">
+            <p class="form-answer__text">
+              回答するにはログインする必要があります
+            </p>
+            <button class="form-answer__btn" @click="postAnswer">
               今すぐログイン
             </button>
           </template>
@@ -74,39 +94,43 @@
       </article>
 
       <!-- 回答 -->
-      <div class="content">
-        <p class="ttl_answer">{{ post.answers.length }}件の回答</p>
+      <div class="block-content">
+        <p class="block-content__title">{{ post.answers.length }}件の回答</p>
         <section
-          class="answer_section"
+          class="block-content__section"
           v-for="answer in post.answers"
           :key="answer.id"
         >
-          <p class="text">{{ answer.content }}</p>
-          <div class="bottom">
+          <p class="block-content__text">{{ answer.content }}</p>
+          <div class="item-bottom">
             <a
-              class="btn_content"
+              class="item-bottom__btn"
               href=""
               v-show="!answer.likedBy.find((el) => el.id === userId)"
               @click.prevent="like(answer.id)"
               >いいね</a
             >
             <a
-              class="btn_content"
+              class="item-bottom__btn"
               href=""
               v-show="answer.likedBy.find((el) => el.id === userId)"
               @click.prevent="dislike(answer.id)"
               >いいね解除</a
             >
-            <div class="author">
-              <div class="icon">
-                <img :src="answer.user.icon_url" />
+            <div class="item-bottom__author">
+              <div class="block-icon">
+                <img class="block-icon__img" :src="answer.user.icon_url" />
               </div>
-              <p class="username">{{ answer.user.username }}</p>
+              <p class="item-bottom__username">{{ answer.user.username }}</p>
             </div>
           </div>
-          <p class="answered_at">{{ answer.updatedAt }}</p>
+          <p
+            class="block-content__updated-at block-content__updated-at--answer"
+          >
+            {{ answer.updatedAt }}
+          </p>
         </section>
-        <p class="text_no_answer" v-if="!post.answers.length">
+        <p class="block-content__no-text" v-if="!post.answers.length">
           まだ回答がありません
         </p>
       </div>
@@ -180,7 +204,20 @@ export default {
     },
     // 住所のデータ
     addressData() {
-      return (key) => this.post.address?.[key];
+      return (address) => {
+        return (
+          address?.["prefecture"] +
+          address?.["municipality"] +
+          address?.["townName"] +
+          address?.["buildingName"]
+        );
+      };
+    },
+    // カテゴリーの数
+    categoryLength() {
+      return (post) => {
+        return post.categories?.length;
+      };
     },
   },
   methods: {
@@ -293,6 +330,7 @@ a {
 
 .container {
   display: flex;
+  justify-content: space-around;
   width: 85%;
   margin: 0 auto;
   padding-top: 50px;
@@ -300,64 +338,61 @@ a {
 }
 
 /* 投稿詳細部分 */
-.post_details {
+.container__item-post-details {
   padding-top: 25px;
-  width: 75%;
+  width: 65%;
 }
 
 /* 質問部分 */
-.content {
+.block-content {
   margin-bottom: 40px;
   padding: 20px;
   border-radius: 2px;
   background: white;
-  box-shadow: 0 5px 5px rgb(155, 153, 153);
+  box-shadow: 0 3px 2px rgb(158, 156, 156);
   overflow-wrap: break-word;
 }
 
 /* タイトル */
-.ttl {
+.block-content__title {
   margin: 10px 0;
-  font-weight: normal;
-  font-size: 1.8em;
+  font-size: 1.5em;
+  letter-spacing: 3px;
 }
 
 /* 内容 */
-.text {
+.block-content__text {
   min-height: 50px;
   margin: 30px 0;
 }
 
 /* 物件情報 */
-.property {
-  margin: 20px 0 5px;
+.item-property__title {
+  margin: 20px 0 0;
 }
 
-.property > h4,
-p {
+.item-property__text {
   margin: 0;
-}
-
-.property > p {
   font-size: 0.9em;
 }
 
 /* 投稿日時 */
-.updated_at {
+.block-content__updated-at {
   border-bottom: 1px solid silver;
   color: gray;
   font-size: 0.8em;
 }
 
 /* コンテンツ下部 */
-.bottom {
+.item-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 10px 0;
 }
 
 /* コンテンツ内ボタン */
-.btn_content {
+.item-bottom__btn {
   padding: 10px 20px;
   border: 2.4px solid rgba(83, 83, 224, 0.808);
   border-radius: 5px;
@@ -365,12 +400,12 @@ p {
   font-weight: bold;
 }
 
-.btn_content:hover {
+.item-bottom__btn:hover {
   background: rgb(173, 171, 171);
 }
 
 /* 投稿者 */
-.author {
+.item-bottom__author {
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -379,20 +414,20 @@ p {
 }
 
 /* アイコン */
-.icon {
+.block-icon {
   width: 40px;
   height: 40px;
   background: silver;
 }
 
-.icon > img {
+.block-icon__img {
   width: 40px;
   height: 40px;
   object-fit: cover;
 }
 
 /* ユーザー名 */
-.username {
+.item-bottom__username {
   min-width: 80px;
   max-width: 100px;
   margin-left: 10px;
@@ -401,16 +436,34 @@ p {
   font-size: 0.9em;
 }
 
+/* カテゴリ― */
+.item-category {
+  font-size: 0.8em;
+}
+
+.item-category__title {
+  margin-bottom: 0;
+}
+
+.item-category__item {
+  display: inline-block;
+  margin: 5px 0 20px;
+  color: rgb(109, 108, 108);
+}
+
+.item-category__item + .item-category__item {
+  margin-left: 15px;
+}
+
 /* 回答フォーム */
-.answer_form {
+.form-answer {
   display: flex;
   flex-direction: column;
-  margin-top: 50px;
   padding-top: 30px;
   border-top: 1px solid silver;
 }
 
-.answer_form > textarea {
+.form-answer__textarea {
   height: 100px;
   padding: 10px;
   border-color: silver;
@@ -419,13 +472,13 @@ p {
   letter-spacing: 2px;
 }
 
-.answer_form > p {
+.form-answer__text {
   margin: 0;
   font-size: 0.8em;
   text-align: center;
 }
 
-.btn_answer {
+.form-answer__btn {
   height: 50px;
   margin: 30px 0;
   border-color: white;
@@ -436,36 +489,28 @@ p {
   cursor: pointer;
 }
 
-.btn_answer:hover {
+.form-answer__btn:hover {
   opacity: 0.8;
 }
 
-.validation {
+.form-answer__validation {
   margin: 0;
 }
 
-/* 回答 */
-.ttl_answer {
-  margin: 0 0 40px;
-  font-size: 1.5em;
-  letter-spacing: 3px;
+/* 回答日時 */
+.block-content__updated-at--answer {
+  display: flex;
+  justify-content: flex-end;
+  border: none;
 }
 
-.answer_section + .answer_section {
+/* 回答 */
+.block-content__section + .block-content__section {
   border-top: 1px solid silver;
 }
 
-/* 回答日時 */
-.answered_at {
-  display: flex;
-  justify-content: flex-end;
-  margin: 5px 0;
-  color: gray;
-  font-size: 0.8em;
-}
-
 /* 回答がない場合 */
-.text_no_answer {
+.block-content__no-text {
   margin: 0 0 30px;
   color: gray;
   text-align: center;
