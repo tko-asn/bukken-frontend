@@ -1,12 +1,12 @@
 <template>
   <!-- 投稿フォーム -->
-  <form @submit.prevent class="post_form">
+  <form @submit.prevent class="form-post">
     <!-- 見出し -->
-    <h1 class="head_form">質問投稿</h1>
+    <h1 class="form-post__title">質問投稿</h1>
 
     <!-- タイトル -->
     <input
-      class="input_title"
+      class="form-post__input-title"
       type="text"
       placeholder="タイトル"
       @keydown.enter.prevent
@@ -15,7 +15,7 @@
 
     <!-- 物件名 -->
     <input
-      class="input_property"
+      class="form-post__input-property"
       type="text"
       placeholder="物件名"
       @keydown.enter.prevent
@@ -23,7 +23,7 @@
     />
 
     <ValidationMessage
-      class="validation"
+      class="form-post__validation"
       :messages="validations.property"
       v-show="validations.property.length"
     />
@@ -31,7 +31,7 @@
     <!-- 内容 -->
     <textarea
       name="text"
-      class="input_text"
+      class="form-post__input-text"
       cols="30"
       rows="8"
       placeholder="質問内容"
@@ -39,12 +39,12 @@
     ></textarea>
 
     <!-- 住所 -->
-    <div class="address_form">
-      <h6>物件住所</h6>
-      <div class="postal_code_form">
-        <p>郵便番号を入力してください（半角）</p>
+    <div class="form-post__item">
+      <p class="form-post__item__title">物件住所</p>
+      <p class="form-post__item__text">郵便番号を入力してください（半角）</p>
+      <div class="form-post__item__item-postal-code">
         <input
-          class="input_postal_code_A"
+          class="form-post__item__item-postal-code__input-a"
           type="text"
           placeholder="xxx"
           @keydown.enter.prevent
@@ -53,7 +53,7 @@
         />
         <span>-</span>
         <input
-          class="input_postal_code_B"
+          class="form-post__item__item-postal-code__input-b"
           type="text"
           placeholder="xxxx"
           @keydown.enter.prevent
@@ -63,7 +63,7 @@
       </div>
 
       <ValidationMessage
-        class="validation"
+        class="form-post__validation"
         :messages="validations.postalCode"
         v-show="validations.postalCode.length"
       />
@@ -71,26 +71,26 @@
       <!-- 郵便番号が入力されたら表示 -->
       <template v-if="prefecture && municipality">
         <input
-          class="input_prefecture"
+          class="form-post__item__input-prefecture"
           type="text"
           v-model="prefecture"
           readonly
         />
         <input
-          class="input_municipality"
+          class="form-post__item__input-municipality"
           type="text"
           v-model="municipality"
           readonly
         />
         <input
-          class="input_town_name"
+          class="form-post__item__input-town-name"
           type="text"
           placeholder="町名・番地"
           @keydown.enter.prevent
           v-model="townName"
         />
         <input
-          class="input_building_name"
+          class="form-post__item__input-building-name"
           type="text"
           placeholder="アパート・マンション名"
           @keydown.enter.prevent
@@ -99,8 +99,21 @@
       </template>
     </div>
 
+    <!-- カテゴリー -->
+    <div class="form-post__item">
+      <p class="form-post__item__title">カテゴリ</p>
+      <p class="form-post__item__text">※3つまで選択可</p>
+      <CategoryForm
+        :selectedCategories="selectedCategories"
+        @add="selectedCategories.push($event)"
+      />
+
+      <!-- 選択済みカテゴリー -->
+      <Tag :tags="selectedCategories" @delete="removeCategory" />
+    </div>
+
     <!-- ボタン -->
-    <button class="btn_post" @click="createPost" :disabled="isDisabled">
+    <button class="form-post__btn" @click="createPost" :disabled="isDisabled">
       投稿
     </button>
   </form>
@@ -109,11 +122,15 @@
 <script>
 import apiClient from "@/axios";
 import ValidationMessage from "@/components/ValidationMessage";
+import CategoryForm from "@/components/CategoryForm";
+import Tag from "@/components/Tag";
 const YubinBango = require("yubinbango-core2");
 
 export default {
   components: {
     ValidationMessage,
+    Tag,
+    CategoryForm,
   },
   data() {
     return {
@@ -130,6 +147,8 @@ export default {
       postalCodeA: "",
       postalCodeB: "",
       isDisabled: true, // ボタン無効化
+      // 選択したカテゴリーのリスト
+      selectedCategories: [],
       // バリデーションメッセージ
       validations: {
         property: [], // 物件名
@@ -189,11 +208,19 @@ export default {
         buildingName: this.buildingName,
       };
 
-      // 住所のIDを取得
-      const res = await apiClient.post(
-        "/addresses/find/or/create/",
-        addressData
-      );
+      // 住所とカテゴリーのIDを取得
+      const [addressRes, categoryRes] = await Promise.all([
+        apiClient.post(
+          // 住所のIDを取得
+          "/addresses/find/or/create/",
+          addressData
+        ),
+        apiClient.post(
+          // カテゴリーのIDのリストを取得
+          "/categories/find/or/create/",
+          this.selectedCategories
+        ),
+      ]);
 
       // 投稿データを作成
       const postData = {
@@ -201,17 +228,34 @@ export default {
         property: this.property,
         text: this.text,
         authorId: this.$store.getters["auth/userId"],
-        addressId: res.data.addressId, // 取得した住所のID
+        addressId: addressRes.data.addressId, // 取得した住所のID
       };
 
       // 投稿を作成
-      await apiClient.post("/posts/post/new", postData);
+      const postRes = await apiClient.post("/posts/post/new", postData);
+
+      // 投稿モデルとカテゴリーモデルの中間テーブルのデータ作成
+      await Promise.all(
+        categoryRes.data.map(
+          async (categoryId) =>
+            await apiClient.post("/posts/set/category", {
+              postId: postRes.data.id,
+              categoryId: categoryId,
+            })
+        )
+      );
 
       // Vuexの自分の投稿を更新
       await this.$store.dispatch("posts/getMyPosts");
 
       // ホームページへ
-      this.$router.push("/");
+      this.$router.replace("/");
+    },
+    // 選択中のカテゴリを削除
+    removeCategory(tagId) {
+      this.selectedCategories = this.selectedCategories.filter(
+        (el) => el.id !== tagId
+      );
     },
   },
   watch: {
@@ -247,7 +291,7 @@ export default {
 
 <style scoped>
 /* 投稿フォーム */
-.post_form {
+.form-post {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
@@ -255,7 +299,7 @@ export default {
 }
 
 /* フォームラベル */
-.head_form {
+.form-post__title {
   margin: 0;
   color: rgb(58, 65, 61);
 }
@@ -271,55 +315,55 @@ export default {
 }
 
 /* 内容入力欄 */
-.input_text {
+.form-post__input-text {
   height: 300px;
   padding: 10px;
   font-size: 1.4em;
 }
 
 /* 住所 */
-.address_form {
+.form-post__item {
   display: flex;
   flex-direction: column;
-  margin: 30px 0;
+  margin: 30px 0 0;
 }
 
-.address_form > h6 {
+.form-post__item__title {
   margin: 0;
   font-size: 1.3em;
   letter-spacing: 2px;
 }
 
-.address_form > [class*="input"] {
+[class*="form-post__item__input"] {
   width: 70%;
 }
 
-.input_postal_code_A {
+.form-post__item__item-postal-code__input-a {
   margin: 0;
   width: 40px;
 }
 
-.input_postal_code_B {
+.form-post__item__item-postal-code__input-b {
   margin: 0;
   width: 60px;
 }
 
-.address_form > input:read-only {
+.form-post__item > input:read-only {
   background: rgb(216, 214, 214);
 }
 
-.postal_code_form > span {
+.form-post__item__item-postal-code > span {
   padding: 0 10px;
 }
 
-.postal_code_form > p {
+.form-post__item__text {
   margin: 10px 1px 5px;
   font-size: 0.8em;
   color: rgb(78, 77, 77);
 }
 
 /* ボタン */
-.btn_post {
+.form-post__btn {
   width: 40%;
   height: 50px;
   margin: 10px auto;
@@ -330,19 +374,19 @@ export default {
   font-size: 1.2em;
 }
 
-.btn_post:hover {
+.form-post__btn:hover {
   background: rgb(173, 110, 231);
   cursor: pointer;
 }
 
-.btn_post[disabled] {
+.form-post__btn:disabled {
   background: rgba(151, 100, 199, 0.877);
   color: rgb(194, 188, 188);
   cursor: default;
 }
 
 /* バリデーションメッセージ */
-.validation {
+.form-post__validation {
   margin: 0;
 }
 </style>
