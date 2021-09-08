@@ -1,12 +1,18 @@
 <template>
-  <aside>
-    <h3>最新の質問</h3>
-    <nav>
-      <ul>
-        <li v-for="post in latestPosts" :key="post.id">
-          <a href="" @click.prevent="moveToPostPage(post.id)">{{
-            post.title
-          }}</a>
+  <aside class="block-side">
+    <nav class="block-side__nav">
+      <ul class="block-side__list">
+        <li class="item">
+          <h3 class="item__title">最新の質問</h3>
+        </li>
+        <li v-for="post in latestPosts" :key="post.id" class="item">
+          <a
+            href=""
+            class="item__link"
+            @click.prevent="moveToPostPage(post.id)"
+          >
+            {{ post.title }}
+          </a>
         </li>
       </ul>
     </nav>
@@ -42,29 +48,22 @@ export default {
 </script>
 
 <style scoped>
-/* 基本設定 */
-a {
-  text-decoration: none;
+/* サイドメニュー */
+.block-side {
+  width: 25%;
 }
 
-ul {
+.block-side__list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* サイドメニュー */
-aside {
-  flex: 1;
-  margin-left: 40px;
-}
-
-aside > h3 + nav {
-  max-width: 250px;
+.block-side__nav {
   border-top: 2px solid rgb(194, 193, 193);
 }
 
-aside li > a {
+.item__link {
   display: flex;
   align-items: center;
   height: 50px;
@@ -72,5 +71,6 @@ aside li > a {
   overflow: hidden;
   border-bottom: 2px solid rgb(194, 193, 193);
   color: rgb(105, 104, 104);
+  text-decoration: none;
 }
 </style>
