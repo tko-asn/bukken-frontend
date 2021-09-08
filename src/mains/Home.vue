@@ -1,28 +1,44 @@
 <template>
   <div class="container">
     <!-- サイドバー -->
-    <aside class="side_bar">
-      <nav>
+    <aside class="container__side-bar">
+      <nav class="list-menu">
         <ul>
           <li>
-            <a href="" @click.prevent="displayLatestPosts">ホーム</a>
+            <a
+              href=""
+              :class="{ is_active_menu: isActiveMenu('home') }"
+              @click.prevent="displayLatestPosts"
+              >ホーム</a
+            >
           </li>
           <li v-if="isLoggedIn">
-            <a href="" @click.prevent="displayFolloweePosts"
+            <a
+              href=""
+              :class="{ is_active_menu: isActiveMenu('followee') }"
+              @click.prevent="displayFolloweePosts"
               >フォローユーザーの投稿</a
             >
           </li>
           <li v-if="isLoggedIn">
-            <a href="" @click.prevent="displayMyFavoritePosts"
+            <a
+              href=""
+              :class="{ is_active_menu: isActiveMenu('favorites') }"
+              @click.prevent="displayMyFavoritePosts"
               >お気に入りの投稿</a
             >
           </li>
           <li v-if="isLoggedIn">
-            <a href="" @click.prevent="displayMyPosts">自分の投稿</a>
+            <a
+              href=""
+              :class="{ is_active_menu: isActiveMenu('myPosts') }"
+              @click.prevent="displayMyPosts"
+              >自分の投稿</a
+            >
           </li>
         </ul>
       </nav>
-      <nav class="follow_list">
+      <nav class="list-follow">
         <ul>
           <!-- フォローしているユーザーのリストを表示 -->
           <template v-if="isLoggedIn">
@@ -80,7 +96,7 @@
           </template>
         </ul>
       </nav>
-      <div class="side_footer">
+      <div class="side-footer">
         <ul>
           <li><a href="">サイト概要</a></li>
         </ul>
@@ -88,8 +104,13 @@
     </aside>
 
     <!-- メイン -->
-    <div class="main">
-      <div class="main_container">
+    <div class="container__main">
+      <div class="container-main">
+        <PostFilter
+          @filter="filterPosts"
+          :currentMenu="activeMenu"
+          :myId="userId"
+        />
         <router-view :postList="displayedPosts" />
       </div>
     </div>
@@ -98,21 +119,33 @@
 
 <script>
 import apiClient from "@/axios";
+import PostFilter from "@/components/PostFilter";
 import { mapGetters } from "vuex";
 
 export default {
+  components: {
+    PostFilter,
+  },
   data() {
     return {
       latestPosts: [], // 最新の投稿
       displayedPosts: [], // 表示する投稿
       showFolloweeList: false,
       showFollowerList: false,
+      activeMenu: "home",
     };
   },
   computed: {
     ...mapGetters("posts", ["followeePosts", "myPosts", "myFavoritePosts"]),
-    ...mapGetters("auth", ["isLoggedIn"]),
+    ...mapGetters("auth", ["isLoggedIn", "userId"]),
     ...mapGetters("follows", ["follow", "follower"]),
+    isActiveMenu() {
+      return (menuType) => {
+        if (menuType === this.activeMenu) {
+          return true;
+        }
+      };
+    },
   },
   created() {
     Promise.all([
@@ -133,21 +166,25 @@ export default {
     // フォローしているユーザーの投稿一覧表示
     displayFolloweePosts() {
       this.switchRoute();
+      this.activeMenu = "followee";
       this.displayedPosts = this.followeePosts;
     },
     // 自分の投稿一覧表示
     displayMyPosts() {
       this.switchRoute();
+      this.activeMenu = "myPosts";
       this.displayedPosts = this.myPosts;
     },
     // 最新の投稿を表示
     displayLatestPosts() {
       this.switchRoute();
+      this.activeMenu = "home";
       this.displayedPosts = this.latestPosts;
     },
     // お気に入りの投稿を表示
     displayMyFavoritePosts() {
       this.switchRoute();
+      this.activeMenu = "favorites";
       this.displayedPosts = this.myFavoritePosts;
     },
     // フォローしているユーザーの表示を切り替える
@@ -169,6 +206,10 @@ export default {
         this.showFollowerList = false;
       }
     },
+    // 投稿のフィルタリング
+    filterPosts(posts) {
+      this.displayedPosts = posts; // フィルタリングした投稿を切り替える
+    },
   },
   beforeRouteUpdate(to, from, next) {
     // 投稿画面から遷移したとき
@@ -177,6 +218,7 @@ export default {
         apiClient.get("/posts/page/1"), // 1ページ目の投稿を取得
         this.$store.dispatch("posts/getFolloweePosts"), // フォロイーの投稿をVuexに保存
       ]).then((values) => {
+        this.activeMenu = "home"; // サイドメニューをホームにする
         this.latestPosts = values[0].data; // 最新の投稿を取得
         this.displayedPosts = this.latestPosts; // 初期は最新の投稿を表示
         next();
@@ -207,7 +249,7 @@ a {
 }
 
 /* サイドバー */
-.side_bar {
+.container__side-bar {
   display: flex;
   flex-direction: column;
   width: 25%;
@@ -215,6 +257,10 @@ a {
   margin-top: 50px;
   overflow-y: scroll;
   background: rgb(76, 26, 92);
+}
+
+.is_active_menu {
+  background: rgb(129, 50, 155);
 }
 
 .ttl {
@@ -239,7 +285,7 @@ nav a:hover {
 }
 
 /* フォロイー・フォロワー表示部分 */
-.follow_list {
+.list-follow {
   padding: 10px 0;
 }
 
@@ -267,7 +313,7 @@ nav a:hover {
   object-fit: cover;
 }
 
-.side_footer {
+.side-footer {
   flex: 1;
   min-height: 250px;
   padding: 30px 30px;
@@ -294,6 +340,7 @@ nav {
 .list_no_login > p {
   color: silver;
   font-size: 0.7em;
+  text-align: center;
 }
 
 .btn_login {
@@ -310,13 +357,13 @@ nav {
 }
 
 /* メイン部分 */
-.main {
+.container__main {
   width: 100%;
   margin-top: 50px;
   overflow-y: scroll;
 }
 
-.main_container {
+.container-main {
   width: 90%;
   margin: 0 auto;
 }
@@ -331,7 +378,7 @@ nav {
   background: rgba(168, 89, 194, 0.795);
 }
 
-.main::-webkit-scrollbar-thumb {
+.container__main::-webkit-scrollbar-thumb {
   background: rgba(139, 130, 130, 0.747);
 }
 </style>
