@@ -36,9 +36,9 @@ const actions = {
   },
   // ユーザーのお気に入りの投稿を取得
   getMyFavoritePosts({ commit }) {
-    return apiClient.get('/users/' + store.getters['auth/userId'] + '/with/favorite/posts/')
+    return apiClient.get('/posts/favorite/user/' + store.getters['auth/userId'] + '/page/1')
       .then(response => {
-        commit('setMyFavoritePosts', response.data.favoritePosts);
+        commit('setMyFavoritePosts', response.data);
       })
       .catch(err => Promise.reject(err));
   },
@@ -61,10 +61,10 @@ const actions = {
       userId, // お気に入りに追加するユーザーのID
       postId, // お気に入りの投稿のID
     };
-    
+
     // お気に入りの投稿を追加
     await apiClient.post('/posts/create/favorite/', params).catch(err => Promise.reject(err));
-    
+
     // お気に入りの投稿リストを更新
     await dispatch('getMyFavoritePosts').catch(err => Promise.reject(err));
   },
@@ -72,8 +72,8 @@ const actions = {
   async removeFavoritePost({ dispatch }, { userId, postId }) {
     // お気に入りの投稿を削除
     await apiClient.delete('/posts/' + postId + '/remove/favorite/' + userId + '/')
-    .catch(err => Promise.reject(err))
-    
+      .catch(err => Promise.reject(err))
+
     // お気に入りの投稿リストを更新
     await dispatch('getMyFavoritePosts').catch(err => Promise.reject(err));
   }
