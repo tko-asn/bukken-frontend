@@ -1,53 +1,69 @@
 <template>
-  <div class="area_edit_profile">
+  <div class="container">
     <!-- プロフィール編集フォーム -->
-    <form @submit.prevent class="edit_form">
-      <div class="container">
+    <form @submit.prevent class="form-edit-profile">
+      <div class="container-form">
         <!-- フォームの見出し -->
-        <div class="head_edit_form">
-          <p class="ttl">Edit Profile</p>
-        </div>
-
+        <p class="container-form__title">Edit Profile</p>
         <!-- 入力欄 -->
-        <div class="body_edit_form">
-          <div class="icon">
-            <img :src="iconSrc" v-show="iconSrc" alt="アイコン">
-          </div>
-          <input class="icon_form" type="file" @change="changeFile" />
-          <input class="input_username" type="text" placeholder="ユーザー名" v-model="newData.username" />
-          <textarea
-            class="input_self_introduction"
-            cols="20"
-            rows="10"
-            placeholder="自己紹介文"
-            v-model="newData.self_introduction"
-          ></textarea>
-          <button class="btn_edit_profile" @click="editProfile">保存</button>
+        <div class="item-icon">
+          <img
+            class="item-icon__img"
+            :src="iconSrc"
+            v-show="iconSrc"
+            alt="アイコン"
+          />
         </div>
+        <input
+          class="container-form__input-icon"
+          type="file"
+          @change="changeFile"
+        />
+        <input
+          class="container-form__input-username"
+          type="text"
+          placeholder="ユーザー名"
+          v-model="newData.username"
+        />
+        <textarea
+          class="container-form__input-self-introduction"
+          cols="20"
+          rows="10"
+          placeholder="自己紹介文"
+          v-model="newData.self_introduction"
+        ></textarea>
+        <button class="container-form__btn-input" @click="editProfile">
+          保存
+        </button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 import Compressor from "compressorjs";
 
 export default {
   data() {
     return {
       // プレビュー用の画像URL
-      iconSrc: '',
+      iconSrc: "",
       // 送信するデータ
       newData: {
         iconFile: null,
-        username: '',
-        self_introduction: '', // DBのカラム名に合わせる
+        username: "",
+        self_introduction: "", // DBのカラム名に合わせる
       },
-    }
+    };
   },
   computed: {
-    ...mapGetters('auth', ['userId', 'username', 'selfIntroduction', 'iconURL'])
+    ...mapGetters("auth", [
+      "userId",
+      "username",
+      "selfIntroduction",
+      "iconURL",
+    ]),
   },
   created() {
     // vuexのデータをdataに保存
@@ -58,9 +74,9 @@ export default {
   methods: {
     changeFile(event) {
       const files = event.target.files || event.dataTransfer.files;
-  
+
       const _this = this;
-      
+
       // 画像圧縮
       new Compressor(files[0], {
         quality: 0.7,
@@ -69,7 +85,7 @@ export default {
           _this.newData.iconFile = result;
 
           // プレビューURLを取得し保存
-          _this.getFileSrc(result).then(src => {
+          _this.getFileSrc(result).then((src) => {
             _this.iconSrc = src;
           });
         },
@@ -94,31 +110,31 @@ export default {
       }
 
       // APIを実行
-      this.$store.dispatch('auth/editProfile', params).then(() => {
+      this.$store.dispatch("auth/editProfile", params).then(() => {
         // マイページへ
-        this.$router.replace({ name: 'userView', params: { id: this.userId } });
-      })
+        this.$router.replace({ name: "userView", params: { id: this.userId } });
+      });
     },
     // 画像のURLを取得する
     getFileSrc(file) {
       return new Promise((resolve, reject) => {
         const fileReader = new FileReader();
         fileReader.onload = () => resolve(fileReader.result);
-        fileReader.onerror = err => reject(err);
+        fileReader.onerror = (err) => reject(err);
         fileReader.readAsDataURL(file);
-      })
-    }
+      });
+    },
   },
 };
 </script>
 
 <style scoped>
 /* ページ全体 */
-.area_edit_profile {
+.container {
   padding: 100px 0 50px;
 }
 
-.edit_form {
+.form-edit-profile {
   width: 45%;
   margin: 0 auto;
   border-radius: 8px;
@@ -127,74 +143,59 @@ export default {
   background: #fff;
 }
 
-.container {
-  width: 90%;
+.container-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
   margin: 0 auto;
 }
 
 /* フォームの見出し部分 */
-.head_edit_form {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
+.container-form__title {
+  width: 100%;
+  margin: 0 0 20px;
+  font-size: 1.8em;
+  letter-spacing: 2px;
   text-align: center;
 }
 
-.ttl {
-  width: 100%;
-  margin: 0;
-  font-size: 1.8em;
-  letter-spacing: 2px;
-}
-
-.ttl::after {
+.container-form__title::after {
   content: "";
   display: block;
-  width: 100%;
   height: 5px;
   background: rgb(58, 202, 70);
 }
 
 /* 入力部分 */
-.body_edit_form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.icon {
+.item-icon {
   width: 200px;
   height: 200px;
   background: silver;
 }
 
-.icon > img {
+.item-icon__img {
   width: 200px;
   height: 200px;
   object-fit: cover;
 }
 
-.icon_form {
-  margin: 10px 0;
-}
-
 [class*="input"] {
-  width: 88%;
+  width: 100%;
   margin: 10px 0;
-  padding-left: 15px;
   font-size: 1.1rem;
 }
 
-.input_username {
+.container-form__input-username {
   height: 40px;
+  padding: 0 10px;
 }
 
-.input_self_introduction {
-  padding-top: 10px;
+.container-form__input-self-introduction {
+  padding: 10px 10px;
 }
 
-.btn_edit_profile {
-  width: 90%;
+.container-form__btn-input {
   height: 50px;
   margin-top: 10px;
   border: 1px solid #fff;
@@ -204,7 +205,7 @@ export default {
   font-size: 1.2em;
 }
 
-.btn_edit_profile:hover {
+.container-form__btn-input:hover {
   background: rgb(30, 250, 41);
   cursor: pointer;
 }

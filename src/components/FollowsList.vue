@@ -1,49 +1,37 @@
 <template>
-  <div class="follows_list">
-    <div class="container">
-      <!-- 表示するユーザーがいる場合 -->
-      <template v-if="followsList.length">
-        <!-- ユーザー表示部分 -->
-
-        <!-- フォロワーを表示する場合 -->
-        <template v-if="$route.name === 'followerList'">
-          <div
-            class="follows_user"
-            v-for="followsObj in followsList"
-            :key="followsObj.id"
-          >
-            <div class="icon">
-              <img :src="followsObj.user.iconURL" />
-            </div>
-            <div class="username">
-              <p>{{ followsObj.user.username }}</p>
-            </div>
-          </div>
-        </template>
-
-        <!-- フォローしているユーザーを表示する場合 -->
-        <template v-else>
-          <div
-          class="follows_user"
-          v-for="followsObj in followsList"
-          :key="followsObj.id"
+  <ul class="container-follows-list">
+    <!-- リストを表示する場合 -->
+    <template v-if="followsList.length">
+      <li
+        class="container-follows-list__item"
+        v-for="followsObj in followsList"
+        :key="followsObj.id"
+      >
+        <router-link
+          class="block-follows"
+          :to="{
+            name: 'userView',
+            params: { id: followsObj[userProperty].id },
+          }"
         >
-          <div class="icon">
-            <img :src="followsObj.follow.iconURL" />
+          <div class="item-icon">
+            <img
+              class="item-icon__img"
+              :src="followsObj[userProperty].iconURL"
+            />
           </div>
-          <div class="username">
-            <p>{{ followsObj.follow.username }}</p>
-          </div>
-        </div>
-        </template>
-      </template>
+          <p class="block-follows__username">
+            {{ followsObj[userProperty].username }}
+          </p>
+        </router-link>
+      </li>
+    </template>
 
-      <!-- 表示するユーザーがいない場合 -->
-      <template v-else>
-        <p class="text_no_follows_obj">{{ noFollows }}</p>
-      </template>
-    </div>
-  </div>
+    <!-- 表示するユーザーがいない場合 -->
+    <template v-else>
+      <p class="container-follows-list__text-no-follow">{{ noFollows }}</p>
+    </template>
+  </ul>
 </template>
 
 <script>
@@ -55,57 +43,65 @@ export default {
     // 表示するユーザーがいない場合のメッセージ
     noFollows() {
       // フォローしているユーザーを表示するページの場合
-      if (this.$route.name === 'followList') {
-        return 'フォローしているユーザーはいません';
+      if (this.$route.name === "followList") {
+        return "フォローしているユーザーはいません";
       }
       // フォロワーを表示するページの場合
-      return 'フォロワーはいません';
-    }
-  }
+      return "フォロワーはいません";
+    },
+    userProperty() {
+      // フォロワーを表示する場合
+      if (this.$route.name === "followList") {
+        return "follow";
+      }
+      // フォローしているユーザーを表示する場合
+      return "user";
+    },
+  },
 };
 </script>
 
 <style scoped>
 /* ページ全体 */
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.container-follows-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 /* ユーザー表示部分 */
-.follows_user {
+.block-follows {
   display: flex;
   align-items: center;
-  width: 100%;
   height: 100px;
-  box-shadow: 0 2px 6px rgb(51, 48, 48);
-  background: #fff;
+  box-shadow: 0 1px 2px gray;
+  text-decoration: none;
 }
 
 /* アイコン */
-.icon {
+.item-icon {
   width: 100px;
   height: 100px;
   background: silver;
 }
 
-.icon > img {
+.item-icon__img {
   width: 100px;
   height: 100px;
   object-fit: cover;
 }
 
 /* ユーザー名 */
-.username {
+.block-follows__username {
   margin-left: 30px;
   overflow: hidden;
+  color: rgb(83, 81, 81);
   font-size: 1.5em;
   letter-spacing: 2px;
 }
 
 /* 表示するユーザーがいないときのメッセージ */
-.text_no_follows_obj {
+.container-follows-list__text-no-follow {
   color: gray;
   font-size: 1.2em;
 }

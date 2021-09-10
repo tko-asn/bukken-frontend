@@ -1,29 +1,33 @@
 <template>
   <!-- アカウント閉鎖 -->
-  <section class="delete_account">
-    <!-- タイトル -->
-    <div class="top_delete_account">
-      <h1>アカウントを閉鎖する</h1>
-    </div>
-
-    <!-- メッセージ＆フォーム -->
-    <div class="middle_delete_account">
-      <p>アカウントを閉鎖しますか？</p>
-      <p class="warning_text">
-        アカウントを閉鎖すると二度と復元できなくなります。
-      </p>
-      <p class="warning_text">投稿はすべて削除されます。</p>
-      <p>閉鎖する場合は「完全に削除」と入力して下さい。</p>
-      <input type="text" placeholder="完全に削除" v-model="deleteText" />
-    </div>
-
+  <div class="block-delete-account">
+    <p class="block-delete-account__text">アカウントを閉鎖しますか？</p>
+    <p class="block-delete-account__text block-delete-account__text--red">
+      アカウントを閉鎖すると二度と復元できなくなります。
+    </p>
+    <p class="block-delete-account__text block-delete-account__text--red">
+      投稿はすべて削除されます。
+    </p>
+    <p class="block-delete-account__text">
+      閉鎖する場合は「完全に削除」と入力して下さい。
+    </p>
+    <input
+      class="block-delete-account__input"
+      type="text"
+      placeholder="完全に削除"
+      v-model="deleteText"
+    />
     <!-- ボタン -->
-    <div class="bottom_delete_account">
-      <button @click="deleteAccount" :disabled="isDisabled">
+    <div class="item-btn">
+      <button
+        class="item-btn__btn"
+        @click="deleteAccount"
+        :disabled="isDisabled"
+      >
         アカウントを閉鎖
       </button>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -34,7 +38,8 @@ export default {
     };
   },
   computed: {
-    isDisabled() { // アカウント閉鎖ボタン
+    isDisabled() {
+      // アカウント閉鎖ボタン
       if (this.deleteText === "完全に削除") {
         return false;
       }
@@ -54,26 +59,11 @@ export default {
 </script>
 
 <style scoped>
-/* トップ部分 */
-.top_delete_account {
-  display: flex;
-  align-items: center;
-  height: 60px;
-  padding-left: 20px;
-  background: rgb(52, 52, 80);
-  color: #fff;
+.block-delete-account {
+  padding-top: 30px;
 }
 
-.top_delete_account > h1 {
-  font-size: 1.5em;
-}
-
-/* 中央部分 */
-.middle_delete_account {
-  margin-top: 30px;
-}
-
-.middle_delete_account > input {
+.block-delete-account__input {
   width: 70%;
   height: 40px;
   margin-top: 10px;
@@ -81,27 +71,29 @@ export default {
   font-size: 1.1em;
 }
 
-/* 警告文 */
-.warning_text {
-  color: red;
+.block-delete-account__text {
   font-size: 0.9em;
 }
 
-.warning_text + .warning_text {
+/* 警告文 */
+.block-delete-account__text--red {
+  color: red;
+}
+
+.block-delete-account__text--red + .block-delete-account__text--red {
   margin-bottom: 50px;
 }
 
-/* ボトム部分 */
-.bottom_delete_account {
+/* ボタン */
+.item-btn {
   display: flex;
-  flex-direction: row-reverse;
-  margin-top: 30px;
-  padding-right: 20px;
+  justify-content: flex-end;
 }
 
-.bottom_delete_account > button {
+.item-btn__btn {
+  margin-top: 30px;
   padding: 10px;
-  border-color: #fff;
+  border: none;
   border-radius: 8px;
   background: rgba(247, 18, 10, 0.829);
   color: #fff;
@@ -109,7 +101,7 @@ export default {
   cursor: pointer;
 }
 
-.bottom_delete_account > button[disabled] {
-  background: rgba(241, 153, 150, 0.829);
+.item-btn__btn:disabled {
+  opacity: 0.6;
 }
 </style>

@@ -1,36 +1,59 @@
 <template>
-  <div class="change_password">
-    <div class="container">
-      <!-- パスワード変更フォーム -->
-      <div class="input_current_password">
-        <label class="ttl" for="current_password">現在のパスワード</label>
-        <input type="password" name="current_password" v-model="currentPassword" />
-      </div>
-      <ValidationMessage
-        :messages="currentPasswdMessage"
-        v-show="currentPasswdMessage.length"
+  <div class="container-change-password">
+    <!-- パスワード変更フォーム -->
+    <div class="block-input">
+      <label class="block-input__label" for="current_password"
+        >現在のパスワード</label
+      >
+      <input
+        class="block-input__input"
+        type="password"
+        name="current_password"
+        v-model="currentPassword"
       />
-      <div class="input_new_password">
-        <label class="ttl" for="new_password">新しいパスワード</label>
-        <input type="password" name="new_password" v-model="newPassword" />
-      </div>
-      <ValidationMessage
-        :messages="newPasswdMessage"
-        v-show="newPasswdMessage.length"
-      />
-      <div class="input_cfm_password">
-        <label class="ttl" for="current_password">確認用パスワード</label>
-        <input type="password" name="current_password" v-model="cfmPassword" />
-      </div>
-      <ValidationMessage
-        class="validation"
-        :messages="cfmPasswdMessage"
-        v-show="cfmPasswdMessage.length"
-      />
-
-      <!-- ボタン -->
-      <button class="btn_change_password" @click="changePassword">保存</button>
     </div>
+    <ValidationMessage
+      class="container-change-password__validation"
+      :messages="currentPasswdMessage"
+      v-show="currentPasswdMessage.length"
+    />
+    <div class="block-input">
+      <label class="block-input__label" for="new_password"
+        >新しいパスワード</label
+      >
+      <input
+        class="block-input__input"
+        type="password"
+        name="new_password"
+        v-model="newPassword"
+      />
+    </div>
+    <ValidationMessage
+      class="container-change-password__validation"
+      :messages="newPasswdMessage"
+      v-show="newPasswdMessage.length"
+    />
+    <div class="block-input">
+      <label class="block-input__label" for="current_password"
+        >確認用パスワード</label
+      >
+      <input
+        class="block-input__input"
+        type="password"
+        name="current_password"
+        v-model="cfmPassword"
+      />
+    </div>
+    <ValidationMessage
+      class="container-change-password__validation"
+      :messages="cfmPasswdMessage"
+      v-show="cfmPasswdMessage.length"
+    />
+
+    <!-- ボタン -->
+    <button class="container-change-password__btn" @click="changePassword">
+      保存
+    </button>
   </div>
 </template>
 
@@ -84,12 +107,14 @@ export default {
             params: { id: this.$store.getters["auth/userId"] },
           });
         })
-        .catch(err => {
+        .catch((err) => {
           // 現在のパスワードが違う場合
-          if (err.response.data.message === 'Invalid current password') {
-            this.currentPasswdMessage.push('現在のパスワードが正しくありません。');
+          if (err.response.data.message === "Invalid current password") {
+            this.currentPasswdMessage.push(
+              "現在のパスワードが正しくありません。"
+            );
           }
-        })
+        });
     },
     // 各入力欄バリデーション
     validate() {
@@ -127,23 +152,18 @@ export default {
 </script>
 
 <style scoped>
-/* ページ全体 */
-.change_password {
-  height: 100%;
+/* コンテナ */
+.container-change-password {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: 0 auto;
   padding: 20px;
   background: #fff;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 80%;
-  margin: 0 auto;
-}
-
 /* ラベル要素 */
-.ttl {
+.block-input__label {
   margin-right: 20px;
   font-weight: bold;
   font-size: 1.2em;
@@ -151,28 +171,23 @@ export default {
 }
 
 /* 各入力部分 */
-[class*="input"] {
+.block-input {
   display: flex;
   align-items: center;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
-[class*="input"] > input {
+.block-input__input {
   flex-grow: 3;
   height: 25px;
 }
 
-/* バリデーションメッセージ */
-.validation {
-  margin: 0;
-}
-
 /* ボタン */
-.btn_change_password {
+.container-change-password__btn {
   margin-top: 20px;
   padding: 5px 10px;
-  border-color: #fff;
+  border: none;
   background: green;
   color: white;
   font-size: 1.2em;

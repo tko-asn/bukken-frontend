@@ -63,6 +63,10 @@ export default {
   border-top: 2px solid rgb(194, 193, 193);
 }
 
+.item__title {
+  margin-bottom: 0;
+}
+
 .item__link {
   display: flex;
   align-items: center;

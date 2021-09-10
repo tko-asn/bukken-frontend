@@ -1,39 +1,50 @@
 <template>
-  <header>
-    <div class="container">
+  <header class="header">
+    <div class="header__container">
       <!-- ロゴイメージ -->
-      <div class="area_logo_header">
-        <router-link class="logo" to="/"> ロゴ </router-link>
+      <div class="item-logo">
+        <router-link class="item-logo__logo" to="/"> ロゴ </router-link>
       </div>
 
       <!-- ナビゲーションメニュー -->
-      <nav class="nav_header">
-        <ul class="list_nav_header">
+      <nav class="block-nav">
+        <ul class="block-nav__list">
           <!-- ログイン済み -->
           <template v-if="isLoggedIn">
-            <li class="area_account_navbar" @mouseleave="pullUp">
-              <a href="" class="account" @click.prevent @mouseover="pullDown"
+            <li class="item-list" @mouseleave="pullUp">
+              <a
+                href=""
+                class="item-list__link-account"
+                @click.prevent
+                @mouseover="pullDown"
                 >アカウント</a
               >
 
               <!-- プルダウンメニュー -->
-              <ul ref="pull_down_block" class="pd_account" @mouseleave="pullUp">
-                <li>
+              <ul
+                ref="pull_down_block"
+                class="item-list__list"
+                @mouseleave="pullUp"
+              >
+                <li class="item-child-list">
                   <router-link
                     :to="{ name: 'userView', params: { id: userId } }"
-                    class="link_pull_down"
+                    class="item-child-list__link"
                     >マイページ</router-link
                   >
                 </li>
-                <li>
+                <li class="item-child-list">
                   <router-link
                     :to="{ name: 'editProfile', params: { id: userId } }"
-                    class="link_pull_down"
+                    class="item-child-list__link"
                     >プロフィール編集</router-link
                   >
                 </li>
-                <li>
-                  <a href="" class="link_pull_down" @click.prevent="logout"
+                <li class="item-child-list">
+                  <a
+                    href=""
+                    class="item-child-list__link"
+                    @click.prevent="logout"
                     >ログアウト</a
                   >
                 </li>
@@ -41,15 +52,25 @@
             </li>
 
             <!-- 投稿ボタン -->
-            <li>
-              <router-link class="btn_post" to="/post/form">投稿する</router-link>
+            <li class="item-list">
+              <router-link class="item-list__btn-post" to="/post/form"
+                >投稿する</router-link
+              >
             </li>
           </template>
 
           <!-- 未ログイン -->
           <template v-else>
-            <li><router-link to="/signup">新規登録</router-link></li>
-            <li><router-link to="/login">ログイン</router-link></li>
+            <li class="item-list">
+              <router-link class="item-list__btn-auth" to="/signup">
+                新規登録
+              </router-link>
+            </li>
+            <li class="item-list">
+              <router-link class="item-list__btn-auth" to="/login">
+                ログイン
+              </router-link>
+            </li>
           </template>
         </ul>
       </nav>
@@ -71,7 +92,7 @@ export default {
     },
     // プルダウンメニュー縮小
     pullUp(event) {
-      if (!event.toElement.closest(".pd_account")) {
+      if (!event.toElement.closest(".item-list__list")) {
         this.$refs.pull_down_block.style.display = "none";
       }
     },
@@ -104,7 +125,7 @@ ul {
 }
 
 /* ヘッダー全体 */
-header {
+.header {
   position: fixed;
   z-index: 10;
   width: 100%;
@@ -113,7 +134,7 @@ header {
   left: 0;
 }
 
-header > .container {
+.header__container {
   display: flex;
   align-items: center;
   height: 50px;
@@ -122,36 +143,37 @@ header > .container {
 }
 
 /* ロゴ */
-.area_logo_header .logo {
+.item-logo__logo {
   display: block;
 }
 
-/* .area_logo_header img {
+/* .item-logo img {
   height: 60px;
 } */
 
 /* ヘッダーナビ */
-.nav_header {
+.block-nav {
   /* 右詰め */
   margin: 0 0 0 auto;
 }
 
-.list_nav_header {
+.block-nav__list {
   display: flex;
   align-items: center;
   margin: 0 -15px;
 }
 
-.list_nav_header > li {
+.item-list {
   padding: 0 15px;
 }
 
 /* プルダウンメニュー */
-.area_account_navbar {
+.item-list {
   position: relative;
 }
 
-.pd_account {
+.item-list__list {
+  z-index: 50;
   position: absolute;
   left: 12px;
   display: none;
@@ -164,19 +186,19 @@ header > .container {
 }
 
 /* プルダウンのボタン */
-.link_pull_down {
+.item-child-list__link {
   display: block;
   padding: 5px 10px;
   color: rgb(54, 53, 53);
 }
 
-.link_pull_down:hover {
+.item-child-list__link:hover {
   background: rgb(238, 235, 235);
   color: rgb(54, 53, 53);
 }
 
 /* 投稿ボタン */
-.btn_post {
+.item-list__btn-post {
   display: flex;
   align-items: center;
   height: 30px;
@@ -186,12 +208,12 @@ header > .container {
   background: slateblue;
 }
 
-.btn_post:hover {
+.item-list__btn-post:hover {
   background: rgb(127, 115, 207);
   color: #fff;
 }
 
-.btn_post:active {
+.item-list__btn-post:active {
   position: relative;
   box-shadow: none;
   background: rgb(81, 76, 119);
