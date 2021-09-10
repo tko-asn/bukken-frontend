@@ -1,45 +1,46 @@
 <template>
   <!-- 投稿リスト -->
-  <div class="post_list">
+  <div class="container-post-list">
     <!-- 投稿がある場合 -->
     <template v-if="postList.length">
       <!-- 投稿 -->
       <section
-        class="post_card"
+        class="section-post section-post--exist"
         v-for="post in postList"
         :key="post.id"
         @click="moveToPostPage(post.id)"
       >
-        <div class="card_container">
-          <!-- タイトル -->
-          <h3 class="ttl">
-            {{ post.title }}
-          </h3>
+        <!-- タイトル -->
+        <h3 class="section-post__title">
+          {{ post.title }}
+        </h3>
 
-          <!-- 投稿者 -->
-          <div class="author">
-            <div class="icon">
-              <img :src="post.user.icon_url" />
-            </div>
-            <p class="sub_ttl">{{ post.user.username }}</p>
+        <!-- 投稿者 -->
+        <div class="section-post__author">
+          <div class="item-icon">
+            <img class="item-icon__img" :src="post.user.icon_url" />
           </div>
-
-          <!-- 物件情報 -->
-          <section class="property">
-            <h4>質問対象の物件</h4>
-            <p class="sub_ttl">{{ post.property }}</p>
-            <p class="sub_ttl">
-              {{ addressData(post) }}
-            </p>
-          </section>
+          <p class="section-post__sub-title">{{ post.user.username }}</p>
         </div>
+
+        <!-- 物件情報 -->
+        <section class="block-property">
+          <h4 class="block-property__title">質問対象の物件</h4>
+          <p class="section-post__sub-title">{{ post.property }}</p>
+          <p class="section-post__sub-title">
+            {{ addressData(post) }}
+          </p>
+        </section>
       </section>
+
+      <!-- セクションを左揃えにするための空の要素 -->
+      <div class="section-post" v-show="isOdd"></div>
     </template>
 
     <!-- 投稿がない場合 -->
     <template v-else>
-      <div class="no_post">
-        <p>投稿はありません</p>
+      <div class="block-no-post">
+        <p class="block-no-post__text">投稿はありません</p>
       </div>
     </template>
   </div>
@@ -51,19 +52,21 @@ export default {
     postList: Array, // 投稿リスト
   },
   computed: {
-    // 住所のデータ
-    addressData() {
-      return (post) => {
-        return (
-          post.address.prefecture +
-          post.address.municipality +
-          post.address.townName +
-          post.address.buildingName
-        );
-      };
+    // 投稿リストの要素数が奇数か判定
+    isOdd() {
+      return this.postList.length % 2 !== 0;
     },
   },
   methods: {
+    // 住所のデータを連結して返す
+    addressData(post) {
+      return (
+        post.address.prefecture +
+        post.address.municipality +
+        post.address.townName +
+        post.address.buildingName
+      );
+    },
     moveToPostPage(id) {
       this.$router.push({ name: "postDetails", params: { postId: id } });
     },
@@ -72,27 +75,23 @@ export default {
 </script>
 
 <style scoped>
-/* 基本設定 */
-h3,
-h4,
-p {
-  margin: 0;
-}
-
 /* 投稿リスト */
-.post_list {
+.container-post-list {
   display: flex;
-  flex-direction: column;
-  width: 95%;
-  margin: 0 auto;
+  justify-content: space-around;
+  flex-wrap: wrap;
   padding: 20px 0;
 }
 
 /* 投稿 */
-.post_card {
-  width: 100%;
-  height: 200px;
-  margin: 0 auto 20px;
+.section-post {
+  width: 45%;
+  max-height: 170px;
+  margin-bottom: 30px;
+  padding: 10px;
+}
+
+.section-post--exist {
   overflow: hidden;
   border: 2px solid rgb(189, 187, 187);
   border-radius: 5px;
@@ -101,23 +100,16 @@ p {
   cursor: pointer;
 }
 
-.card_container {
-  display: flex;
-  flex-direction: column;
-  width: 95%;
-  margin: 20px auto;
-  overflow: hidden;
-}
-
 /* タイトル */
-.ttl {
+.section-post__title {
   max-height: 30px;
+  margin: 0;
   overflow: hidden;
   font-size: 1.3em;
 }
 
 /* 投稿者表示部分 */
-.author {
+.section-post__author {
   max-height: 40px;
   display: flex;
   overflow: hidden;
@@ -125,31 +117,33 @@ p {
   margin: 10px 0;
 }
 
-.icon {
+.item-icon {
   width: 40px;
   height: 40px;
   margin-right: 15px;
   background: silver;
 }
 
-.icon > img {
+.item-icon__img {
   width: 40px;
   height: 40px;
   object-fit: cover;
 }
 
-.sub_ttl {
+.section-post__sub-title {
   overflow: hidden;
+  margin: 0;
   color: rgb(78, 76, 76);
   font-size: 1.1em;
 }
 
-.property > h4 {
+.block-property__title {
+  margin: 0;
   color: rgb(97, 97, 97);
 }
 
 /* 投稿がない場合 */
-.no_post {
+.block-no-post {
   display: flex;
   justify-content: center;
   width: 100%;

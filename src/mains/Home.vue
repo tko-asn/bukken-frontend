@@ -2,103 +2,105 @@
   <div class="container">
     <!-- サイドバー -->
     <aside class="container__side-bar">
-      <nav class="list-menu">
-        <ul>
-          <li>
+      <nav class="nav">
+        <ul class="list">
+          <li
+            class="list__item"
+            v-for="obj in mainMenu"
+            :key="obj.name"
+            v-show="obj.login ? isLoggedIn : true"
+            @click.prevent="switchPosts(obj.type)"
+          >
             <a
               href=""
-              :class="{ is_active_menu: isActiveMenu('home') }"
-              @click.prevent="displayLatestPosts"
-              >ホーム</a
+              :class="{
+                list__link: true,
+                is_active_menu: obj.type === activeMenu,
+              }"
             >
-          </li>
-          <li v-if="isLoggedIn">
-            <a
-              href=""
-              :class="{ is_active_menu: isActiveMenu('followee') }"
-              @click.prevent="displayFolloweePosts"
-              >フォローユーザーの投稿</a
-            >
-          </li>
-          <li v-if="isLoggedIn">
-            <a
-              href=""
-              :class="{ is_active_menu: isActiveMenu('favorites') }"
-              @click.prevent="displayMyFavoritePosts"
-              >お気に入りの投稿</a
-            >
-          </li>
-          <li v-if="isLoggedIn">
-            <a
-              href=""
-              :class="{ is_active_menu: isActiveMenu('myPosts') }"
-              @click.prevent="displayMyPosts"
-              >自分の投稿</a
-            >
+              {{ obj.name }}
+            </a>
           </li>
         </ul>
       </nav>
-      <nav class="list-follow">
-        <ul>
+      <nav class="nav">
+        <ul class="list">
           <!-- フォローしているユーザーのリストを表示 -->
           <template v-if="isLoggedIn">
-            <li class="ttl">フォロー</li>
-            <li>
-              <a href="" @click.prevent="toggleUser('followee')">フォロー</a>
+            <li class="list__title">フォロー</li>
+            <li
+              class="list__item"
+              v-for="menuObj in followMenu"
+              :key="menuObj.name"
+            >
+              <a
+                href=""
+                class="list__link"
+                @click.prevent="toggleUser(menuObj.type)"
+                >{{ menuObj.name }}</a
+              >
               <!-- ドロップダウンメニュー -->
-              <ul class="list_user" v-show="showFolloweeList">
-                <li v-for="followObj in follow" :key="followObj.id">
-                  <router-link to="home">
-                    <div class="icon">
-                      <img :src="followObj.follow.iconURL" />
-                    </div>
-                    <p>{{ followObj.follow.username }}</p>
-                  </router-link>
-                </li>
-                <a
-                  class="btn_close"
-                  href=""
-                  @click.prevent="closeUserList('followee')"
-                  >閉じる</a
+              <ul
+                class="list"
+                v-show="
+                  menuObj.type === 'followee'
+                    ? showFolloweeList
+                    : showFollowerList
+                "
+              >
+                <li
+                  class="list__item"
+                  v-for="obj in followsList(menuObj.type)"
+                  :key="obj.id"
                 >
-              </ul>
-            </li>
-
-            <!-- フォロワーのリストを表示 -->
-            <li>
-              <a href="" @click.prevent="toggleUser('follower')">フォロワー</a>
-              <!-- ドロップダウンメニュー -->
-              <ul class="list_user" v-show="showFollowerList">
-                <li v-for="followerObj in follower" :key="followerObj.id">
-                  <router-link to="home">
-                    <div class="icon">
-                      <img :src="followerObj.user.iconURL" />
+                  <router-link
+                    class="list__link list__link--small"
+                    :to="{
+                      name: 'userView',
+                      params: {
+                        id: followsObjKey(menuObj.type, obj).id,
+                      },
+                    }"
+                  >
+                    <div class="item-icon">
+                      <img
+                        class="item-icon__img"
+                        :src="followsObjKey(menuObj.type, obj).iconURL"
+                      />
                     </div>
-                    <p>{{ followerObj.user.username }}</p>
+                    <p class="list__username">
+                      {{ followsObjKey(menuObj.type, obj).username }}
+                    </p>
                   </router-link>
                 </li>
                 <a
-                  class="btn_close"
+                  class="list__link list__link--large"
                   href=""
-                  @click.prevent="closeUserList('follower')"
+                  @click.prevent="closeUserList(menuObj.type)"
                   >閉じる</a
                 >
               </ul>
             </li>
           </template>
           <template v-else>
-            <li class="list_no_login">
-              <p>ログインするとフォロー機能を使用できます</p>
-              <router-link to="/login" class="btn_login" tag="button"
-                >ログイン</router-link
+            <li class="item-no-login">
+              <p class="item-no-login__text">
+                ログインするとフォロー機能を使用できます
+              </p>
+              <router-link
+                to="/login"
+                class="item-no-login__btn-login"
+                tag="button"
               >
+                ログイン
+              </router-link>
             </li>
           </template>
         </ul>
       </nav>
       <div class="side-footer">
-        <ul>
-          <li><a href="">サイト概要</a></li>
+        <ul class="list">
+          <li class="list__item"><a href="">サイト概要</a></li>
         </ul>
       </div>
     </aside>
@@ -110,6 +112,7 @@
           @filter="filterPosts"
           :currentMenu="activeMenu"
           :myId="userId"
+          v-show="$route.name === 'home'"
         />
         <router-view :postList="displayedPosts" />
       </div>
@@ -133,19 +136,45 @@ export default {
       showFolloweeList: false,
       showFollowerList: false,
       activeMenu: "home",
+      mainMenu: {
+        // サイドメニュー一覧
+        home: {
+          login: false,
+          name: "ホーム",
+          type: "home",
+        },
+        followee: {
+          login: true,
+          name: "フォローユーザーの投稿",
+          type: "followee",
+        },
+        favorites: {
+          login: true,
+          name: "お気に入りの投稿",
+          type: "favorites",
+        },
+        myPosts: {
+          login: true,
+          name: "自分の投稿",
+          type: "myPosts",
+        },
+      },
+      followMenu: {
+        followee: {
+          name: "フォロー",
+          type: "followee",
+        },
+        follower: {
+          name: "フォロワー",
+          type: "follower",
+        },
+      },
     };
   },
   computed: {
     ...mapGetters("posts", ["followeePosts", "myPosts", "myFavoritePosts"]),
     ...mapGetters("auth", ["isLoggedIn", "userId"]),
     ...mapGetters("follows", ["follow", "follower"]),
-    isActiveMenu() {
-      return (menuType) => {
-        if (menuType === this.activeMenu) {
-          return true;
-        }
-      };
-    },
   },
   created() {
     Promise.all([
@@ -157,35 +186,43 @@ export default {
     });
   },
   methods: {
+    // フォローデータの種類を判定しデータのリストを返す
+    followsList(type) {
+      // フォローしているユーザー一覧を取得する場合
+      if (type === "followee") {
+        return this.follow;
+
+        // フォロワー一覧を取得する場合
+      } else if (type === "follower") {
+        return this.follower;
+      }
+    },
+    // フォローデータの種類を判定しデータの属性の値を返す
+    followsObjKey(type, obj) {
+      if (type === "followee") {
+        return obj.follow;
+      } else if (type === "follower") {
+        return obj.user;
+      }
+    },
     // 投稿を表示する画面に遷移
     switchRoute() {
       if (this.$route.name !== "home") {
         this.$router.push("/");
       }
     },
-    // フォローしているユーザーの投稿一覧表示
-    displayFolloweePosts() {
+    // 投稿を切り替え表示
+    switchPosts(type) {
+      const menuAndPosts = {
+        // メニューの種類と表示する投稿の対応表
+        home: this.latestPosts,
+        followee: this.followeePosts,
+        favorites: this.myFavoritePosts,
+        myPosts: this.myPosts,
+      };
       this.switchRoute();
-      this.activeMenu = "followee";
-      this.displayedPosts = this.followeePosts;
-    },
-    // 自分の投稿一覧表示
-    displayMyPosts() {
-      this.switchRoute();
-      this.activeMenu = "myPosts";
-      this.displayedPosts = this.myPosts;
-    },
-    // 最新の投稿を表示
-    displayLatestPosts() {
-      this.switchRoute();
-      this.activeMenu = "home";
-      this.displayedPosts = this.latestPosts;
-    },
-    // お気に入りの投稿を表示
-    displayMyFavoritePosts() {
-      this.switchRoute();
-      this.activeMenu = "favorites";
-      this.displayedPosts = this.myFavoritePosts;
+      this.activeMenu = type;
+      this.displayedPosts = menuAndPosts[type];
     },
     // フォローしているユーザーの表示を切り替える
     toggleUser(userType) {
@@ -263,7 +300,7 @@ a {
   background: rgb(129, 50, 155);
 }
 
-.ttl {
+.list__title {
   display: flex;
   align-items: center;
   height: 50px;
@@ -272,14 +309,14 @@ a {
   font-size: 1.2em;
 }
 
-nav a {
+.list__link {
   display: flex;
   align-items: center;
   height: 50px;
   padding-left: 30px;
 }
 
-nav a:hover {
+.list__link:hover {
   background: rgba(124, 46, 150, 0.918);
   cursor: pointer;
 }
@@ -289,25 +326,23 @@ nav a:hover {
   padding: 10px 0;
 }
 
-.list_user a {
-  display: flex;
-  align-items: center;
+.list__link--small {
   height: 40px;
 }
 
-.list_user a > p {
+.list__username {
   margin-left: 20px;
   overflow: hidden;
   color: white;
 }
 
-.icon {
+.item-icon {
   width: 30px;
   height: 30px;
   background: silver;
 }
 
-.icon > img {
+.item-icon__img {
   width: 30px;
   height: 30px;
   object-fit: cover;
@@ -322,28 +357,28 @@ nav a:hover {
   font-size: 0.8em;
 }
 
-nav {
+.nav {
   border-bottom: 2px solid gray;
 }
 
-.btn_close {
+.list__link--large {
   padding: 5px 30px;
   font-size: 0.9em;
 }
 
 /* ログインしていない場合のフォロー部分 */
-.list_no_login {
+.item-no-login {
   min-height: 100px;
   padding: 20px;
 }
 
-.list_no_login > p {
+.item-no-login__text {
   color: silver;
   font-size: 0.7em;
   text-align: center;
 }
 
-.btn_login {
+.item-no-login__btn-login {
   display: block;
   width: 130px;
   height: 40px;

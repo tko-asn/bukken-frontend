@@ -202,25 +202,21 @@ export default {
       }
       return false;
     },
-    // 住所のデータ
-    addressData() {
-      return (address) => {
-        return (
-          address?.["prefecture"] +
-          address?.["municipality"] +
-          address?.["townName"] +
-          address?.["buildingName"]
-        );
-      };
-    },
-    // カテゴリーの数
-    categoryLength() {
-      return (post) => {
-        return post.categories?.length;
-      };
-    },
   },
   methods: {
+    // カテゴリーの数を返す
+    categoryLength(post) {
+      return post.categories?.length;
+    },
+    // 所在地のデータを連結して返す
+    addressData(address) {
+      return (
+        address?.["prefecture"] +
+        address?.["municipality"] +
+        address?.["townName"] +
+        address?.["buildingName"]
+      );
+    },
     // お気に入りの投稿を追加
     createFavoritePost() {
       // ログインしていない場合はログインページへ
@@ -346,7 +342,7 @@ a {
 /* 質問部分 */
 .block-content {
   margin-bottom: 40px;
-  padding: 20px;
+  padding: 10px 20px;
   border-radius: 2px;
   background: white;
   box-shadow: 0 3px 2px rgb(158, 156, 156);

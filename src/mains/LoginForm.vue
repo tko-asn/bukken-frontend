@@ -1,45 +1,53 @@
 <template>
   <div class="container">
     <!-- ログインフォーム -->
-    <form @submit.prevent="login" class="login_form">
+    <form @submit.prevent="login" class="form-login">
       <!-- ラベル -->
-      <div class="head_login_form">
-        <p class="ttl">Login</p>
-      </div>
+      <p class="form-login__title">Login</p>
 
       <!-- フォーム -->
-      <div class="body_login_form">
-        <!-- ユーザー名 -->
-        <input
-          class="input_username"
-          type="text"
-          placeholder="ユーザー名またはメールアドレス"
-          v-model="username"
+      <!-- ユーザー名 -->
+      <input
+        class="form-login__input-username"
+        type="text"
+        placeholder="ユーザー名またはメールアドレス"
+        v-model="username"
+      />
+
+      <!-- ユーザー名のバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="usernameMessage"
         />
-
-        <!-- ユーザー名のバリデーションメッセージ -->
-        <ValidationMessage :messages="usernameMessage" />
-
-        <!-- パスワード -->
-        <input
-          class="input_password"
-          type="password"
-          placeholder="パスワード"
-          v-model="password"
-        />
-
-        <!-- パスワードのバリデーションメッセージ -->
-        <ValidationMessage :messages="passwordMessage" />
-
-        <!-- ボタン -->
-        <button ref="login_button" class="btn_login">ログイン</button>
       </div>
+
+      <!-- パスワード -->
+      <input
+        class="form-login__input-password"
+        type="password"
+        placeholder="パスワード"
+        v-model="password"
+      />
+
+      <!-- パスワードのバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="passwordMessage"
+        />
+      </div>
+
+      <!-- ボタン -->
+      <button ref="login_button" class="form-login__btn-login">ログイン</button>
     </form>
 
     <!-- サインアップフォームのリンク -->
-    <div class="link_sign_up">
-      <p>アカウントを持っていない場合</p>
-      <router-link to="/signup">アカウントを作成</router-link>
+    <div class="block-sign-up">
+      <p class="block-sign-up__text">アカウントを持っていない場合</p>
+      <router-link class="block-sign-up__link" to="/signup"
+        >アカウントを作成</router-link
+      >
     </div>
   </div>
 </template>
@@ -116,14 +124,14 @@ export default {
 
       // 文字数
       if (!this.username) {
-        this.usernameMessage.push("ユーザー名を入力して下さい。");
+        this.usernameMessage.push("ユーザー名を入力してください。");
       }
 
       // パスワードのバリデーション（最大1個）
 
       // 文字数
       if (!this.password) {
-        this.passwordMessage.push("パスワードを入力して下さい。");
+        this.passwordMessage.push("パスワードを入力してください。");
       }
     },
   },
@@ -131,20 +139,16 @@ export default {
 </script>
 
 <style scoped>
-/* 基本設定 */
-a {
-  color: rgb(52, 189, 161);
-  text-decoration: none;
-}
-
 .container {
   padding: 190px 0 0;
 }
 
 /* ログインフォーム */
-.login_form {
+.form-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   max-width: 510px;
-  height: 400px;
   margin: 0 auto;
   border: 4px solid rgb(143, 141, 141);
   border-radius: 7px;
@@ -152,78 +156,80 @@ a {
 }
 
 /* フォームラベル */
-.head_login_form {
+.form-login__title {
   display: flex;
-  justify-content: center;
-  margin: 0 0 20px;
-  text-align: center;
-}
-
-.head_login_form .ttl {
-  position: relative;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   font-size: 1.8em;
   letter-spacing: 6px;
 }
 
-.head_login_form .ttl:after {
+.form-login__title:after {
   content: "";
   display: block;
   width: 90%;
   height: 4px;
-  margin: 10px auto 0;
+  margin: 10px 0 0;
   background: #0fc;
 }
 
 /* 入力欄 */
-.body_login_form {
-  display: flex;
-  flex-direction: column;
-}
-
 [class*="input"] {
   width: 85%;
   height: 45px;
-  margin: 0 auto;
-  padding-left: 15px;
+  padding: 0 15px;
   border: 1px solid silver;
   border-radius: 5px;
   font-size: 1.2em;
 }
 
-.body_login_form > ::placeholder {
+.form-login::placeholder {
   color: rgb(170, 167, 167);
   letter-spacing: 2px;
 }
 
 /* ボタン */
-.btn_login {
-  width: 87%;
+.form-login__btn-login {
+  width: 90%;
   height: 50px;
-  margin: 0 auto 10px;
-  border-width: 0px;
+  margin-bottom: 30px;
+  border: none;
   border-radius: 5px;
   background: rgb(16, 211, 65);
   color: #fff;
-  font-size: 1em;
   letter-spacing: 3px;
 }
 
-.btn_login:hover {
+.form-login__btn-login:hover {
   background: rgb(22, 236, 75);
 }
 
+.form-login__btn-login:disabled {
+  opacity: 0.4;
+}
+
 /* サインアップフォームへのリンク部分 */
-.link_sign_up {
-  margin: 45px 0 0;
+.block-sign-up {
   color: gray;
   font-size: 1.2em;
   letter-spacing: 2px;
   text-align: center;
 }
 
-.link_sign_up > p {
-  margin: 0 0 10px;
+.block-sign-up__text {
+  margin: 45px 0 10px;
   font-size: 0.8em;
+}
+
+.block-sign-up__link {
+  color: rgb(52, 189, 161);
+  text-decoration: none;
+}
+
+/* バリデーションメッセージ */
+.item-validation {
+  width: 90%;
+  padding-bottom: 15px;
 }
 </style>

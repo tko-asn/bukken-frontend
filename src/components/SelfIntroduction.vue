@@ -1,10 +1,12 @@
 <template>
   <!-- 自己紹介 -->
-  <div>
-    <div class="self_introduction" v-if="selfIntroduction">
-      <p>{{ selfIntroduction }}</p>
-    </div>
-    <p class="no_self_introduction" v-else>自己紹介はありません</p>
+  <div class="item-self-intro">
+    <p class="item-self-intro__text" v-if="selfIntroduction">
+      {{ selfIntroduction }}
+    </p>
+    <p class="item-self-intro__text item-self-intro__text--center" v-else>
+      自己紹介はありません
+    </p>
   </div>
 </template>
 
@@ -18,14 +20,14 @@ export default {
 
 <style scoped>
 /* 自己紹介 */
-.self_introduction {
+.item-self-intro {
   padding: 10px 50px;
   overflow-wrap: break-word;
   background: #fff;
   font-size: 1.1em;
 }
 
-.no_self_introduction {
+.item-self-intro__text--center {
   text-align: center;
 }
 </style>

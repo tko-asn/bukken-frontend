@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import FollowsList from '@/components/FollowsList';
+import FollowsList from "@/components/FollowsList";
 
 export default {
   components: {

@@ -1,75 +1,90 @@
 <template>
-  <div class="area_sign_up_form">
-    <div class="container">
-      <!-- サインアップフォーム -->
-      <form @submit.prevent="signUp" class="sign_up_form">
-        <!-- ラベル -->
-        <div class="head_sign_up_form">
-          <p class="ttl">Sign Up</p>
-        </div>
+  <div class="container">
+    <!-- サインアップフォーム -->
+    <form @submit.prevent="signUp" class="form-sign-up">
+      <!-- ラベル -->
+      <p class="form-sign-up__title">Sign Up</p>
 
-        <!-- フォーム -->
-        <div class="body_sign_up_form">
-          <!-- ユーザー名 -->
-          <input
-            class="input_username"
-            type="text"
-            placeholder="ユーザー名"
-            v-model="username"
-          />
-          
-          <!-- ユーザー名のバリデーションメッセージ -->
-          <ValidationMessage :messages="usernameMessage" />
+      <!-- ユーザー名 -->
+      <input
+        class="form-sign-up__input-username"
+        type="text"
+        placeholder="ユーザー名"
+        v-model="username"
+      />
 
-          <!-- メールアドレス -->
-          <input
-            class="input_email"
-            type="text"
-            placeholder="メールアドレス"
-            v-model="email"
-          />
-
-          <!-- メールアドレスのバリデーションメッセージ -->
-          <ValidationMessage :messages="emailMessage" />
-
-          <!-- パスワード -->
-          <input
-            class="input_password"
-            type="password"
-            placeholder="パスワード"
-            v-model="password"
-          />
-
-          <!-- パスワードのバリデーションメッセージ -->
-          <ValidationMessage :messages="passwordMessage" />
-
-          <!-- 確認用パスワード -->
-          <input
-            class="input_confirmation"
-            type="password"
-            placeholder="確認用パスワード"
-            v-model="confirmationPassword"
-          />
-
-          <!-- 確認用パスワードのバリデーションメッセージ -->
-          <ValidationMessage :messages="cpMessage" />
-
-          <!-- ボタン -->
-          <button ref="sign_up_button" class="btn_sign_up">新規作成</button>
-        </div>
-      </form>
-
-      <!-- ログインフォームのリンク -->
-      <div class="link_login">
-        <p>アカウントをお持ちの場合</p>
-        <router-link to="/login">ログイン</router-link>
+      <!-- ユーザー名のバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="usernameMessage"
+        />
       </div>
+
+      <!-- メールアドレス -->
+      <input
+        class="form-sign-up__input-email"
+        type="text"
+        placeholder="メールアドレス"
+        v-model="email"
+      />
+
+      <!-- メールアドレスのバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="emailMessage"
+        />
+      </div>
+
+      <!-- パスワード -->
+      <input
+        class="form-sign-up__input-password"
+        type="password"
+        placeholder="パスワード"
+        v-model="password"
+      />
+
+      <!-- パスワードのバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="passwordMessage"
+        />
+      </div>
+
+      <!-- 確認用パスワード -->
+      <input
+        class="form-sign-up__input-cfm-password"
+        type="password"
+        placeholder="確認用パスワード"
+        v-model="confirmationPassword"
+      />
+
+      <!-- 確認用パスワードのバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="cfmMessage"
+        />
+      </div>
+
+      <!-- ボタン -->
+      <button ref="sign_up_button" class="form-sign-up__btn-sign-up">
+        新規作成
+      </button>
+    </form>
+
+    <!-- ログインフォームのリンク -->
+    <div class="block-login">
+      <p class="block-login__text">アカウントをお持ちの場合</p>
+      <router-link class="block-login__link" to="/login">ログイン</router-link>
     </div>
   </div>
 </template>
 
 <script>
-import ValidationMessage from '@/components/ValidationMessage';
+import ValidationMessage from "@/components/ValidationMessage";
 
 export default {
   components: {
@@ -85,7 +100,7 @@ export default {
       usernameMessage: [],
       emailMessage: [],
       passwordMessage: [],
-      cpMessage: [], 
+      cfmMessage: [],
     };
   },
   methods: {
@@ -98,17 +113,17 @@ export default {
       this.usernameMessage = [];
       this.emailMessage = [];
       this.passwordMessage = [];
-      this.cpMessage = [];
+      this.cfmMessage = [];
 
       // バリデーションを実行
       this.validate();
 
       // バリデーションメッセージが格納されている場合は終了
       if (
-        this.usernameMessage.length || 
-        this.emailMessage.length || 
-        this.passwordMessage.length || 
-        this.cpMessage.length
+        this.usernameMessage.length ||
+        this.emailMessage.length ||
+        this.passwordMessage.length ||
+        this.cfmMessage.length
       ) {
         // ボタンを有効化
         buttonElement.disabled = false;
@@ -138,7 +153,7 @@ export default {
 
       // 文字数
       if (!this.username) {
-        this.usernameMessage.push("ユーザー名を入力して下さい。");
+        this.usernameMessage.push("ユーザー名を入力してください。");
       }
 
       // メールアドレスのバリデーション（最大1個）
@@ -149,19 +164,17 @@ export default {
 
       // 文字数
       if (!this.email) {
-        this.emailMessage.push("メールアドレスを入力して下さい。");
+        this.emailMessage.push("メールアドレスを入力してください。");
         // 正規表現
       } else if (!reg.test(this.email)) {
-        this.emailMessage.push(
-          "メールアドレスを正しく入力して下さい。"
-        );
+        this.emailMessage.push("メールアドレスを正しく入力してください。");
       }
 
       // パスワードのバリデーション（最大1個）
 
       // 文字数
       if (!this.password) {
-        this.passwordMessage.push("パスワードを入力して下さい。");
+        this.passwordMessage.push("パスワードを入力してください。");
       } else if (this.password.length < 8) {
         this.passwordMessage.push("パスワードは8文字以上です。");
       }
@@ -170,11 +183,11 @@ export default {
 
       // 文字数
       if (!this.confirmationPassword) {
-        this.cpMessage.push("確認用パスワードを入力して下さい。");
+        this.cfmMessage.push("確認用パスワードを入力してください。");
 
         // 確認用パスワードの判定
       } else if (this.confirmationPassword !== this.password) {
-        this.cpMessage.push('確認用パスワードが正しくありません。');
+        this.cfmMessage.push("確認用パスワードが正しくありません。");
       }
     },
   },
@@ -182,77 +195,61 @@ export default {
 </script>
 
 <style scoped>
-/* 基本設定 */
-a {
-  color: rgb(52, 189, 161);
-  text-decoration: none;
-}
-
 .container {
-  max-width: 1160px;
-  margin: 0 auto;
   padding: 120px 0 0;
 }
 
 /* サインアップフォーム */
-.sign_up_form {
+.form-sign-up {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   max-width: 510px;
-  height: 540px;
   margin: 0 auto;
+  border: 4px solid rgb(143, 141, 141);
   border-radius: 7px;
   background: #fff;
 }
 
 /* フォームラベル */
-.head_sign_up_form {
+.form-sign-up__title {
   display: flex;
-  justify-content: center;
-  margin: 0 0 5px;
-  text-align: center;
-}
-
-.head_sign_up_form .ttl {
-  position: relative;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   font-size: 1.8em;
   letter-spacing: 6px;
 }
 
-.head_sign_up_form .ttl:after {
+.form-sign-up__title:after {
   content: "";
   display: block;
   width: 90%;
   height: 4px;
-  margin: 10px auto 0;
+  margin-top: 5px;
   background: #0fc;
 }
 
 /* 入力欄 */
-.body_sign_up_form {
-  display: flex;
-  flex-direction: column;
-}
-
 [class*="input"] {
   width: 85%;
-  height: 45px;
-  margin: 0 auto;
-  padding-left: 15px;
+  height: 40px;
+  padding: 0 15px;
   border: 1px solid silver;
   border-radius: 5px;
   font-size: 1.1em;
 }
 
-.body_sign_up_form > ::placeholder {
+.form-sign-up::placeholder {
   color: rgb(170, 167, 167);
   letter-spacing: 3px;
 }
 
 /* ボタン */
-.btn_sign_up {
-  width: 87%;
+.form-sign-up__btn-sign-up {
+  width: 90%;
   height: 50px;
-  margin: 5px auto;
+  margin: 0 0 30px;
   border-width: 0px;
   border-radius: 5px;
   background: rgb(16, 211, 65);
@@ -261,21 +258,35 @@ a {
   letter-spacing: 3px;
 }
 
-.btn_sign_up:hover {
+.form-sign-up__btn-sign-up:hover {
   background: rgb(22, 236, 75);
 }
 
+.form-sign-up__btn-sign-up:disabled {
+  opacity: 0.4;
+}
+
 /* ログインフォームへのリンク部分 */
-.link_login {
-  margin: 35px 0 0;
+.block-login {
   color: gray;
   font-size: 1.2em;
   letter-spacing: 2px;
   text-align: center;
 }
 
-.link_login > p {
-  margin: 0 0 8px;
+.block-login__text {
+  margin: 35px 0 8px;
   font-size: 0.8em;
+}
+
+.block-login__link {
+  color: rgb(52, 189, 161);
+  text-decoration: none;
+}
+
+/* バリデーションメッセージ */
+.item-validation {
+  width: 90%;
+  padding-bottom: 10px;
 }
 </style>

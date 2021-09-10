@@ -1,132 +1,120 @@
 <template>
-  <div class="my_page">
-    <div class="area_head_profile">
+  <div class="block-my-page">
+    <div class="block-my-page__item-top">
       <div class="container">
-        <div class="layout_2_div">
-          <div class="left_profile">
-            <!-- アイコン画像 -->
-            <div class="icon">
-              <img :src="displayedIconURL" v-show="displayedIconURL" />
-            </div>
+        <div class="container__block-left">
+          <!-- アイコン画像 -->
+          <div class="item-icon">
+            <img
+              class="item-icon__img"
+              :src="displayedIconURL"
+              v-show="displayedIconURL"
+            />
           </div>
+        </div>
 
-          <div class="right_profile">
-            <!-- ユーザー名 -->
-            <div class="username">
-              <p>
-                {{ displayedUsername }}
-              </p>
-            </div>
+        <div class="container__block-right">
+          <!-- ユーザー名 -->
+          <p class="container__username">
+            {{ displayedUsername }}
+          </p>
 
-            <!-- プロフィール編集ボタン -->
-            <div class="option_right_profile" v-if="isMe">
-              <router-link
-                class="btn_edit_profile"
-                :to="{ name: 'editProfile' }"
-                >プロフィールを編集</router-link
-              >
-            </div>
+          <!-- プロフィール編集ボタン -->
+          <router-link
+            class="container__btn"
+            :to="{ name: 'editProfile' }"
+            v-if="isMe"
+            >プロフィールを編集
+          </router-link>
 
-            <!-- フォローボタン -->
-            <div class="option_right_profile" v-else>
-              <a
-                class="btn_follow_user"
-                v-show="!isYourFavoriteUser"
-                @click="followUser"
-                >フォローする</a
-              >
-              <a
-                class="btn_follow_user"
-                v-show="isYourFavoriteUser"
-                @click="unfollowUser"
-                >フォローを解除</a
-              >
-            </div>
-          </div>
+          <!-- フォローボタン -->
+          <template v-else>
+            <a
+              href=""
+              class="container__btn"
+              v-show="!isYourFavoriteUser"
+              @click.prevent="followUser"
+              >フォローする</a
+            >
+            <a
+              href=""
+              class="container__btn"
+              v-show="isYourFavoriteUser"
+              @click.prevent="unfollowUser"
+              >フォローを解除</a
+            >
+          </template>
         </div>
       </div>
     </div>
 
-    <div class="area_body_profile">
-      <!-- ユーザーの投稿一覧 -->
-      <section class="content_list">
-        <div class="head_content_list">
-          <p class="ttl">{{ contentListTitle[$route.name] }}</p>
-        </div>
-
-        <div
-          :class="{ body_content_list: true, scroll_content_list: isScroll }"
-        >
-          <router-view
-            :isMe="isMe"
-            :userId="id"
-            :follow="follow"
-            :follower="follower"
-            :selfIntroduction="displayedSelfIntroduction"
-          />
-        </div>
-      </section>
-
-      <!-- メニュー -->
-      <aside class="side_menu">
-        <!-- 投稿一覧 -->
-        <div>
-          <!-- マイページの場合 -->
-          <template v-if="isMe">
-            <a
-              href=""
-              class="ttl"
-              @click.prevent="openSideMenu('posts', $event)"
-              >投稿一覧</a
-            >
-            <div id="" class="item_posts" v-show="items.posts">
-              <a href="">自分の投稿</a>
-              <a href="">お気に入りの投稿</a>
-            </div>
-          </template>
-
-          <!-- ログインユーザー以外の場合 -->
-          <template v-else>
-            <a href="" class="ttl" @click.prevent="openSideMenu('posts')"
-              >ユーザーの投稿</a
-            >
-          </template>
-        </div>
-
-        <!-- フォロー -->
-        <div>
-          <a
-            href=""
-            class="ttl"
-            @click.prevent="openSideMenu('following', $event)"
-            >フォロー</a
-          >
-          <div id="" class="item_following" v-show="items.following">
-            <router-link :to="{ name: 'followList' }"
-              >フォローしているユーザー</router-link
-            >
-            <router-link :to="{ name: 'followerList' }">フォロワー</router-link>
+    <div class="block-my-page__item-bottom">
+      <div class="container container--space">
+        <!-- コンテンツ -->
+        <section class="container__section">
+          <h2 class="container__title">{{ contentListTitle[$route.name] }}</h2>
+          <div :class="{ 'item-content': true, container__scroll: isScroll }">
+            <router-view
+              :isMe="isMe"
+              :userId="id"
+              :follow="follow"
+              :follower="follower"
+              :selfIntroduction="displayedSelfIntroduction"
+            />
           </div>
-        </div>
+        </section>
 
-        <!-- 設定 -->
-        <div v-if="isMe">
-          <a
-            href=""
-            class="ttl"
-            @click.prevent="openSideMenu('settings', $event)"
-            >設定</a
-          >
-          <div id="" class="item_settings" v-show="items.settings">
-            <router-link :to="{ name: 'editProfile' }"
-              >プロフィール編集</router-link
+        <!-- メニュー -->
+        <aside class="side-menu">
+          <ul class="list">
+            <li
+              :class="{ list__item: true, 'list__link--active': item.open }"
+              v-for="item in sideMenuList"
+              :key="item.name"
+              v-show="showMenuItem(item)"
             >
-            <router-link :to="{ name: 'authInfo' }">認証情報</router-link>
-            <a href="" @click.prevent="logout">ログアウト</a>
-            <a href="" @click.prevent="showDeleteAccount">アカウントを閉鎖</a>
-          </div>
-        </div>
-      </aside>
+              <router-link
+                class="list__link"
+                :to="{ name: item.link.name }"
+                v-if="item.link"
+              >
+                {{ item.name }}
+              </router-link>
+              <a
+                href=""
+                class="list__link"
+                @click.prevent="pullDownMenu(item)"
+                v-else
+              >
+                {{ item.name }}
+              </a>
+              <ul class="list" v-show="item.children && item.open">
+                <li
+                  class="list__item"
+                  v-for="child in item.children"
+                  :key="child.name"
+                >
+                  <router-link
+                    class="list__link list__link--small"
+                    :to="{ name: child.link.name }"
+                    v-if="child.link"
+                  >
+                    {{ child.name }}
+                  </router-link>
+                  <a
+                    href=""
+                    class="list__link list__link--small"
+                    @click.prevent="child.methodName"
+                    v-else
+                  >
+                    {{ child.name }}
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </aside>
+      </div>
     </div>
 
     <!-- モーダルウィンドウ -->
@@ -163,18 +151,11 @@ export default {
       displayedUsername: "",
       displayedSelfIntroduction: "",
       displayedIconURL: "",
-      // サイドメニューのv-show用boolean
-      items: {
-        posts: false,
-        following: false,
-        settings: false,
-      },
       // モーダルウィンドウの情報
       modalInfo: {
         slotName: "", // 表示するモーダルウィンドウ
         showWindow: false, // モーダルウィンドウの表示・非表示
       },
-      // deleteText: "", // アカウント閉鎖確認用
       contentListTitle: {
         userView: "プロフィール",
         authInfo: "認証情報",
@@ -182,6 +163,71 @@ export default {
         followList: "フォロー",
         followerList: "フォロワー",
       },
+      // サイドメニュー一覧
+      sideMenuList: [
+        {
+          name: "ユーザーの投稿",
+          myPageItem: false, 
+        },
+        {
+          name: "フォロー",
+          open: false, // 展開するメニューにのみ指定
+          children: [
+            {
+              name: "フォローしているユーザー",
+              link: {
+                name: "followList",
+              },
+            },
+            {
+              name: "フォロワー",
+              link: {
+                name: "followerList",
+              },
+            },
+          ],
+        },
+        {
+          name: "プロフィール",
+          myPageItem: false,
+          link: {
+            name: "userView",
+          },
+        },
+        {
+          name: "設定",
+          open: false,
+          myPageItem: true,
+          children: [
+            {
+              name: "プロフィール",
+              link: {
+                name: "userView",
+              },
+            },
+            {
+              name: "プロフィール編集",
+              link: {
+                name: "editProfile",
+              },
+            },
+            {
+              name: "認証情報",
+              link: {
+                name: "authInfo",
+              },
+            },
+            {
+              name: "ログアウト",
+              methodName: this.logout,
+            },
+            {
+              name: "アカウントを閉鎖",
+              methodName: this.showDeleteAccount,
+            },
+          ],
+        },
+      ],
     };
   },
   computed: {
@@ -195,7 +241,7 @@ export default {
     ]),
     // ログインユーザーのフォローしているユーザーのリスト
     ...mapGetters("follows", ["follow", "follower"]),
-    // ログインユーザーかどうか判定
+    // 自分のページかどうか判定
     isMe() {
       if (this.userId === this.id) {
         return true;
@@ -251,12 +297,25 @@ export default {
     }
   },
   methods: {
-    // サイドメニューのアイテムを開閉
-    openSideMenu(itemName, event) {
-      if (event) {
-        event.target.classList.toggle("active_side_menu");
+    // サイドメニューの表示・非表示
+    showMenuItem(item) {
+      // フォローはマイページでもユーザーページでも表示
+      if (item.name === "フォロー") {
+        return true;
       }
-      this.items[itemName] = !this.items[itemName];
+
+      // マイページかどうか
+      return this.isMe ? item.myPageItem : !item.myPageItem;
+    },
+    // メニューの開閉
+    pullDownMenu(item) {
+      // 展開できないメニューの場合
+      if ("open" in item === false) {
+        return;
+      }
+
+      // 展開できるメニューの場合
+      item.open = !item.open;
     },
     // ログアウト
     logout() {
@@ -311,6 +370,9 @@ export default {
   },
   watch: {
     id(val) {
+      // 開いていたサイドメニューを閉じる
+      this.sideMenuList.map((el) => (el.open = false));
+
       // URLのidが更新されたとき
       if (!this.isMe) {
         // 自分以外のユーザーのidの場合
@@ -319,8 +381,9 @@ export default {
           this.displayedSelfIntroduction = response.data.self_introduction;
           this.displayedIconURL = response.data.icon_url;
         });
+
+        // idがログインユーザー自身の場合
       } else {
-        // idがログインユーザー自身のものの場合
         this.displayedUsername = this.username;
         this.displayedSelfIntroduction = this.selfIntroduction;
         this.displayedIconURL = this.iconURL;
@@ -333,148 +396,104 @@ export default {
 <style scoped>
 /* 基本設定 */
 a {
-  display: block;
   color: #fff;
   text-decoration: none;
 }
 
-p {
-  margin: 0;
-}
-
-.container {
-  width: 90%;
-  margin: 0 auto;
-}
-
-/* ページ全体 */
-.my_page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  margin: 0 auto;
-}
-
-/* ミドル部分 */
-.area_head_profile {
+/* トップ部分 */
+.block-my-page__item-top {
   width: 100%;
   padding: 80px 0 10px;
   box-shadow: 0 3px 5px rgb(165, 164, 164);
   background: #fff;
 }
 
-.layout_2_div {
+/* コンテナ */
+.container {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  width: 80%;
+  margin: 0 auto;
+}
+
+/* 子要素を両端に寄せるコンテナ */
+.container--space {
+  justify-content: space-around;
+  align-items: flex-start;
 }
 
 /* プロフィールの左部分 */
-.left_profile {
+.container__block-left {
   width: 200px;
   height: 200px;
 }
 
-.left_profile > div {
-  width: 100%;
-  text-align: center;
-}
-
 /* アイコン画像 */
-.icon {
+.item-icon {
   width: 100%;
   height: 100%;
   background: silver;
 }
 
-.icon > img {
+.item-icon__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 /* プロフィールの右部分 */
-.right_profile {
-  width: 600px;
+.container__block-right {
   margin: 10px 10%;
 }
 
 /* ユーザー名 */
-.username {
+.container__username {
   width: 100%;
   overflow: hidden;
   font-size: 1.7em;
   letter-spacing: 2px;
 }
 
-/* プロフィール編集ボタン */
-.option_right_profile {
+/* プロフィール編集・フォローボタン */
+.container__btn {
+  padding: 5px 30px;
   margin-top: 20px;
-}
-
-.option_right_profile > a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50%;
-  height: 35px;
   border-radius: 3px;
   background: rgb(42, 85, 226);
   font-size: 1.08em;
-  cursor: pointer;
+  text-align: center;
 }
 
-.option_right_profile > a:hover {
-  background: rgb(25, 47, 119);
+.container__btn:hover {
+  opacity: 0.6;
 }
 
 /* ボトム部分 */
-.area_body_profile {
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-  width: 95%;
+.block-my-page__item-bottom {
   margin: 40px auto 0;
 }
 
-.area_body_profile > * {
-  box-shadow: 0 5px 5px rgb(165, 164, 164);
-}
-
-/* コンテントリストの見出し */
-.head_content_list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50px;
-  font-weight: bold;
-}
-
-/* セクションのタイトル */
-.ttl {
-  color: #fff;
-  font-size: 1.1em;
-  letter-spacing: 3px;
-}
-
 /* コンテンツのリスト */
-.content_list {
+.container__section {
   width: 60%;
   min-height: 90px;
   overflow: hidden;
+  border: 3px solid gray;
   border-radius: 5px;
 }
 
-.head_content_list {
-  background: rgb(139, 140, 146);
+.container__title {
+  font-size: 1.3em;
+  text-align: center;
 }
 
-.body_content_list {
+.item-content {
   max-height: 300px;
+  background: #fff;
 }
 
 /* スクロールバー */
-.scroll_content_list {
+.container__scroll {
   overflow-y: scroll;
 }
 
@@ -488,40 +507,41 @@ p {
 }
 
 /* サイドメニュー */
-.side_menu {
+.side-menu {
   position: sticky;
   width: 25%;
-  background: rgb(25, 31, 156);
+  border: 3px solid rgb(185, 181, 181);
+  border-radius: 5px;
+  background: rgb(156, 154, 154);
 }
 
-/* サイドメニューアイテム */
-.side_menu > div + div {
-  border-top: 1px solid #fff;
+/* サイドメニューのリスト */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.side_menu a {
+/* リストのアイテム */
+.list__link {
   display: flex;
   align-items: center;
   height: 70px;
   padding-left: 20px;
-  color: #fff;
 }
 
-.side_menu a:hover {
-  background: rgb(36, 45, 218);
+.list__link:hover {
+  background: rgb(177, 174, 174);
 }
 
-.active_side_menu {
-  background: rgb(12, 15, 71);
+/* 選択されたアイテム */
+.list__link--active {
+  background: rgb(64, 79, 94);
 }
 
-[class*="item"] > a {
+/* ネストされたリスト */
+.list__link--small {
   height: 50px;
-  border-top: 1px solid rgb(151, 146, 146);
-  background: rgb(65, 72, 204);
-}
-
-[class*="item"] > a:hover {
-  background: rgb(36, 41, 138);
+  background: rgb(134, 131, 131);
 }
 </style>

@@ -1,18 +1,21 @@
 <template>
-  <div class="auth_info">
-    <div class="container">
-      <!-- メールアドレス -->
-      <div class="input_email">
-        <label for="email" class="ttl">メールアドレス</label>
-        <input type="text" name="email" v-model="userEmail" />
-      </div>
-      <button class="btn_edit_email" @click="changeEmail">保存</button>
-      <div class="change_password">
-        <router-link :to="{ name: 'changePassword' }"
-          >パスワードの変更</router-link
-        >
-      </div>
+  <div class="container-auth-info">
+    <!-- メールアドレス -->
+    <div class="block-email">
+      <label for="email" class="block-email__label">メールアドレス</label>
+      <input
+        class="block-email__input"
+        type="text"
+        name="email"
+        v-model="userEmail"
+      />
     </div>
+    <button class="container-auth-info__btn" @click="changeEmail">保存</button>
+    <router-link
+      :to="{ name: 'changePassword' }"
+      class="container-auth-info__link"
+      >パスワードの変更</router-link
+    >
   </div>
 </template>
 
@@ -44,44 +47,40 @@ export default {
 </script>
 
 <style scoped>
-/* ページ全体 */
-.auth_info {
-  height: 100%;
-  padding: 20px;
-  background: #fff;
-}
-
-.container {
+/* コンテナ */
+.container-auth-info {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 80%;
   margin: 0 auto;
+  padding: 20px;
+  background: #fff;
 }
 
 /* フォーム部分 */
-.input_email {
+.block-email {
   display: flex;
   align-items: center;
   width: 100%;
 }
 
 /* ラベル要素 */
-.ttl {
-  margin-right: 20px;
+.block-email__label {
   font-weight: bold;
   font-size: 1.2em;
   letter-spacing: 1px;
 }
 
 /* input要素 */
-.input_email > input {
+.block-email__input {
   flex-grow: 3;
   height: 30px;
+  margin-left: 20px;
 }
 
 /* 保存ボタン */
-.btn_edit_email {
+.container-auth-info__btn {
   margin-top: 20px;
   padding: 5px 10px;
   border-color: #fff;
@@ -92,15 +91,11 @@ export default {
 }
 
 /* パスワード変更のリンク */
-.change_password {
+.container-auth-info__link {
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: flex-end;
   width: 100%;
-  margin-top: 15px;
-}
-
-a {
-  margin-right: 10px;
+  margin: 15px 10px 0;
   letter-spacing: 1px;
   text-decoration: none;
 }

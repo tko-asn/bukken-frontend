@@ -164,10 +164,6 @@ a {
   color: black;
 }
 
-ul {
-  list-style: none;
-}
-
 .item-title {
   display: flex;
   justify-content: flex-end;
@@ -188,6 +184,7 @@ ul {
 .section__list {
   display: flex;
   flex-wrap: wrap;
+  list-style: none;
   margin: 0 0 10px;
   padding: 0;
 }

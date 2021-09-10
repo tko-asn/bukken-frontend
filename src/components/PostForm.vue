@@ -39,21 +39,21 @@
     ></textarea>
 
     <!-- 住所 -->
-    <div class="form-post__item">
-      <p class="form-post__item__title">物件住所</p>
-      <p class="form-post__item__text">郵便番号を入力してください（半角）</p>
-      <div class="form-post__item__item-postal-code">
+    <div class="item-form">
+      <p class="item-form__title">物件住所</p>
+      <p class="item-form__text">郵便番号を入力してください（半角）</p>
+      <div class="item-postal-code">
         <input
-          class="form-post__item__item-postal-code__input-a"
+          class="item-postal-code__input-a"
           type="text"
           placeholder="xxx"
           @keydown.enter.prevent
           v-model="postalCodeA"
           maxlength="3"
         />
-        <span>-</span>
+        <span class="item-postal-code__span">-</span>
         <input
-          class="form-post__item__item-postal-code__input-b"
+          class="item-postal-code__input-b"
           type="text"
           placeholder="xxxx"
           @keydown.enter.prevent
@@ -71,26 +71,26 @@
       <!-- 郵便番号が入力されたら表示 -->
       <template v-if="prefecture && municipality">
         <input
-          class="form-post__item__input-prefecture"
+          class="item-form__input-prefecture"
           type="text"
           v-model="prefecture"
           readonly
         />
         <input
-          class="form-post__item__input-municipality"
+          class="item-form__input-municipality"
           type="text"
           v-model="municipality"
           readonly
         />
         <input
-          class="form-post__item__input-town-name"
+          class="item-form__input-town-name"
           type="text"
           placeholder="町名・番地"
           @keydown.enter.prevent
           v-model="townName"
         />
         <input
-          class="form-post__item__input-building-name"
+          class="item-form__input-building-name"
           type="text"
           placeholder="アパート・マンション名"
           @keydown.enter.prevent
@@ -100,9 +100,9 @@
     </div>
 
     <!-- カテゴリー -->
-    <div class="form-post__item">
-      <p class="form-post__item__title">カテゴリ</p>
-      <p class="form-post__item__text">※3つまで選択可</p>
+    <div class="item-form">
+      <p class="item-form__title">カテゴリ</p>
+      <p class="item-form__text">※3つまで選択可</p>
       <CategoryForm
         :selectedCategories="selectedCategories"
         @add="selectedCategories.push($event)"
@@ -322,41 +322,40 @@ export default {
 }
 
 /* 住所 */
-.form-post__item {
+.item-form {
   display: flex;
   flex-direction: column;
-  margin: 30px 0 0;
 }
 
-.form-post__item__title {
-  margin: 0;
+.item-form__title {
+  margin: 30px 0 0;
   font-size: 1.3em;
   letter-spacing: 2px;
 }
 
-[class*="form-post__item__input"] {
+[class*="item-form__input"] {
   width: 70%;
 }
 
-.form-post__item__item-postal-code__input-a {
+.item-postal-code__input-a {
   margin: 0;
   width: 40px;
 }
 
-.form-post__item__item-postal-code__input-b {
+.item-postal-code__input-b {
   margin: 0;
   width: 60px;
 }
 
-.form-post__item > input:read-only {
+[class*="item-form__input"]:read-only {
   background: rgb(216, 214, 214);
 }
 
-.form-post__item__item-postal-code > span {
+.item-postal-code__span {
   padding: 0 10px;
 }
 
-.form-post__item__text {
+.item-form__text {
   margin: 10px 1px 5px;
   font-size: 0.8em;
   color: rgb(78, 77, 77);
@@ -383,10 +382,5 @@ export default {
   background: rgba(151, 100, 199, 0.877);
   color: rgb(194, 188, 188);
   cursor: default;
-}
-
-/* バリデーションメッセージ */
-.form-post__validation {
-  margin: 0;
 }
 </style>

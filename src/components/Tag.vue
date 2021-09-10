@@ -1,12 +1,12 @@
 <template>
   <div class="item-tags">
-    <a v-for="tag in tags" :key="tag.id" class="item-tags__tag">
+    <a v-for="tag in tags" :key="tag.id" class="link">
       {{ tag.first }}
-      <span v-if="tag.second">/</span>
+      <span class="link__span" v-if="tag.second">/</span>
       {{ tag.second }}
       <!-- ×アイコン -->
       <fa-icon
-        class="item-tags__tag__times-circle"
+        class="link__times-circle"
         icon="times-circle"
         @click="deleteTag(tag.id)"
       />
@@ -33,7 +33,7 @@ export default {
   margin: 10px 0 20px;
 }
 
-.item-tags__tag {
+.link {
   display: inline-block;
   margin: 10px 15px 0 0;
   padding: 0.6em;
@@ -44,11 +44,11 @@ export default {
 }
 
 /* ×アイコン */
-.item-tags__tag__times-circle {
+.link__times-circle {
   margin-left: 5px;
 }
 
-.item-tags__tag__times-circle:hover {
+.link__times-circle:hover {
   opacity: 0.7;
 }
 </style>
