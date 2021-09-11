@@ -50,6 +50,17 @@
           </li>
         </ul>
       </section>
+
+      <!-- 地域 -->
+      <section class="section">
+        <!-- タイトル -->
+        <h3 class="section__title">地域</h3>
+        <AddressForm
+          class="section__form-address"
+          @addressData="getAddressData"
+        />
+      </section>
+
       <!-- 絞り込みボタン -->
       <a href="" class="item-filter__btn" @click.prevent="filter"> 絞り込む </a>
     </div>
@@ -59,14 +70,19 @@
 <script>
 import apiClient from "@/axios";
 import qs from "qs";
+import AddressForm from "@/components/AddressForm";
 
 export default {
+  components: {
+    AddressForm,
+  },
   props: {
     currentMenu: String,
     myId: String,
   },
   data() {
     return {
+      // カテゴリー一覧
       categories: {
         environment: {
           name: "周辺環境",
@@ -87,11 +103,20 @@ export default {
       },
       currentCategory: "",
       selectedCategories: [], // 選択中のカテゴリーのオブジェクトを要素としてもつ配列
+      postalCode: "", // 投稿絞り込みのための郵便番号
       openFilter: false,
       isDisabled: true,
     };
   },
   methods: {
+    // 絞り込みの住所のデータを取得
+    getAddressData(addressData) {
+      Object.keys(addressData).forEach((key) => {
+        if (key === "postalCode") {
+          this.postalCode = addressData[key];
+        }
+      });
+    },
     // 第二カテゴリーの表示を切り替える
     switchCategory(e, name) {
       // 現在アクティブの第一カテゴリーをクリックしたとき
@@ -113,7 +138,8 @@ export default {
     // 絞り込み
     filter() {
       const params = {
-        categories: this.selectedCategories,
+        categories: this.selectedCategories, // カテゴリー
+        address: this.postalCode, // 住所
       };
 
       // 自分の投稿表示中の絞り込み
@@ -140,8 +166,7 @@ export default {
         })
         .then((response) => {
           this.$emit("filter", response.data);
-        })
-        .catch((err) => console.log(err));
+        });
     },
     // フィルターの開閉
     toggleFilter() {
@@ -242,6 +267,10 @@ a {
 
 .list-checkbox__input {
   display: none;
+}
+
+.section__form-address {
+  width: 60%;
 }
 
 .item-filter__btn {
