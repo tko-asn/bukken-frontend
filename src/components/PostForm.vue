@@ -38,70 +38,20 @@
       v-model="text"
     ></textarea>
 
-    <!-- 住所 -->
+    <!-- 所在地のフォーム -->
     <div class="item-form">
-      <p class="item-form__title">物件住所</p>
+      <p class="item-form__title">物件の所在地</p>
       <p class="item-form__text">郵便番号を入力してください（半角）</p>
-      <div class="item-postal-code">
-        <input
-          class="item-postal-code__input-a"
-          type="text"
-          placeholder="xxx"
-          @keydown.enter.prevent
-          v-model="postalCodeA"
-          maxlength="3"
-        />
-        <span class="item-postal-code__span">-</span>
-        <input
-          class="item-postal-code__input-b"
-          type="text"
-          placeholder="xxxx"
-          @keydown.enter.prevent
-          v-model="postalCodeB"
-          maxlength="4"
-        />
-      </div>
-
-      <ValidationMessage
-        class="form-post__validation"
-        :messages="validations.postalCode"
-        v-show="validations.postalCode.length"
+      <AddressForm
+        :optionInput="true"
+        :validations="validations.postalCode"
+        @addressData="getAddressData"
       />
-
-      <!-- 郵便番号が入力されたら表示 -->
-      <template v-if="prefecture && municipality">
-        <input
-          class="item-form__input-prefecture"
-          type="text"
-          v-model="prefecture"
-          readonly
-        />
-        <input
-          class="item-form__input-municipality"
-          type="text"
-          v-model="municipality"
-          readonly
-        />
-        <input
-          class="item-form__input-town-name"
-          type="text"
-          placeholder="町名・番地"
-          @keydown.enter.prevent
-          v-model="townName"
-        />
-        <input
-          class="item-form__input-building-name"
-          type="text"
-          placeholder="アパート・マンション名"
-          @keydown.enter.prevent
-          v-model="buildingName"
-        />
-      </template>
     </div>
 
     <!-- カテゴリー -->
     <div class="item-form">
-      <p class="item-form__title">カテゴリ</p>
+      <p class="item-form__title">カテゴリー</p>
       <p class="item-form__text">※3つまで選択可</p>
       <CategoryForm
         :selectedCategories="selectedCategories"
@@ -124,13 +74,14 @@ import apiClient from "@/axios";
 import ValidationMessage from "@/components/ValidationMessage";
 import CategoryForm from "@/components/CategoryForm";
 import Tag from "@/components/Tag";
-const YubinBango = require("yubinbango-core2");
+import AddressForm from "@/components/AddressForm";
 
 export default {
   components: {
     ValidationMessage,
     Tag,
     CategoryForm,
+    AddressForm,
   },
   data() {
     return {
@@ -138,14 +89,14 @@ export default {
       title: "",
       property: "",
       text: "",
-      postalCode: "",
+      // 所在地
+      postalCodeA: "",
+      postalCodeB: "",
+      postalCode: "", // 郵便番号
       prefecture: "",
       municipality: "",
       townName: "",
       buildingName: "",
-      // 郵便番号の部品
-      postalCodeA: "",
-      postalCodeB: "",
       isDisabled: true, // ボタン無効化
       // 選択したカテゴリーのリスト
       selectedCategories: [],
@@ -157,6 +108,12 @@ export default {
     };
   },
   methods: {
+    // 子コンポーネントから所在地のデータを取得
+    getAddressData(addressObj) {
+      Object.keys(addressObj).forEach((key) => {
+        this.$data[key] = addressObj[key];
+      });
+    },
     // バリデーション
     validate() {
       // メッセージの初期化
@@ -172,7 +129,7 @@ export default {
 
       // 郵便番号
       if (!this.postalCode) {
-        this.validations.postalCode.push("物件の住所を入力してください"); // 必須入力
+        this.validations.postalCode.push("物件の郵便番号を入力してください"); // 必須入力
       } else if (this.postalCode.match(/[^0-9]/g)) {
         // 半角数字のみ
         this.validations.postalCode.push("半角数字で入力してください");
@@ -263,28 +220,6 @@ export default {
     title(val) {
       this.isDisabled = val.length ? false : true;
     },
-    postalCodeA(val) {
-      this.postalCode = val + this.postalCodeB; // 郵便番号を結合
-    },
-    postalCodeB(val) {
-      this.postalCode = this.postalCodeA + val; // 郵便番号を結合
-    },
-    // 郵便番号
-    postalCode(val) {
-      const _this = this;
-      // 半角数字以外の文字はNG
-      if (val && !val.match(/[^0-9]/g)) {
-        new YubinBango.Core(val, (addr) => {
-          _this.prefecture = addr.region; // 都道府県
-          _this.municipality = addr.locality + addr.street; // 市区町村
-        });
-
-        // 適切でない値が入力されたら値を初期化
-      } else {
-        _this.prefecture = "";
-        _this.municipality = "";
-      }
-    },
   },
 };
 </script>
@@ -321,7 +256,6 @@ export default {
   font-size: 1.4em;
 }
 
-/* 住所 */
 .item-form {
   display: flex;
   flex-direction: column;
@@ -331,28 +265,6 @@ export default {
   margin: 30px 0 0;
   font-size: 1.3em;
   letter-spacing: 2px;
-}
-
-[class*="item-form__input"] {
-  width: 70%;
-}
-
-.item-postal-code__input-a {
-  margin: 0;
-  width: 40px;
-}
-
-.item-postal-code__input-b {
-  margin: 0;
-  width: 60px;
-}
-
-[class*="item-form__input"]:read-only {
-  background: rgb(216, 214, 214);
-}
-
-.item-postal-code__span {
-  padding: 0 10px;
 }
 
 .item-form__text {
