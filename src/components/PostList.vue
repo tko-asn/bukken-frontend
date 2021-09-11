@@ -61,6 +61,11 @@ export default {
     // 住所のデータを連結して返す
     addressData(post) {
       return (
+        "〒" +
+        post.address?.["postalCode"].slice(0, 3) +
+        "-" +
+        post.address?.["postalCode"].slice(3) +
+        " " +
         post.address.prefecture +
         post.address.municipality +
         post.address.townName +
@@ -86,16 +91,16 @@ export default {
 /* 投稿 */
 .section-post {
   width: 45%;
-  max-height: 170px;
+  max-height: 200px;
   margin-bottom: 30px;
   padding: 10px;
 }
 
 .section-post--exist {
-  overflow: hidden;
   border: 2px solid rgb(189, 187, 187);
   border-radius: 5px;
-  box-shadow: 0 4px 6px rgb(70, 69, 69);
+  box-shadow: inset 10px 10px 15px rgb(233, 231, 231),
+    inset -10px -10px 15px rgb(233, 231, 231), 0 4px 6px rgb(70, 69, 69);
   background: #fff;
   cursor: pointer;
 }
@@ -131,10 +136,10 @@ export default {
 }
 
 .section-post__sub-title {
-  overflow: hidden;
   margin: 0;
   color: rgb(78, 76, 76);
   font-size: 1.1em;
+  overflow: hidden;
 }
 
 .block-property__title {

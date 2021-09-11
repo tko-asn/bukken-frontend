@@ -211,6 +211,11 @@ export default {
     // 所在地のデータを連結して返す
     addressData(address) {
       return (
+        "〒" +
+        address?.["postalCode"].slice(0, 3) +
+        "-" +
+        address?.["postalCode"].slice(3) +
+        " " +
         address?.["prefecture"] +
         address?.["municipality"] +
         address?.["townName"] +
