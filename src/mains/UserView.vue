@@ -73,11 +73,7 @@
               :key="item.name"
               v-show="showMenuItem(item)"
             >
-              <router-link
-                class="list__link"
-                :to="{ name: item.link.name }"
-                v-if="item.link"
-              >
+              <router-link class="list__link" :to="item.link" v-if="item.link">
                 {{ item.name }}
               </router-link>
               <a
@@ -167,7 +163,13 @@ export default {
       sideMenuList: [
         {
           name: "ユーザーの投稿",
-          myPageItem: false, 
+          myPageItem: false,
+          link: {
+            name: "userPosts",
+            params: {
+              userId: this.id,
+            },
+          },
         },
         {
           name: "フォロー",
