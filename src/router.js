@@ -20,6 +20,9 @@ const EditProfileForm = () => import(
 const PostDetails = () => import(
   /* webpackChankName: 'PostDetails' */ './mains/PostDetails'
 );
+const UserPosts = () => import(
+  /* webpackChankName: 'UserPosts' */ './mains/UserPosts'
+);
 const PostForm = () => import(
   /* webpackChankName: 'PostForm' */ './components/PostForm'
 );
@@ -94,6 +97,12 @@ const router = new VueRouter({
       path: '/post/:postId',
       component: PostDetails,
       name: 'postDetails',
+      props: true,
+    },
+    {
+      path: '/user/:userId/posts/list',
+      component: UserPosts,
+      name: 'userPosts',
       props: true,
     },
     { path: '*', redirect: '/' },
