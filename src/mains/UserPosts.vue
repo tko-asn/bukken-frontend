@@ -11,13 +11,19 @@
       の投稿
     </h1>
     <!-- 投稿フィルター -->
-    <PostFilter :currentMenu="'myPosts'" :myId="userId" @filter="filterPosts" />
+    <PostFilter :currentMenu="'myPosts'" :myId="userId" @filter="changePosts" />
 
     <!-- 投稿が存在する場合 -->
     <PostList :postList="postList" v-if="postList.length" />
 
     <!-- 投稿が存在しない場合 -->
     <p class="container__text-no-posts" v-else>投稿はありません</p>
+    <Pagination 
+      :total="total"
+      :postType="'other'"
+      :userId="userId"
+      @movePage="changePosts"
+    />
   </div>
 </template>
 
@@ -25,11 +31,13 @@
 import apiClient from "@/axios";
 import PostList from "@/components/PostList";
 import PostFilter from "@/components/PostFilter";
+import Pagination from "@/components/Pagination";
 
 export default {
   components: {
     PostList,
     PostFilter,
+    Pagination
   },
   props: {
     userId: String, // ユーザーのID
@@ -38,20 +46,22 @@ export default {
     return {
       postList: [], // ユーザーの投稿のリスト
       userData: {}, // ユーザーのデータ
+      total: 0,
     };
   },
   created() {
     Promise.all([
-      apiClient.get("/posts/" + this.userId + "/"), // ユーザーの投稿のリストを取得
+      apiClient.get("/posts/" + this.userId + "/page/" + 1 + "/"), // ユーザーの投稿のリストを取得
       apiClient.get("/users/" + this.userId + "/"), // ユーザーデータを取得
     ]).then((values) => {
-      this.postList = values[0].data;
+      this.postList = values[0].data.posts;
+      this.total = values[0].data.total;
       this.userData = values[1].data;
     });
   },
   methods: {
     // 投稿のフィルタリング
-    filterPosts(posts) {
+    changePosts(posts) {
       this.postList = posts;
     },
   },
