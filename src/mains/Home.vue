@@ -115,27 +115,34 @@
           v-show="$route.name === 'home'"
         />
         <router-view :postList="displayedPosts" />
+        <!-- ページネーション -->
+        <Pagination
+          :total="total"
+          :postType="activeMenu"
+          @movePage="pagination"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import apiClient from "@/axios";
 import PostFilter from "@/components/PostFilter";
-import { mapGetters } from "vuex";
+import Pagination from "@/components/Pagination";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: {
     PostFilter,
+    Pagination,
   },
   data() {
     return {
-      latestPosts: [], // 最新の投稿
       displayedPosts: [], // 表示する投稿
       showFolloweeList: false,
       showFollowerList: false,
       activeMenu: "home",
+      total: 0, // 総ページ数
       mainMenu: {
         // サイドメニュー一覧
         home: {
@@ -172,20 +179,43 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("posts", ["followeePosts", "myPosts", "myFavoritePosts"]),
+    ...mapGetters("posts", [
+      "latestPosts",
+      "followeePosts",
+      "myPosts",
+      "myFavoritePosts",
+      "pageTotal",
+    ]),
     ...mapGetters("auth", ["isLoggedIn", "userId"]),
     ...mapGetters("follows", ["follow", "follower"]),
   },
   created() {
     Promise.all([
-      apiClient.get("/posts/page/1"), // 1ページ目の投稿を取得
-      this.$store.dispatch("posts/getFolloweePosts"), // フォロイーの投稿をVuexに保存
-    ]).then((values) => {
-      this.latestPosts = values[0].data; // 最新の投稿を取得
-      this.displayedPosts = this.latestPosts; // 初期は最新の投稿を表示
+      this.getLatestPosts(), // 最新の投稿をVuexに保存
+      this.getFolloweePosts(), // フォロイーの投稿をVuexに保存
+    ]).then(() => {
+      this.total = this.pageTotal["home"]; // 最新の投稿の総ページ数
+      this.displayedPosts = this.latestPosts; // 最新の投稿を表示
     });
   },
   methods: {
+    ...mapActions("posts", [
+      "getLatestPosts",
+      "getFolloweePosts",
+      "getMyFavoritePosts",
+      "getMyPosts",
+    ]),
+    // ページ別に適切な投稿を返す
+    getPosts(postType) {
+      const menuAndPosts = {
+        // メニューの種類と表示する投稿の対応表
+        home: this.latestPosts,
+        followee: this.followeePosts,
+        favorites: this.myFavoritePosts,
+        myPosts: this.myPosts,
+      };
+      return menuAndPosts[postType];
+    },
     // フォローデータの種類を判定しデータのリストを返す
     followsList(type) {
       // フォローしているユーザー一覧を取得する場合
@@ -205,24 +235,15 @@ export default {
         return obj.user;
       }
     },
-    // 投稿を表示する画面に遷移
-    switchRoute() {
+    // 投稿を切り替え表示
+    switchPosts(type) {
+      // 投稿ページからメニューを押した場合
       if (this.$route.name !== "home") {
         this.$router.push("/");
       }
-    },
-    // 投稿を切り替え表示
-    switchPosts(type) {
-      const menuAndPosts = {
-        // メニューの種類と表示する投稿の対応表
-        home: this.latestPosts,
-        followee: this.followeePosts,
-        favorites: this.myFavoritePosts,
-        myPosts: this.myPosts,
-      };
-      this.switchRoute();
-      this.activeMenu = type;
-      this.displayedPosts = menuAndPosts[type];
+      this.activeMenu = type; // メニューのタイプを切り替え
+      this.displayedPosts = this.getPosts(type); // 投稿を切り替え
+      this.total = this.pageTotal[type]; // 総ページ数を更新
     },
     // フォローしているユーザーの表示を切り替える
     toggleUser(userType) {
@@ -244,24 +265,40 @@ export default {
       }
     },
     // 投稿のフィルタリング
-    filterPosts(posts) {
-      this.displayedPosts = posts; // フィルタリングした投稿を切り替える
+    filterPosts(postData) {
+      this.total = postData.total; // 総ページ数をセット
+      this.displayedPosts = postData.posts; // フィルタリングした投稿へ切り替え
+    },
+    // ページ移動時
+    pagination() {
+      this.displayedPosts = this.getPosts(this.activeMenu); // それ以外のページ
     },
   },
   beforeRouteUpdate(to, from, next) {
     // 投稿画面から遷移したとき
     if (to.name === "home") {
       Promise.all([
-        apiClient.get("/posts/page/1"), // 1ページ目の投稿を取得
-        this.$store.dispatch("posts/getFolloweePosts"), // フォロイーの投稿をVuexに保存
-      ]).then((values) => {
+        this.getLatestPosts(), // 最新の投稿をVuexに保存
+        this.getFolloweePosts(), // フォロイーの投稿をVuexに保存
+      ]).then(() => {
         this.activeMenu = "home"; // サイドメニューをホームにする
-        this.latestPosts = values[0].data; // 最新の投稿を取得
+        this.total = this.pageTotal["home"]; // 最新の投稿
         this.displayedPosts = this.latestPosts; // 初期は最新の投稿を表示
         next();
       });
     }
     next();
+  },
+  beforeRouteLeave(to, from, next) {
+    const params = [this.getLatestPosts(), this.getFolloweePosts()];
+    if (this.isLoggedIn) {
+      params.push(this.getMyPosts());
+      params.push(this.getMyFavoritePosts());
+    }
+    // 投稿を初期化
+    Promise.all(params).then(() => {
+      next();
+    });
   },
 };
 </script>
