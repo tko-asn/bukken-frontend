@@ -25,6 +25,7 @@
           'item-page__link--disabled': num === currentPageList[postType],
         }"
         @click.prevent="movePage(num)"
+        v-show="displayPageButton(num)"
       >
         {{ num }}
       </a>
@@ -48,10 +49,17 @@
 </template>
 
 <script>
+import apiClient from "@/axios";
+
 export default {
   props: {
     total: Number, // 総ページ数
     postType: String, // 表示する投稿の種類
+    userId: {
+      // 取得する投稿の投稿者ID
+      type: String,
+      require: false,
+    },
   },
   data() {
     return {
@@ -61,6 +69,7 @@ export default {
         followee: 1,
         favorites: 1,
         myPosts: 1,
+        other: 1,
       },
       getPostAction: {
         // 投稿取得アクション名
@@ -72,10 +81,35 @@ export default {
     };
   },
   methods: {
+    // ページボタンの表示・非表示
+    displayPageButton(num) {
+      const currentPage = this.currentPageList[this.postType];
+      if (currentPage === 1 || currentPage === 2) {
+        return num <= 5;
+      } else if (currentPage === this.total || currentPage === this.total - 1) {
+        return num >= this.total - 4;
+      } else if (num === currentPage) {
+        return true;
+      } else if (num < currentPage) {
+        return num >= currentPage - 2;
+      } else if (num > currentPage) {
+        return num <= currentPage + 2;
+      }
+    },
     async movePage(page) {
       // 現在のページを更新
       this.currentPageList[this.postType] = page;
 
+      // UserPosts.vue
+      if (this.postType === "other") {
+        const { data } = await apiClient.get(
+          "/posts/" + this.userId + "/page/" + page + "/"
+        );
+        this.$emit("movePage", data.posts);
+        return;
+      }
+
+      // Home.vue
       await this.$store.dispatch(
         "posts/" + this.getPostAction[this.postType],
         page
@@ -91,10 +125,9 @@ export default {
   display: flex;
   justify-content: center;
   padding-bottom: 30px;
-}
-
-.item-page {
-  margin: 0 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .item-page__link {
@@ -103,6 +136,7 @@ export default {
   align-items: center;
   width: 40px;
   height: 50px;
+  margin: 0 5px;
   border: 1px solid gray;
   box-shadow: 0 2px 2px rgb(90, 90, 90);
   border-radius: 5px;
