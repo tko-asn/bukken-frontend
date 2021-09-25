@@ -59,7 +59,7 @@
       />
 
       <!-- 選択済みカテゴリー -->
-      <Tag :tags="selectedCategories" @delete="removeCategory" />
+      <Tag :tags="selectedCategories" :deleteTag="removeCategory" />
     </div>
 
     <!-- ボタン -->

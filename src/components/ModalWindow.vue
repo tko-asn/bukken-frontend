@@ -1,17 +1,17 @@
 <template>
   <!-- 背景部分 -->
-  <div class="modal-overlay" @click="removeWindow">
+  <div class="modal-overlay" @click="closeWindow">
     <!-- コンテンツ -->
     <div class="modal-content" @click.stop>
       <section class="modal-content__container">
         <!-- タイトル -->
-        <h1 class="modal-content__title">{{ title[slotName] }}</h1>
+        <h1 class="modal-content__title">{{ title }}</h1>
         <!-- slotで表示するコンテンツを切り替える -->
         <slot
           class="modal-content__content"
           name="deleteAccount"
           v-if="slotName === 'deleteAccount'"
-        ></slot>
+        />
       </section>
     </div>
   </div>
@@ -21,19 +21,14 @@
 export default {
   props: {
     slotName: String,
-  },
-  data() {
-    return {
-      title: {
-        deleteAccount: "アカウントを閉鎖する",
-      },
-    };
-  },
-  methods: {
-    // モーダルウィンドウを閉じる
-    removeWindow() {
-      this.$emit("close");
+    title: {
+      type: String,
+      default: '',
     },
+    closeWindow: {
+      type: Function,
+      default: () => () => {},
+    }
   },
 };
 </script>

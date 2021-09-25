@@ -108,18 +108,14 @@
     <!-- メイン -->
     <div class="container__main">
       <div class="container-main">
-        <PostFilter
-          @filter="filterPosts"
-          :currentMenu="activeMenu"
-          :myId="userId"
-          v-show="$route.name === 'home'"
-        />
+        <PostFilter :myId="userId" v-show="$route.name === 'home'" />
         <router-view :postList="displayedPosts" />
         <!-- ページネーション -->
         <Pagination
           :total="total"
-          :postType="activeMenu"
           @movePage="pagination"
+          :userId="userId"
+          v-show="$route.name === 'home'"
         />
       </div>
     </div>
@@ -130,6 +126,7 @@
 import PostFilter from "@/components/PostFilter";
 import Pagination from "@/components/Pagination";
 import { mapGetters, mapActions } from "vuex";
+import authInfoMixin from "@/mixins/authInfoMixin";
 
 export default {
   components: {
@@ -141,40 +138,21 @@ export default {
       displayedPosts: [], // 表示する投稿
       showFolloweeList: false,
       showFollowerList: false,
-      activeMenu: "home",
       total: 0, // 総ページ数
       mainMenu: {
         // サイドメニュー一覧
-        home: {
-          login: false,
-          name: "ホーム",
-          type: "home",
-        },
+        home: { login: false, name: "ホーム", type: "home" },
         followee: {
           login: true,
           name: "フォローユーザーの投稿",
           type: "followee",
         },
-        favorites: {
-          login: true,
-          name: "お気に入りの投稿",
-          type: "favorites",
-        },
-        myPosts: {
-          login: true,
-          name: "自分の投稿",
-          type: "myPosts",
-        },
+        favorites: { login: true, name: "お気に入りの投稿", type: "favorites" },
+        myPosts: { login: true, name: "自分の投稿", type: "myPosts" },
       },
       followMenu: {
-        followee: {
-          name: "フォロー",
-          type: "followee",
-        },
-        follower: {
-          name: "フォロワー",
-          type: "follower",
-        },
+        followee: { name: "フォロー", type: "followee" },
+        follower: { name: "フォロワー", type: "follower" },
       },
     };
   },
@@ -184,16 +162,22 @@ export default {
       "followeePosts",
       "myPosts",
       "myFavoritePosts",
+      "filteredPosts",
+      "searchedPosts",
+      "filterType",
       "pageTotal",
+      "activeMenu",
     ]),
-    ...mapGetters("auth", ["isLoggedIn", "userId"]),
     ...mapGetters("follows", ["follow", "follower"]),
   },
+  mixins: [authInfoMixin],
   created() {
     Promise.all([
       this.getLatestPosts(), // 最新の投稿をVuexに保存
       this.getFolloweePosts(), // フォロイーの投稿をVuexに保存
     ]).then(() => {
+      this.resetFilterType(); // filterTypeを初期化
+      this.resetActiveMenu("home");
       this.total = this.pageTotal["home"]; // 最新の投稿の総ページ数
       this.displayedPosts = this.latestPosts; // 最新の投稿を表示
     });
@@ -204,6 +188,8 @@ export default {
       "getFolloweePosts",
       "getMyFavoritePosts",
       "getMyPosts",
+      "resetActiveMenu",
+      "resetFilterType",
     ]),
     // ページ別に適切な投稿を返す
     getPosts(postType) {
@@ -241,9 +227,10 @@ export default {
       if (this.$route.name !== "home") {
         this.$router.push("/");
       }
-      this.activeMenu = type; // メニューのタイプを切り替え
       this.displayedPosts = this.getPosts(type); // 投稿を切り替え
       this.total = this.pageTotal[type]; // 総ページ数を更新
+      this.resetActiveMenu(type); // メニューのタイプを切り替え
+      this.resetFilterType(); // filterTypeを初期化
     },
     // フォローしているユーザーの表示を切り替える
     toggleUser(userType) {
@@ -264,14 +251,23 @@ export default {
         this.showFollowerList = false;
       }
     },
-    // 投稿のフィルタリング
-    filterPosts(postData) {
-      this.total = postData.total; // 総ページ数をセット
-      this.displayedPosts = postData.posts; // フィルタリングした投稿へ切り替え
-    },
-    // ページ移動時
+    // ページ移動時（フィルタリング・検索時は対象外）
     pagination() {
       this.displayedPosts = this.getPosts(this.activeMenu); // それ以外のページ
+    },
+  },
+  watch: {
+    filterType(val) {
+      // 投稿がフィルタリングされた場合
+      if (val === "filter") {
+        this.displayedPosts = this.filteredPosts;
+        this.total = this.pageTotal.filter;
+
+        // 投稿が検索された場合
+      } else if (val === "search") {
+        this.displayedPosts = this.searchedPosts;
+        this.total = this.pageTotal.search;
+      }
     },
   },
   beforeRouteUpdate(to, from, next) {
@@ -281,7 +277,7 @@ export default {
         this.getLatestPosts(), // 最新の投稿をVuexに保存
         this.getFolloweePosts(), // フォロイーの投稿をVuexに保存
       ]).then(() => {
-        this.activeMenu = "home"; // サイドメニューをホームにする
+        this.resetActiveMenu("home");
         this.total = this.pageTotal["home"]; // 最新の投稿
         this.displayedPosts = this.latestPosts; // 初期は最新の投稿を表示
         next();

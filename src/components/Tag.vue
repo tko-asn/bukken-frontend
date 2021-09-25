@@ -18,11 +18,9 @@
 export default {
   props: {
     tags: Array,
-  },
-  methods: {
-    // タグを消去
-    deleteTag(tagId) {
-      this.$emit("delete", tagId);
+    deleteTag: {
+      type: Function,
+      default: () => () => {},
     },
   },
 };

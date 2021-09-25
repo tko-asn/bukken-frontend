@@ -11,7 +11,7 @@
             class="item__link"
             @click.prevent="moveToPostPage(post.id)"
           >
-            {{ post.title }}
+            {{ post.property }}
           </a>
         </li>
       </ul>
@@ -20,20 +20,14 @@
 </template>
 
 <script>
-import apiClient from "@/axios";
+import { mapGetters } from "vuex";
 
 export default {
-  data() {
-    return {
-      latestPosts: [], // 最新の投稿
-    };
+  computed: {
+    ...mapGetters("posts", ["latestPosts"]),
   },
   created() {
-    apiClient
-      .get("/posts/page/1") // 最新の投稿の1ページ目を取得
-      .then((response) => {
-        this.latestPosts = response.data;
-      });
+    this.$store.dispatch("posts/getLatestPosts");
   },
   methods: {
     // 投稿のページへ移動

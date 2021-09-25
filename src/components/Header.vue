@@ -9,6 +9,9 @@
       <!-- ナビゲーションメニュー -->
       <nav class="block-nav">
         <ul class="block-nav__list">
+          <li class="item-list">
+            <slot />
+          </li>
           <!-- ログイン済み -->
           <template v-if="isLoggedIn">
             <li class="item-list" @mouseleave="pullUp">
@@ -79,12 +82,10 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import authInfoMixin from "@/mixins/authInfoMixin";
 
 export default {
-  computed: {
-    ...mapGetters("auth", ["isLoggedIn", "userId"]),
-  },
+  mixins: [authInfoMixin],
   methods: {
     // プルダウンメニュー展開
     pullDown() {
@@ -129,6 +130,7 @@ ul {
   position: fixed;
   z-index: 10;
   width: 100%;
+  box-shadow: 0 2px 3px rgb(75, 74, 74);
   background: #000;
   top: 0;
   left: 0;

@@ -99,8 +99,8 @@ export default {
 .section-post--exist {
   border: 2px solid rgb(189, 187, 187);
   border-radius: 5px;
-  box-shadow: inset 10px 10px 15px rgb(233, 231, 231),
-    inset -10px -10px 15px rgb(233, 231, 231), 0 4px 6px rgb(70, 69, 69);
+  box-shadow: inset 5px 5px 10px rgb(233, 231, 231),
+    inset -5px -5px 10px rgb(233, 231, 231), 0 4px 6px rgb(70, 69, 69);
   background: #fff;
   cursor: pointer;
 }
