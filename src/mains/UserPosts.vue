@@ -11,14 +11,14 @@
       の投稿
     </h1>
     <!-- 投稿フィルター -->
-    <PostFilter :myId="userId" @filtered="switchPosts('filter')" />
+    <PostFilter :myId="userId" />
 
     <!-- 投稿が存在する場合 -->
     <PostList :postList="postList" v-if="postList.length" />
 
     <!-- 投稿が存在しない場合 -->
     <p class="container__text-no-posts" v-else>投稿はありません</p>
-    <Pagination :total="total" :userId="userId" @movePage="pagination" @filtered="switchPosts('filter')" />
+    <Pagination :total="total" :userId="userId" @movePage="pagination" />
   </div>
 </template>
 
@@ -70,13 +70,6 @@ export default {
       "resetFilterType",
       "resetActiveMenu",
     ]),
-    // フィルタリング・検索
-    switchPosts(type) {
-      if (type === "filter") {
-        this.postList = this.filteredPosts;
-      }
-      this.total = this.pageTotal[type];
-    },
     // ページネーション
     pagination(posts) {
       this.postList = posts;
@@ -84,8 +77,13 @@ export default {
   },
   watch: {
     filterType(val) {
-      // 投稿が検索された場合
-      if (val === "search") {
+      // 投稿がフィルタリングした場合
+      if (val === "filter") {
+        this.postList = this.filteredPosts;
+        this.total = this.pageTotal.filter;
+
+        // 投稿が検索された場合
+      } else if (val === "search") {
         this.postList = this.searchedPosts;
         this.total = this.pageTotal.search;
       }

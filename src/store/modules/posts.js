@@ -62,6 +62,7 @@ const mutations = {
     // フィルタリングされた投稿をセット
     state.filteredPosts = payload.posts;
     state.pageTotal.filter = payload.total;
+    // watchで正規のfilteredPostsとtotalを取得するため最後にfilterTypeをセット
     state.filterType = "filter";
   },
   setSearchedPosts(state, payload) {

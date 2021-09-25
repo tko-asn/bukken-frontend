@@ -149,15 +149,14 @@ export default {
       const payload = {
         categories: this.selectedCategories,
         postalCode: this.postalCode,
-      }
+      };
       this.registerFilterData(payload);
 
       const params = {
         page: 1,
         userId: this.myId,
-      }
+      };
       await this.registerFilteredPosts(params);
-      this.$emit("filtered");
     },
     // フィルターの開閉
     toggleFilter() {
@@ -213,7 +212,7 @@ a {
 .list__item {
   display: flex;
   padding: 10px 20px;
-  box-shadow: inset 2px 2px 2px rgb(218, 216, 216), 
+  box-shadow: inset 2px 2px 2px rgb(218, 216, 216),
     inset -2px -2px 2px rgb(218, 216, 216);
 }
 

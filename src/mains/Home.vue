@@ -108,11 +108,7 @@
     <!-- メイン -->
     <div class="container__main">
       <div class="container-main">
-        <PostFilter
-          :myId="userId"
-          v-show="$route.name === 'home'"
-          @filtered="switchPosts('filter')"
-        />
+        <PostFilter :myId="userId" v-show="$route.name === 'home'" />
         <router-view :postList="displayedPosts" />
         <!-- ページネーション -->
         <Pagination
@@ -120,7 +116,6 @@
           @movePage="pagination"
           :userId="userId"
           v-show="$route.name === 'home'"
-          @filtered="switchPosts('filter')"
         />
       </div>
     </div>
@@ -204,7 +199,6 @@ export default {
         followee: this.followeePosts,
         favorites: this.myFavoritePosts,
         myPosts: this.myPosts,
-        filter: this.filteredPosts,
       };
       return menuAndPosts[postType];
     },
@@ -235,10 +229,8 @@ export default {
       }
       this.displayedPosts = this.getPosts(type); // 投稿を切り替え
       this.total = this.pageTotal[type]; // 総ページ数を更新
-      if (type !== "filter") {
-        this.resetActiveMenu(type); // メニューのタイプを切り替え
-        this.resetFilterType(); // filterTypeを初期化
-      }
+      this.resetActiveMenu(type); // メニューのタイプを切り替え
+      this.resetFilterType(); // filterTypeを初期化
     },
     // フォローしているユーザーの表示を切り替える
     toggleUser(userType) {
@@ -266,8 +258,13 @@ export default {
   },
   watch: {
     filterType(val) {
-      // 投稿が検索された場合
-      if (val === "search") {
+      // 投稿がフィルタリングされた場合
+      if (val === "filter") {
+        this.displayedPosts = this.filteredPosts;
+        this.total = this.pageTotal.filter;
+
+        // 投稿が検索された場合
+      } else if (val === "search") {
         this.displayedPosts = this.searchedPosts;
         this.total = this.pageTotal.search;
       }

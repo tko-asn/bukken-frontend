@@ -118,11 +118,13 @@ export default {
     async movePage(page) {
       // フィルタリング条件指定時
       if (this.filterType === "filter") {
+        // watchでfilterTypeの変更を感知できるように検索データを初期化
+        this.resetFilterType();
+        
         await this.registerFilteredPosts({
           page,
           userId: this.userId,
         });
-        this.$emit("filtered");
         this.currentPageList.filter = page;
 
         // 検索キーワード指定時
