@@ -62,13 +62,13 @@ const actions = {
   // ログイン
   async login({ commit, state }, payload) {
     // APIを実行
-    const res = await apiClient.post('/auth/login/', payload).catch(err => Promise.reject(err));
+    const { data } = await apiClient.post('/auth/login/', payload).catch(err => Promise.reject(err));
     
     // トークンを保存
-    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('token', data.token);
     
     // id, username, email, selfIntroduciton, iconURLを保存
-    commit('set', res.data);
+    commit('set', data);
     
     await Promise.all([
       store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }), // フォローデータ
@@ -86,10 +86,10 @@ const actions = {
   // トークンの検証
   async verify({ commit, state }) {
     // APIを実行
-    const res = await apiClient.get('/auth/verify/').catch(err => Promise.reject(err));
+    const { data } = await apiClient.get('/auth/verify/').catch(err => Promise.reject(err));
     
     // ユーザー情報をセット(stateが初期化されている状態でトークンが残っている場合)
-    commit('set', res.data);
+    commit('set', data);
     
     await Promise.all([
       store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }), // フォローデータ
@@ -144,9 +144,9 @@ const actions = {
       {
         headers, // headersをセット
       }
-    ).then(response => {
+    ).then(({ data }) => {
       // vuexの値を更新
-      commit(mutation, response.data);
+      commit(mutation, data);
     })
       .catch(err => Promise.reject(err));
   },

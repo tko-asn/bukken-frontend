@@ -68,17 +68,18 @@
 </template>
 
 <script>
-import apiClient from "@/axios";
-import qs from "qs";
 import AddressForm from "@/components/AddressForm";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: {
     AddressForm,
   },
   props: {
-    currentMenu: String,
     myId: String,
+  },
+  computed: {
+    ...mapGetters("posts", ["activeMenu"]),
   },
   data() {
     return {
@@ -102,13 +103,18 @@ export default {
         },
       },
       currentCategory: "",
-      selectedCategories: [], // 選択中のカテゴリーのオブジェクトを要素としてもつ配列
       postalCode: "", // 投稿絞り込みのための郵便番号
+      selectedCategories: [], // 選択中のカテゴリーのオブジェクトを要素としてもつ配列
       openFilter: false,
       isDisabled: true,
     };
   },
   methods: {
+    ...mapActions("posts", [
+      "resetFilterType",
+      "registerFilterData",
+      "registerFilteredPosts",
+    ]),
     // 絞り込みの住所のデータを取得
     getAddressData(addressData) {
       Object.keys(addressData).forEach((key) => {
@@ -136,48 +142,26 @@ export default {
       this.currentCategory = name;
     },
     // 絞り込み
-    filter() {
-      const params = {
-        categories: this.selectedCategories, // カテゴリー
-        address: this.postalCode, // 住所
-      };
+    async filter() {
+      // filterの現在のページ数の初期化のため
+      this.resetFilterType();
 
-      // 自分の投稿表示中の絞り込み
-      if (this.currentMenu === "myPosts") {
-        params.authorId = this.myId;
-
-        // フォローしているユーザーの投稿表示中の絞り込み
-      } else if (this.currentMenu === "followee") {
-        const followsId = []; // フォローしているユーザーのIDの配列
-        for (const obj of this.$store.getters["follows/follow"]) {
-          followsId.push(obj.follow.id);
-        }
-        params.authorId = followsId;
-
-        // お気に入りの投稿表示中の絞り込み
-      } else if (this.currentMenu === "favorites") {
-        params.userId = this.myId;
+      const payload = {
+        categories: this.selectedCategories,
+        postalCode: this.postalCode,
       }
+      this.registerFilterData(payload);
 
-      apiClient
-        .get("/posts/filter/page/1", {
-          params, // クエリパラメータ
-          paramsSerializer: (params) => qs.stringify(params),
-        })
-        .then((response) => {
-          this.$emit("filter", response.data);
-        });
+      const params = {
+        page: 1,
+        userId: this.myId,
+      }
+      await this.registerFilteredPosts(params);
+      this.$emit("filtered");
     },
     // フィルターの開閉
     toggleFilter() {
       this.openFilter = !this.openFilter;
-    },
-  },
-  watch: {
-    currentMenu() {
-      // メニューを切り替えるたびにフィルターを初期化
-      this.openFilter = false;
-      this.selectedCategories = [];
     },
   },
 };
@@ -229,6 +213,8 @@ a {
 .list__item {
   display: flex;
   padding: 10px 20px;
+  box-shadow: inset 2px 2px 2px rgb(218, 216, 216), 
+    inset -2px -2px 2px rgb(218, 216, 216);
 }
 
 .list-checkbox {

@@ -33,14 +33,14 @@
               href=""
               class="container__btn"
               v-show="!isYourFavoriteUser"
-              @click.prevent="followUser"
+              @click.prevent="following"
               >フォローする</a
             >
             <a
               href=""
               class="container__btn"
               v-show="isYourFavoriteUser"
-              @click.prevent="unfollowUser"
+              @click.prevent="unfollowing"
               >フォローを解除</a
             >
           </template>
@@ -115,9 +115,10 @@
 
     <!-- モーダルウィンドウ -->
     <ModalWindow
-      v-show="modalInfo.showWindow"
-      :slotName="modalInfo.slotName"
-      @close="closeWindow"
+      v-show="showWindow"
+      :title="modalTitle"
+      :slotName="slotName"
+      :closeWindow="closeWindow"
     >
       <!-- アカウント閉鎖 -->
       <template v-slot:deleteAccount>
@@ -128,9 +129,11 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import ModalWindow from "@/components/ModalWindow";
 import DeleteAccount from "@/components/DeleteAccount";
+import authInfoMixin from "@/mixins/authInfoMixin";
+import apiClient from "@/axios";
 
 export default {
   components: {
@@ -148,10 +151,9 @@ export default {
       displayedSelfIntroduction: "",
       displayedIconURL: "",
       // モーダルウィンドウの情報
-      modalInfo: {
-        slotName: "", // 表示するモーダルウィンドウ
-        showWindow: false, // モーダルウィンドウの表示・非表示
-      },
+      slotName: "", // 表示するモーダルウィンドウ
+      modalTitle: "", // モーダルのタイトル
+      showWindow: false, // モーダルウィンドウの表示・非表示
       contentListTitle: {
         userView: "プロフィール",
         authInfo: "認証情報",
@@ -232,15 +234,8 @@ export default {
       ],
     };
   },
+  mixins: [authInfoMixin],
   computed: {
-    ...mapGetters("auth", [
-      // ログインユーザーの認証情報・プロフィール
-      "isLoggedIn",
-      "userId",
-      "username",
-      "selfIntroduction",
-      "iconURL",
-    ]),
     // ログインユーザーのフォローしているユーザーのリスト
     ...mapGetters("follows", ["follow", "follower"]),
     // 自分のページかどうか判定
@@ -285,11 +280,14 @@ export default {
     // 他のユーザーの場合
     if (!this.isMe) {
       // ユーザーの情報を取得
-      this.$store.dispatch("users/retrieve", this.id).then((response) => {
-        this.displayedUsername = response.data.username;
-        this.displayedSelfIntroduction = response.data.self_introduction;
-        this.displayedIconURL = response.data.icon_url;
-      });
+      apiClient
+        .get("/users/" + this.id + "/")
+        .then(({ data }) => {
+          this.displayedUsername = data.username;
+          this.displayedSelfIntroduction = data.self_introduction;
+          this.displayedIconURL = data.icon_url;
+        })
+        .catch((err) => Promise.reject(err));
 
       // ログインユーザー自身の情報をセット
     } else {
@@ -299,6 +297,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions("follows", ["followUser", "unfollowUser"]),
     // サイドメニューの表示・非表示
     showMenuItem(item) {
       // フォローはマイページでもユーザーページでも表示
@@ -330,27 +329,27 @@ export default {
     },
     // モーダルウィンドウを閉じる
     closeWindow() {
-      this.modalInfo.slotName = "";
-      this.modalInfo.showWindow = false;
+      this.modalTitle = "";
+      this.slotName = "";
+      this.showWindow = false;
     },
     // アカウント閉鎖のモーダルウィンドウを表示
     showDeleteAccount() {
-      this.modalInfo = {
-        slotName: "deleteAccount",
-        showWindow: true,
-      };
+      this.slotName = "deleteAccount";
+      this.modalTitle = "アカウントを閉鎖する";
+      this.showWindow = true;
     },
     // ユーザーをフォロー
-    followUser() {
+    following() {
       if (!this.isLoggedIn) {
         // ログインしていなければログインページへ
         this.$router.push("/login");
         return;
       }
-      this.$store.dispatch("follows/followUser", this.userInfo);
+      this.followUser(this.userInfo);
     },
     // ユーザーのフォローを解除
-    unfollowUser() {
+    unfollowing() {
       if (!this.isLoggedIn) {
         this.$router.push("/login");
         return;
@@ -359,7 +358,7 @@ export default {
       // followリストからユーザーのidを使ってフォローデータを検索
       const targetObj = this.follow.find((el) => el.follow.id === this.id);
 
-      this.$store.dispatch("follows/unfollowUser", targetObj.id);
+      this.unfollowUser(targetObj.id);
     },
   },
   beforeRouteEnter(to, from, next) {
@@ -378,11 +377,14 @@ export default {
       // URLのidが更新されたとき
       if (!this.isMe) {
         // 自分以外のユーザーのidの場合
-        this.$store.dispatch("users/retrieve", val).then((response) => {
-          this.displayedUsername = response.data.username;
-          this.displayedSelfIntroduction = response.data.self_introduction;
-          this.displayedIconURL = response.data.icon_url;
-        });
+        apiClient
+          .get("/users/" + val + "/")
+          .then(({ data }) => {
+            this.displayedUsername = data.username;
+            this.displayedSelfIntroduction = data.self_introduction;
+            this.displayedIconURL = data.icon_url;
+          })
+          .catch((err) => Promise.reject(err));
 
         // idがログインユーザー自身の場合
       } else {

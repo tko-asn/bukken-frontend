@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import Compressor from "compressorjs";
+import authInfoMixin from "@/mixins/authInfoMixin";
 
 export default {
   data() {
@@ -57,14 +57,7 @@ export default {
       },
     };
   },
-  computed: {
-    ...mapGetters("auth", [
-      "userId",
-      "username",
-      "selfIntroduction",
-      "iconURL",
-    ]),
-  },
+  mixins: [authInfoMixin],
   created() {
     // vuexのデータをdataに保存
     this.iconSrc = this.iconURL;

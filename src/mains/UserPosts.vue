@@ -11,19 +11,14 @@
       の投稿
     </h1>
     <!-- 投稿フィルター -->
-    <PostFilter :currentMenu="'myPosts'" :myId="userId" @filter="changePosts" />
+    <PostFilter :myId="userId" @filtered="switchPosts('filter')" />
 
     <!-- 投稿が存在する場合 -->
     <PostList :postList="postList" v-if="postList.length" />
 
     <!-- 投稿が存在しない場合 -->
     <p class="container__text-no-posts" v-else>投稿はありません</p>
-    <Pagination 
-      :total="total"
-      :postType="'other'"
-      :userId="userId"
-      @movePage="changePosts"
-    />
+    <Pagination :total="total" :userId="userId" @movePage="pagination" @filtered="switchPosts('filter')" />
   </div>
 </template>
 
@@ -32,38 +27,69 @@ import apiClient from "@/axios";
 import PostList from "@/components/PostList";
 import PostFilter from "@/components/PostFilter";
 import Pagination from "@/components/Pagination";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: {
     PostList,
     PostFilter,
-    Pagination
+    Pagination,
   },
   props: {
     userId: String, // ユーザーのID
   },
   data() {
     return {
-      postList: [], // ユーザーの投稿のリスト
+      postList: [], // 表示する投稿
       userData: {}, // ユーザーのデータ
       total: 0,
     };
+  },
+  computed: {
+    ...mapGetters("posts", [
+      "filteredPosts", 
+      "searchedPosts", 
+      "pageTotal", 
+      "filterType"
+    ]),
   },
   created() {
     Promise.all([
       apiClient.get("/posts/" + this.userId + "/page/" + 1 + "/"), // ユーザーの投稿のリストを取得
       apiClient.get("/users/" + this.userId + "/"), // ユーザーデータを取得
     ]).then((values) => {
-      this.postList = values[0].data.posts;
+      this.resetFilterType(); // filterTypeの初期化
+      this.resetActiveMenu("myPosts"); // フィルタリング時に使用
+      this.postList = values[0].data.posts; // ユーザーの投稿はdataに保存
       this.total = values[0].data.total;
       this.userData = values[1].data;
     });
   },
   methods: {
-    // 投稿のフィルタリング
-    changePosts(posts) {
+    ...mapActions("posts", [
+      "resetFilterType",
+      "resetActiveMenu",
+    ]),
+    // フィルタリング・検索
+    switchPosts(type) {
+      if (type === "filter") {
+        this.postList = this.filteredPosts;
+      }
+      this.total = this.pageTotal[type];
+    },
+    // ページネーション
+    pagination(posts) {
       this.postList = posts;
     },
+  },
+  watch: {
+    filterType(val) {
+      // 投稿が検索された場合
+      if (val === "search") {
+        this.postList = this.searchedPosts;
+        this.total = this.pageTotal.search;
+      }
+    }
   },
 };
 </script>

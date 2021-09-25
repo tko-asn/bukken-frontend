@@ -7,10 +7,10 @@
         :class="{
           'item-page__link': true,
           'item-page__link--direction': true,
-          'item-page__link--disabled': currentPageList[postType] === 1,
-          'item-page__link--end': currentPageList[postType] === 1,
+          'item-page__link--disabled': currentPage === 1,
+          'item-page__link--end': currentPage === 1,
         }"
-        @click.prevent="movePage(currentPageList[postType] - 1)"
+        @click.prevent="movePage(currentPage - 1)"
       >
         前へ
       </a>
@@ -21,8 +21,8 @@
         href=""
         :class="{
           'item-page__link': true,
-          'item-page__link--current': num === currentPageList[postType],
-          'item-page__link--disabled': num === currentPageList[postType],
+          'item-page__link--current': num === currentPage,
+          'item-page__link--disabled': num === currentPage,
         }"
         @click.prevent="movePage(num)"
         v-show="displayPageButton(num)"
@@ -37,10 +37,10 @@
         :class="{
           'item-page__link': true,
           'item-page__link--direction': true,
-          'item-page__link--disabled': total === currentPageList[postType],
-          'item-page__link--end': total === currentPageList[postType],
+          'item-page__link--disabled': total === currentPage,
+          'item-page__link--end': total === currentPage,
         }"
-        @click.prevent="movePage(currentPageList[postType] + 1)"
+        @click.prevent="movePage(currentPage + 1)"
       >
         次へ
       </a>
@@ -50,15 +50,25 @@
 
 <script>
 import apiClient from "@/axios";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: {
     total: Number, // 総ページ数
-    postType: String, // 表示する投稿の種類
     userId: {
       // 取得する投稿の投稿者ID
       type: String,
-      require: false,
+      required: false,
+      default: "",
+    },
+  },
+  computed: {
+    ...mapGetters("posts", ["activeMenu", "filterType"]),
+    currentPage() {
+      if (this.filterType === "filter" || this.filterType === "search") {
+        return this.currentPageList[this.filterType];
+      }
+      return this.currentPageList[this.activeMenu];
     },
   },
   data() {
@@ -69,7 +79,8 @@ export default {
         followee: 1,
         favorites: 1,
         myPosts: 1,
-        other: 1,
+        filter: 1,
+        search: 1,
       },
       getPostAction: {
         // 投稿取得アクション名
@@ -81,40 +92,79 @@ export default {
     };
   },
   methods: {
+    ...mapActions("posts", [
+      "registerFilteredPosts",
+      "registerSearchedPosts",
+      "resetFilterType",
+    ]),
     // ページボタンの表示・非表示
     displayPageButton(num) {
-      const currentPage = this.currentPageList[this.postType];
-      if (currentPage === 1 || currentPage === 2) {
+      if (this.currentPage === 1 || this.currentPage === 2) {
         return num <= 5;
-      } else if (currentPage === this.total || currentPage === this.total - 1) {
+      } else if (
+        this.currentPage === this.total ||
+        this.currentPage === this.total - 1
+      ) {
         return num >= this.total - 4;
-      } else if (num === currentPage) {
+      } else if (num === this.currentPage) {
         return true;
-      } else if (num < currentPage) {
-        return num >= currentPage - 2;
-      } else if (num > currentPage) {
-        return num <= currentPage + 2;
+      } else if (num < this.currentPage) {
+        return num >= this.currentPage - 2;
+      } else if (num > this.currentPage) {
+        return num <= this.currentPage + 2;
       }
     },
+    // ページ移動
     async movePage(page) {
-      // 現在のページを更新
-      this.currentPageList[this.postType] = page;
+      // フィルタリング条件指定時
+      if (this.filterType === "filter") {
+        await this.registerFilteredPosts({
+          page,
+          userId: this.userId,
+        });
+        this.$emit("filtered");
+        this.currentPageList.filter = page;
 
-      // UserPosts.vue
-      if (this.postType === "other") {
+        // 検索キーワード指定時
+      } else if (this.filterType === "search") {
+        // watchでfilterTypeの変更を感知できるように検索データを初期化
+        this.resetFilterType();
+
+        await this.registerSearchedPosts({
+          page,
+          userId: this.userId,
+        });
+        this.currentPageList.search = page;
+
+        // UserPosts.vue
+      } else if (this.$route.name === "userPosts") {
         const { data } = await apiClient.get(
           "/posts/" + this.userId + "/page/" + page + "/"
         );
         this.$emit("movePage", data.posts);
-        return;
-      }
+        this.currentPageList[this.activeMenu] = page;
 
-      // Home.vue
-      await this.$store.dispatch(
-        "posts/" + this.getPostAction[this.postType],
-        page
-      );
-      this.$emit("movePage");
+        // Home.vue
+      } else {
+        await this.$store.dispatch(
+          "posts/" + this.getPostAction[this.activeMenu],
+          page
+        );
+        this.$emit("movePage");
+        this.currentPageList[this.activeMenu] = page;
+      }
+    },
+  },
+  watch: {
+    filterType(val, old) {
+      // フィルタリングされた投稿を非表示にした場合
+      if (!val && old === "filter") {
+        this.currentPageList.filter = 1;
+
+        // 検索された投稿を非表示にした場合
+      } else if (!val && old === "search") {
+        this.currentPageList.search = 1;
+      }
     },
   },
 };
@@ -127,7 +177,7 @@ export default {
   padding-bottom: 30px;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 20px 0;
 }
 
 .item-page__link {

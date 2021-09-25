@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import apiClient from "@/axios";
 import ValidationMessage from "@/components/ValidationMessage";
 import SidePostList from "@/components/SidePostList";
@@ -188,8 +188,8 @@ export default {
     };
   },
   created() {
-    apiClient.get("/posts/post/" + this.postId + "/").then((response) => {
-      this.post = response.data; // 対象の投稿データをセット
+    apiClient.get("/posts/post/" + this.postId + "/").then(({ data }) => {
+      this.post = data; // 対象の投稿データをセット
     });
   },
   computed: {
@@ -204,6 +204,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions("posts", [
+      "addFavoritePost",
+      "removeFavoritePost"
+    ]),
     // カテゴリーの数を返す
     categoryLength(post) {
       return post.categories?.length;
@@ -229,14 +233,14 @@ export default {
         this.$router.push("/login");
         return;
       }
-      this.$store.dispatch("posts/addFavoritePost", {
+      this.addFavoritePost({
         userId: this.userId,
         postId: this.postId,
       });
     },
     // お気に入りの投稿を削除
     deleteFavoritePost() {
-      this.$store.dispatch("posts/removeFavoritePost", {
+      this.removeFavoritePost({
         userId: this.userId,
         postId: this.postId,
       });
@@ -275,8 +279,8 @@ export default {
       await apiClient.post("/answers/create/", params);
 
       // 回答を更新
-      const res = await apiClient.get("/posts/post/" + this.postId + "/");
-      this.post = res.data;
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
 
       // フォームの文章を初期化
       this.newAnswer = "";
@@ -297,8 +301,8 @@ export default {
       await apiClient.post("/answers/add/like/", params);
 
       // 回答を更新
-      const res = await apiClient.get("/posts/post/" + this.postId + "/");
-      this.post = res.data;
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
     },
     // 回答のいいねを外す
     async dislike(answerId) {
@@ -308,15 +312,15 @@ export default {
       );
 
       // 回答を更新
-      const res = await apiClient.get("/posts/post/" + this.postId + "/");
-      this.post = res.data;
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
     },
   },
   watch: {
     postId(val) {
       // サイドバーからページをpostIdを切り替えたとき
-      apiClient.get("/posts/post/" + val + "/").then((response) => {
-        this.post = response.data; // 対象の投稿データをセット
+      apiClient.get("/posts/post/" + val + "/").then(({ data }) => {
+        this.post = data; // 対象の投稿データをセット
       });
     },
   },

@@ -41,9 +41,9 @@ const actions = {
     };
 
     return apiClient.post('/follows/create/', params)
-      .then(response => {
+      .then(({ data }) => {
         const followObj = {
-          id: response.data.followId, // フォローデータのid
+          id: data.followId, // フォローデータのid
           follow: userInfo, // フォローしているユーザーの情報（オブジェクト）
         };
 
@@ -65,26 +65,26 @@ const actions = {
   // フォローしているユーザーのリストを取得
   async getFollow({ commit }, { userId, isMe }) { // フォローしている側のユーザーのidがuserId
     // フォローデータのリストを取得
-    const res = await apiClient.get('/follows/follow/' + userId);
+    const { data } = await apiClient.get('/follows/follow/' + userId);
 
     if (isMe) { // ログインユーザーのフォローデータのリストの場合
-      commit('setFollow', res.data);
+      commit('setFollow', data);
     }
 
     // 他のユーザーのフォローデータの場合
-    return Promise.resolve(res.data);
+    return Promise.resolve(data);
   },
   // フォロワーのリストを取得
   async getFollower({ commit }, { followId, isMe }) { // フォローされている側のユーザーのidがfollowId
     // フォロワーデータのリストを取得
-    const res = await apiClient.get('/follows/follower/' + followId);
+    const { data } = await apiClient.get('/follows/follower/' + followId);
 
     if (isMe) { // ログインユーザーのフォロワーデータのリストの場合
-      commit('setFollower', res.data);
+      commit('setFollower', data);
     }
 
     // 他のユーザーのフォロワーデータの場合
-    return Promise.resolve(res.data);
+    return Promise.resolve(data);
   },
 };
 
