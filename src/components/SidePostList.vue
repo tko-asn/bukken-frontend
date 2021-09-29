@@ -45,16 +45,23 @@ export default {
 /* サイドメニュー */
 .block-side {
   width: 25%;
+  animation: scaleUp 0.5s;
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
 .block-side__list {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.block-side__nav {
-  border-top: 2px solid rgb(194, 193, 193);
 }
 
 .item__title {

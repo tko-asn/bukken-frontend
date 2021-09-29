@@ -54,13 +54,15 @@
         <section class="container__section">
           <h2 class="container__title">{{ contentListTitle[$route.name] }}</h2>
           <div :class="{ 'item-content': true, container__scroll: isScroll }">
-            <router-view
-              :isMe="isMe"
-              :userId="id"
-              :follow="follow"
-              :follower="follower"
-              :selfIntroduction="displayedSelfIntroduction"
-            />
+            <transition name="fade" mode="out-in" appear>
+              <router-view
+                :isMe="isMe"
+                :userId="id"
+                :follow="follow"
+                :follower="follower"
+                :selfIntroduction="displayedSelfIntroduction"
+              />
+            </transition>
           </div>
         </section>
 
@@ -84,29 +86,31 @@
               >
                 {{ item.name }}
               </a>
-              <ul class="list" v-show="item.children && item.open">
-                <li
-                  class="list__item"
-                  v-for="child in item.children"
-                  :key="child.name"
-                >
-                  <router-link
-                    class="list__link list__link--small"
-                    :to="{ name: child.link.name }"
-                    v-if="child.link"
+              <transition name="open">
+                <ul class="list" v-show="item.children && item.open">
+                  <li
+                    class="list__item"
+                    v-for="child in item.children"
+                    :key="child.name"
                   >
-                    {{ child.name }}
-                  </router-link>
-                  <a
-                    href=""
-                    class="list__link list__link--small"
-                    @click.prevent="child.methodName"
-                    v-else
-                  >
-                    {{ child.name }}
-                  </a>
-                </li>
-              </ul>
+                    <router-link
+                      class="list__link list__link--small"
+                      :to="{ name: child.link.name }"
+                      v-if="child.link"
+                    >
+                      {{ child.name }}
+                    </router-link>
+                    <a
+                      href=""
+                      class="list__link list__link--small"
+                      @click.prevent="child.methodName"
+                      v-else
+                    >
+                      {{ child.name }}
+                    </a>
+                  </li>
+                </ul>
+              </transition>
             </li>
           </ul>
         </aside>
@@ -410,6 +414,7 @@ a {
   padding: 80px 0 10px;
   box-shadow: 0 3px 5px rgb(165, 164, 164);
   background: #fff;
+  animation: slideDown 0.8s;
 }
 
 /* コンテナ */
@@ -484,6 +489,7 @@ a {
   overflow: hidden;
   border: 3px solid gray;
   border-radius: 5px;
+  animation: slideUp 0.8s;
 }
 
 .container__title {
@@ -517,6 +523,7 @@ a {
   border: 3px solid rgb(185, 181, 181);
   border-radius: 5px;
   background: rgb(156, 154, 154);
+  animation: slideUp 0.8s;
 }
 
 /* サイドメニューのリスト */
@@ -540,12 +547,60 @@ a {
 
 /* 選択されたアイテム */
 .list__link--active {
-  background: rgb(64, 79, 94);
+  background: rgb(99, 106, 114);
 }
 
 /* ネストされたリスト */
 .list__link--small {
   height: 50px;
   background: rgb(134, 131, 131);
+}
+
+/* アニメーション */
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-acitve {
+  transition: opacity 0.3s;
+}
+
+@keyframes open {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.open-enter-active {
+  animation: open 0.2s ease-in;
+}
+.open-leave-active {
+  animation: open 0.2s linear reverse;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 </style>

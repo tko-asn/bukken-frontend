@@ -231,6 +231,7 @@ export default {
   flex-direction: column;
   margin: 0 auto;
   padding: 20px 40px;
+  animation: slideUp 0.5s;
 }
 
 /* フォームラベル */
@@ -294,5 +295,16 @@ export default {
   background: rgba(151, 100, 199, 0.877);
   color: rgb(194, 188, 188);
   cursor: default;
+}
+
+/* アニメーション */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 </style>

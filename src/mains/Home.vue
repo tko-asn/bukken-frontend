@@ -40,46 +40,48 @@
                 >{{ menuObj.name }}</a
               >
               <!-- ドロップダウンメニュー -->
-              <ul
-                class="list"
-                v-show="
-                  menuObj.type === 'followee'
-                    ? showFolloweeList
-                    : showFollowerList
-                "
-              >
-                <li
-                  class="list__item"
-                  v-for="obj in followsList(menuObj.type)"
-                  :key="obj.id"
+              <transition name="open">
+                <ul
+                  class="list"
+                  v-show="
+                    menuObj.type === 'followee'
+                      ? showFolloweeList
+                      : showFollowerList
+                  "
                 >
-                  <router-link
-                    class="list__link list__link--small"
-                    :to="{
-                      name: 'userView',
-                      params: {
-                        id: followsObjKey(menuObj.type, obj).id,
-                      },
-                    }"
+                  <li
+                    class="list__item"
+                    v-for="obj in followsList(menuObj.type)"
+                    :key="obj.id"
                   >
-                    <div class="item-icon">
-                      <img
-                        class="item-icon__img"
-                        :src="followsObjKey(menuObj.type, obj).iconURL"
-                      />
-                    </div>
-                    <p class="list__username">
-                      {{ followsObjKey(menuObj.type, obj).username }}
-                    </p>
-                  </router-link>
-                </li>
-                <a
-                  class="list__link list__link--large"
-                  href=""
-                  @click.prevent="closeUserList(menuObj.type)"
-                  >閉じる</a
-                >
-              </ul>
+                    <router-link
+                      class="list__link list__link--small"
+                      :to="{
+                        name: 'userView',
+                        params: {
+                          id: followsObjKey(menuObj.type, obj).id,
+                        },
+                      }"
+                    >
+                      <div class="item-icon">
+                        <img
+                          class="item-icon__img"
+                          :src="followsObjKey(menuObj.type, obj).iconURL"
+                        />
+                      </div>
+                      <p class="list__username">
+                        {{ followsObjKey(menuObj.type, obj).username }}
+                      </p>
+                    </router-link>
+                  </li>
+                  <a
+                    class="list__link list__link--large"
+                    href=""
+                    @click.prevent="closeUserList(menuObj.type)"
+                    >閉じる</a
+                  >
+                </ul>
+              </transition>
             </li>
           </template>
           <template v-else>
@@ -111,12 +113,14 @@
         <PostFilter :myId="userId" v-show="$route.name === 'home'" />
         <router-view :postList="displayedPosts" />
         <!-- ページネーション -->
-        <Pagination
-          :total="total"
-          @movePage="pagination"
-          :userId="userId"
-          v-show="$route.name === 'home'"
-        />
+        <transition name="fade">
+          <Pagination
+            :total="total"
+            @movePage="pagination"
+            :userId="userId"
+            v-show="$route.name === 'home' && displayedPosts.length > 0"
+          />
+        </transition>
       </div>
     </div>
   </div>
@@ -448,5 +452,33 @@ a {
 
 .container__main::-webkit-scrollbar-thumb {
   background: rgba(139, 130, 130, 0.747);
+}
+
+/* アニメーション */
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 2.5s;
+}
+
+@keyframes open {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.open-enter-active {
+  animation: open 0.4s ease-in;
+}
+.open-leave-active {
+  animation: open 0.3s linear reverse;
 }
 </style>
