@@ -393,6 +393,7 @@ a {
 .block-content__text {
   min-height: 50px;
   margin: 30px 0;
+  white-space: pre-wrap;
 }
 
 /* 物件情報 */
@@ -493,7 +494,7 @@ a {
 }
 
 .form-answer__textarea {
-  height: 100px;
+  height: 200px;
   padding: 10px;
   border-color: silver;
   border-radius: 3px;
