@@ -8,62 +8,66 @@
       </span>
     </div>
     <!-- フィルター部分 -->
-    <div class="item-filter" v-show="openFilter">
-      <!-- カテゴリー -->
-      <section class="section">
-        <h3 class="section__title">カテゴリー</h3>
-        <ul class="section__list">
-          <li
-            class="list"
+    <transition name="open">
+      <div class="item-filter" v-show="openFilter">
+        <!-- カテゴリー -->
+        <section class="section">
+          <h3 class="section__title">カテゴリー</h3>
+          <ul class="section__list">
+            <li
+              class="list"
+              v-for="firstCategory in categories"
+              :key="firstCategory.name"
+            >
+              <a
+                href=""
+                class="list__item"
+                @click.prevent="switchCategory($event, firstCategory.name)"
+                >{{ firstCategory.name }}</a
+              >
+            </li>
+          </ul>
+          <ul
+            class="section__list"
+            v-show="currentCategory === firstCategory.name"
             v-for="firstCategory in categories"
             :key="firstCategory.name"
           >
-            <a
-              href=""
-              class="list__item"
-              @click.prevent="switchCategory($event, firstCategory.name)"
-              >{{ firstCategory.name }}</a
+            <li
+              class="list-checkbox"
+              v-for="secondCategory in firstCategory.children"
+              :key="secondCategory"
             >
-          </li>
-        </ul>
-        <ul
-          class="section__list"
-          v-show="currentCategory === firstCategory.name"
-          v-for="firstCategory in categories"
-          :key="firstCategory.name"
-        >
-          <li
-            class="list-checkbox"
-            v-for="secondCategory in firstCategory.children"
-            :key="secondCategory"
-          >
-            <input
-              type="checkbox"
-              :value="secondCategory"
-              :id="secondCategory"
-              class="list-checkbox__input"
-              v-model="selectedCategories"
-            />
-            <label :for="secondCategory" class="list-checkbox__label">{{
-              secondCategory
-            }}</label>
-          </li>
-        </ul>
-      </section>
+              <input
+                type="checkbox"
+                :value="secondCategory"
+                :id="secondCategory"
+                class="list-checkbox__input"
+                v-model="selectedCategories"
+              />
+              <label :for="secondCategory" class="list-checkbox__label">{{
+                secondCategory
+              }}</label>
+            </li>
+          </ul>
+        </section>
 
-      <!-- 地域 -->
-      <section class="section">
-        <!-- タイトル -->
-        <h3 class="section__title">地域</h3>
-        <AddressForm
-          class="section__form-address"
-          @addressData="getAddressData"
-        />
-      </section>
+        <!-- 地域 -->
+        <section class="section">
+          <!-- タイトル -->
+          <h3 class="section__title">地域</h3>
+          <AddressForm
+            class="section__form-address"
+            @addressData="getAddressData"
+          />
+        </section>
 
-      <!-- 絞り込みボタン -->
-      <a href="" class="item-filter__btn" @click.prevent="filter"> 絞り込む </a>
-    </div>
+        <!-- 絞り込みボタン -->
+        <a href="" class="item-filter__btn" @click.prevent="filter">
+          絞り込む
+        </a>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -277,5 +281,22 @@ a {
 
 .item-filter__btn:active {
   opacity: 0.4;
+}
+
+@keyframes open {
+  from {
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.open-enter-active {
+  animation: open 0.4s;
+}
+.open-leave-active {
+  animation: open 0.2s linear reverse;
 }
 </style>

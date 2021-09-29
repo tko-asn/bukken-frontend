@@ -140,7 +140,17 @@ export default {
 
 <style scoped>
 .container {
-  padding: 190px 0 0;
+  padding: 220px 0 0;
+  animation: fadeIn 0.8s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ログインフォーム */

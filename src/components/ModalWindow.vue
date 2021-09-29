@@ -23,12 +23,12 @@ export default {
     slotName: String,
     title: {
       type: String,
-      default: '',
+      default: "",
     },
     closeWindow: {
       type: Function,
       default: () => () => {},
-    }
+    },
   },
 };
 </script>
@@ -49,10 +49,10 @@ export default {
   top: 50%;
   left: 50%;
   z-index: 100;
-  transform: translate(-50%, -50%);
   width: 80%;
   border-radius: 15px;
   background: #fff;
+  animation: slide 0.2s ease forwards;
 }
 
 .modal-content__container {
@@ -66,5 +66,14 @@ export default {
   padding-left: 20px;
   background: rgb(52, 52, 80);
   color: #fff;
+}
+
+@keyframes slide {
+  from {
+    transform: translate(-50%, -1000px);
+  }
+  to {
+    transform: translate(-50%, -50%);
+  }
 }
 </style>

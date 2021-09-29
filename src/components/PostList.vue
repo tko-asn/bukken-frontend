@@ -2,47 +2,52 @@
   <!-- 投稿リスト -->
   <div class="container-post-list">
     <!-- 投稿がある場合 -->
-    <template v-if="postList.length">
-      <!-- 投稿 -->
-      <section
-        class="section-post section-post--exist"
-        v-for="post in postList"
-        :key="post.id"
-        @click="moveToPostPage(post.id)"
+    <transition name="fade" mode="out-in" appear>
+      <transition-group
+        name="fade"
+        class="container-post-list__block-posts"
+        v-if="postList.length"
+        key="showPosts"
       >
-        <!-- タイトル -->
-        <h3 class="section-post__title">
-          {{ post.title }}
-        </h3>
+        <!-- 投稿 -->
+        <section
+          class="section-post section-post--exist"
+          v-for="post in postList"
+          :key="post.id"
+          @click="moveToPostPage(post.id)"
+        >
+          <!-- タイトル -->
+          <h3 class="section-post__title">
+            {{ post.title }}
+          </h3>
 
-        <!-- 投稿者 -->
-        <div class="section-post__author">
-          <div class="item-icon">
-            <img class="item-icon__img" :src="post.user.icon_url" />
+          <!-- 投稿者 -->
+          <div class="section-post__author">
+            <div class="item-icon">
+              <img class="item-icon__img" :src="post.user.icon_url" />
+            </div>
+            <p class="section-post__sub-title">{{ post.user.username }}</p>
           </div>
-          <p class="section-post__sub-title">{{ post.user.username }}</p>
-        </div>
 
-        <!-- 物件情報 -->
-        <section class="block-property">
-          <h4 class="block-property__title">質問対象の物件</h4>
-          <p class="section-post__sub-title">{{ post.property }}</p>
-          <p class="section-post__sub-title">
-            {{ addressData(post) }}
-          </p>
+          <!-- 物件情報 -->
+          <section class="block-property">
+            <h4 class="block-property__title">質問対象の物件</h4>
+            <p class="section-post__sub-title">{{ post.property }}</p>
+            <p class="section-post__sub-title">
+              {{ addressData(post) }}
+            </p>
+          </section>
         </section>
-      </section>
 
-      <!-- セクションを左揃えにするための空の要素 -->
-      <div class="section-post" v-show="isOdd"></div>
-    </template>
+        <!-- セクションを左揃えにするための空の要素 -->
+        <div class="section-post" v-show="isOdd" key="emptyPost"></div>
+      </transition-group>
 
-    <!-- 投稿がない場合 -->
-    <template v-else>
-      <div class="block-no-post">
+      <!-- 投稿がない場合 -->
+      <div class="block-no-post" v-else key="hidePosts">
         <p class="block-no-post__text">投稿はありません</p>
       </div>
-    </template>
+    </transition>
   </div>
 </template>
 
@@ -82,10 +87,14 @@ export default {
 <style scoped>
 /* 投稿リスト */
 .container-post-list {
+  padding: 20px 0;
+}
+
+/* 投稿リストの投稿ブロック */
+.container-post-list__block-posts {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  padding: 20px 0;
 }
 
 /* 投稿 */
@@ -103,6 +112,19 @@ export default {
     inset -5px -5px 10px rgb(233, 231, 231), 0 4px 6px rgb(70, 69, 69);
   background: #fff;
   cursor: pointer;
+}
+
+.section-post--exist:active {
+  animation: zoomIn 1s;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.9);
+  }
 }
 
 /* タイトル */
@@ -153,5 +175,34 @@ export default {
   justify-content: center;
   width: 100%;
   margin: 0 auto;
+}
+
+/* アニメーション */
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  transition: opacity 0.5s;
+  animation: slideUp 0.5s;
+}
+
+.fade-leave-active {
+  transition: opacity 0.2s;
+  position: absolute;
+}
+
+.fade-move {
+  transition: transform 0.8s;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 </style>

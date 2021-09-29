@@ -204,10 +204,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions("posts", [
-      "addFavoritePost",
-      "removeFavoritePost"
-    ]),
+    ...mapActions("posts", ["addFavoritePost", "removeFavoritePost"]),
     // カテゴリーの数を返す
     categoryLength(post) {
       return post.categories?.length;
@@ -348,13 +345,40 @@ a {
   width: 65%;
 }
 
+.block-content {
+  animation: slideUp 0.5s;
+}
+
+.block-content * {
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 /* 質問部分 */
 .block-content {
   margin-bottom: 40px;
   padding: 10px 20px;
   border-radius: 2px;
   background: white;
-  box-shadow: 0 3px 2px rgb(158, 156, 156);
+  box-shadow: 0 3px 2px rgb(158, 156, 156), inset 1px 1px 5px rgb(224, 224, 224),
+    inset -1px -1px 5px rgb(224, 224, 224);
   overflow-wrap: break-word;
 }
 
