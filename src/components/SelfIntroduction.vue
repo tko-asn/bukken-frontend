@@ -27,6 +27,10 @@ export default {
   font-size: 1.1em;
 }
 
+.item-self-intro__text {
+  white-space: pre-wrap;
+}
+
 .item-self-intro__text--center {
   text-align: center;
 }
