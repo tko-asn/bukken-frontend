@@ -98,6 +98,10 @@ export default {
         params = new FormData();
         // 送信データを作成
         Object.entries(this.newData).forEach(([key, value]) => {
+          // 自己紹介の値がnullの場合は空文字列をセット
+          if (key === "self_introduction" && !value) {
+            value = "";
+          }
           params.append(key, value);
         });
       }
