@@ -25,6 +25,9 @@
           placeholder="ユーザー名"
           v-model="newData.username"
         />
+        <div class="block-validation" v-show="usernameMessage.length">
+          <ValidationMessage :messages="usernameMessage" />
+        </div>
         <textarea
           class="container-form__input-self-introduction"
           cols="20"
@@ -43,8 +46,12 @@
 <script>
 import Compressor from "compressorjs";
 import authInfoMixin from "@/mixins/authInfoMixin";
+import ValidationMessage from "@/components/ValidationMessage";
 
 export default {
+  components: {
+    ValidationMessage,
+  },
   data() {
     return {
       // プレビュー用の画像URL
@@ -55,6 +62,7 @@ export default {
         username: "",
         self_introduction: "", // DBのカラム名に合わせる
       },
+      usernameMessage: [], // ユーザー名のバリデーションメッセージ
     };
   },
   mixins: [authInfoMixin],
@@ -88,6 +96,7 @@ export default {
       });
     },
     editProfile() {
+      this.usernameMessage = [];
       let params;
       // アイコン画像に変更がない場合
       if (!this.newData.iconFile) {
@@ -107,10 +116,26 @@ export default {
       }
 
       // APIを実行
-      this.$store.dispatch("auth/editProfile", params).then(() => {
-        // マイページへ
-        this.$router.replace({ name: "userView", params: { id: this.userId } });
-      });
+      this.$store
+        .dispatch("auth/editProfile", params)
+        .then(() => {
+          // マイページへ
+          this.$router.replace({
+            name: "userView",
+            params: { id: this.userId },
+          });
+        })
+        .catch((err) => {
+          if (err.response.data.message === "Duplicate") {
+            err.response.data.fields.forEach((field) => {
+              if (field === "username") {
+                this.usernameMessage.push(
+                  "このユーザー名は既に使われています。"
+                );
+              }
+            });
+          }
+        });
     },
     // 画像のURLを取得する
     getFileSrc(file) {
@@ -205,5 +230,9 @@ export default {
 .container-form__btn-input:hover {
   background: rgb(30, 250, 41);
   cursor: pointer;
+}
+
+.block-validation {
+  width: 100%;
 }
 </style>

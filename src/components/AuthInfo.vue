@@ -10,6 +10,10 @@
         v-model="userEmail"
       />
     </div>
+    <ValidationMessage
+      :messages="emailMessages"
+      v-show="emailMessages.length"
+    />
     <button class="container-auth-info__btn" @click="changeEmail">保存</button>
     <router-link
       :to="{ name: 'changePassword' }"
@@ -20,10 +24,16 @@
 </template>
 
 <script>
+import ValidationMessage from "@/components/ValidationMessage";
+
 export default {
+  components: {
+    ValidationMessage,
+  },
   data() {
     return {
       userEmail: "",
+      emailMessages: [],
     };
   },
   created() {
@@ -32,6 +42,8 @@ export default {
   },
   methods: {
     changeEmail() {
+      this.emailMessages = [];
+
       // データはオブジェクトで送信
       this.$store
         .dispatch("auth/editAuthInfo", { email: this.userEmail })
@@ -40,6 +52,17 @@ export default {
             name: "userView",
             params: { id: this.$store.getters["auth/userId"] },
           }); // マイページへ
+        })
+        .catch((err) => {
+          if (err.response.data.message === "Duplicate") {
+            err.response.data.fields.forEach((field) => {
+              if (field === "email") {
+                this.emailMessages.push(
+                  "このメールアドレスは既に使われています。"
+                );
+              }
+            });
+          }
         });
     },
   },

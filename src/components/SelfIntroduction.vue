@@ -1,9 +1,7 @@
 <template>
   <!-- 自己紹介 -->
   <div class="item-self-intro">
-    <p class="item-self-intro__text" v-if="selfIntroduction">
-      {{ selfIntroduction }}
-    </p>
+    <p class="item-self-intro__text" v-if="selfIntroduction">{{ selfIntroduction }}</p>
     <p class="item-self-intro__text item-self-intro__text--center" v-else>
       自己紹介はありません
     </p>
