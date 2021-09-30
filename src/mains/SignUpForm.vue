@@ -143,9 +143,22 @@ export default {
           // ホームページへ
           this.$router.replace("/");
         })
-        .catch(() => {
+        .catch((err) => {
           // 登録ボタンを有効化
           buttonElement.disabled = false;
+          if (err.response.data.message === "Duplicate") {
+            err.response.data.fields.forEach((field) => {
+              if (field === "username") {
+                this.usernameMessage.push(
+                  "このユーザー名は既に使われています。"
+                );
+              } else if (field === "email") {
+                this.emailMessage.push(
+                  "このメールアドレスは既に使われています。"
+                );
+              }
+            });
+          }
         });
     },
     validate() {
