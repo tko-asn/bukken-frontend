@@ -157,6 +157,7 @@ export default {
   },
   data() {
     return {
+      // 参照エラーが発生するので空のデータを追加
       post: {
         // 表示する投稿
         id: "",
@@ -332,7 +333,7 @@ a {
 
 .container {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   width: 85%;
   margin: 0 auto;
   padding-top: 50px;
@@ -341,12 +342,10 @@ a {
 
 /* 投稿詳細部分 */
 .container__item-post-details {
-  padding-top: 25px;
+  max-width: 750px;
   width: 65%;
-}
-
-.block-content {
-  animation: slideUp 0.5s;
+  margin-right: 50px;
+  padding-top: 25px;
 }
 
 .block-content * {
@@ -380,6 +379,7 @@ a {
   box-shadow: 0 3px 2px rgb(158, 156, 156), inset 1px 1px 5px rgb(224, 224, 224),
     inset -1px -1px 5px rgb(224, 224, 224);
   overflow-wrap: break-word;
+  animation: slideUp 0.5s;
 }
 
 /* タイトル */
