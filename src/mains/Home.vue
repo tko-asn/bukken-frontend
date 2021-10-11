@@ -8,6 +8,12 @@
         :closeWindow="toggleSideMenu"
       />
     </transition>
+    <ModalWindow
+      title="概要"
+      v-show="showAppOverview"
+      :closeWindow="toggleAppOverview"
+      ><AppOverview
+    /></ModalWindow>
     <!-- サイドバー -->
     <transition name="slide">
       <aside
@@ -143,7 +149,9 @@
         </nav>
         <div class="side-footer">
           <ul class="list">
-            <li class="list__item"><a href="">サイト概要</a></li>
+            <li class="list__item">
+              <a href="" @click.prevent="toggleAppOverview">サイト概要</a>
+            </li>
           </ul>
         </div>
       </aside>
@@ -172,6 +180,7 @@
 import PostFilter from "@/components/PostFilter";
 import Pagination from "@/components/Pagination";
 import ModalWindow from "@/components/ModalWindow";
+import AppOverview from "@/components/AppOverview";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import authInfoMixin from "@/mixins/authInfoMixin";
 
@@ -180,6 +189,7 @@ export default {
     PostFilter,
     Pagination,
     ModalWindow,
+    AppOverview,
   },
   data() {
     return {
@@ -204,6 +214,7 @@ export default {
       },
       // 画面幅
       width: window.innerWidth,
+      showAppOverview: false, // 概要の表示・非表示
     };
   },
   computed: {
@@ -248,7 +259,7 @@ export default {
       "resetActiveMenu",
       "resetFilterType",
     ]),
-    ...mapMutations("posts", ["toggleSideMenu"]),
+    ...mapMutations("posts", ["toggleSideMenu", "hideSideMenu"]),
     // ページ別に適切な投稿を返す
     getPosts(postType) {
       const menuAndPosts = {
@@ -321,6 +332,11 @@ export default {
           this.$router.push("/");
         }
       });
+    },
+    // サイト概要の表示・非表示切り替え
+    toggleAppOverview() {
+      this.hideSideMenu();
+      this.showAppOverview = !this.showAppOverview;
     },
   },
   watch: {
@@ -566,11 +582,11 @@ a {
 }
 
 .slide-enter-active {
-  animation: slide 0.1s ease-in;
+  animation: slide 0.3s ease-in;
 }
 
 .slide-leave-active {
-  animation: slide 0.1s ease-in reverse;
+  animation: slide 0.3s ease-in reverse;
 }
 
 .nav--tablet_sp {

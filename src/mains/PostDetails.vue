@@ -413,6 +413,7 @@ a {
 
 /* 物件情報 */
 .item-property {
+  overflow: hidden;
   font-size: 0.9em;
 }
 

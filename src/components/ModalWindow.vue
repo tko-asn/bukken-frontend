@@ -7,11 +7,7 @@
         <!-- タイトル -->
         <h1 class="modal-content__title">{{ title }}</h1>
         <!-- slotで表示するコンテンツを切り替える -->
-        <slot
-          class="modal-content__content"
-          name="deleteAccount"
-          v-if="slotName === 'deleteAccount'"
-        />
+        <slot class="modal-content__content" />
       </section>
     </div>
   </div>
@@ -20,7 +16,6 @@
 <script>
 export default {
   props: {
-    slotName: String,
     title: {
       type: String,
       default: "",
@@ -54,9 +49,20 @@ export default {
   left: 50%;
   z-index: 100;
   width: 60%;
+  overflow: hidden;
+  overflow-y: scroll;
   border-radius: 15px;
   background: #fff;
   animation: slide 0.2s ease forwards;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: rgba(219, 218, 219, 0.795);
 }
 
 .modal-content__container {
@@ -88,6 +94,7 @@ export default {
 
   .modal-content {
     width: 95%;
+    height: 70%;
   }
 }
 </style>

@@ -140,13 +140,10 @@
     <ModalWindow
       v-show="showWindow"
       :title="modalTitle"
-      :slotName="slotName"
       :closeWindow="closeWindow"
     >
       <!-- アカウント閉鎖 -->
-      <template v-slot:deleteAccount>
-        <DeleteAccount />
-      </template>
+      <DeleteAccount />
     </ModalWindow>
   </div>
 </template>
