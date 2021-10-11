@@ -23,6 +23,7 @@ const state = {
   categories: [], // 選択中のカテゴリー
   postalCode: "", // 指定中の郵便番号
   keyword: "", // 検索用キーワード
+  showSideMenu: false, // SP・タブレット状態でのメニューの表示切り替え
 };
 
 const getters = {
@@ -35,6 +36,7 @@ const getters = {
   pageTotal: (state) => state.pageTotal,
   activeMenu: (state) => state.activeMenu,
   filterType: (state) => state.filterType,
+  showSideMenu: (state) => state.showSideMenu,
 };
 
 const mutations = {
@@ -88,6 +90,14 @@ const mutations = {
   // メニューの変更
   changeActiveMenu(state, payload) {
     state.activeMenu = payload;
+  },
+  // SP・タブレット状態でのサイドメニューの表示・非表示
+  toggleSideMenu() {
+    state.showSideMenu = !state.showSideMenu;
+  },
+  // SP・タブレット状態のでのサイドメニューの非表示
+  hideSideMenu() {
+    state.showSideMenu = false;
   },
 };
 
@@ -189,7 +199,7 @@ const actions = {
     const params = {
       keyword: state.keyword,
     };
-    
+
     // 自分の投稿表示中の絞り込み
     if (state.activeMenu === "myPosts") {
       params.authorId = userId;
@@ -206,7 +216,7 @@ const actions = {
     } else if (state.activeMenu === "favorites") {
       params.userId = userId;
     }
-    
+
     const { data } = await apiClient.get(
       "/posts/search/query/page/" + page + "/",
       {

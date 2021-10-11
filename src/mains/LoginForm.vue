@@ -242,4 +242,21 @@ export default {
   width: 90%;
   padding-bottom: 15px;
 }
+
+@media screen and (max-width: 599px) {
+  .container {
+    padding-top: 115px;
+  }
+
+  [class*="input"] {
+    height: 40px;
+    padding: 0 10px;
+    font-size: 1em;
+    letter-spacing: 1.5px;
+  }
+
+  .block-sign-up__text {
+    margin-top: 30px;
+  }
+}
 </style>

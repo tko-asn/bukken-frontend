@@ -153,16 +153,18 @@ export default {
 <style scoped>
 /* ページ全体 */
 .container {
-  padding: 100px 0 50px;
+  padding: 70px 0 20px;
 }
 
 .form-edit-profile {
-  width: 45%;
+  max-width: 650px;
+  width: 50%;
   margin: 0 auto;
-  border-radius: 8px;
+  border-radius: 2px;
   padding: 20px 0;
-  box-shadow: 0 5px 5px rgb(173, 171, 171);
+  box-shadow: 0 5px 3px rgb(134, 134, 134);
   background: #fff;
+  animation: slideUp 0.5s;
 }
 
 .container-form {
@@ -205,6 +207,7 @@ export default {
 [class*="input"] {
   width: 100%;
   margin: 10px 0;
+  border: 0.5px solid rgb(172, 170, 170);
   font-size: 1.1rem;
 }
 
@@ -234,5 +237,41 @@ export default {
 
 .block-validation {
   width: 100%;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .form-edit-profile {
+    width: 70%;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .item-icon,
+  .item-icon__img {
+    width: 150px;
+    height: 150px;
+  }
+
+  [class*="input"] {
+    width: 90%;
+  }
+
+  .container {
+    padding: 50px 0 0;
+  }
+
+  .form-edit-profile {
+    width: 100%;
+  }
 }
 </style>

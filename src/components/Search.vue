@@ -6,7 +6,8 @@
       v-model="keyword"
     />
     <button class="item-search__button" @click="search">
-      <fa-icon class="item-search__icon" icon="search" />検索
+      <fa-icon class="item-search__icon" icon="search" />
+      <span class="item-search__search">検索</span>
     </button>
   </div>
 </template>
@@ -80,5 +81,29 @@ export default {
 
 .item-search__button:active {
   background: rgb(129, 54, 129);
+}
+
+@media screen and (max-width: 1024px) {
+  .item-search__input {
+    width: 300px;
+  }
+
+  .item-search__button {
+    width: 50px;
+  }
+
+  .item-search__search {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .item-search__input {
+    width: 80%;
+  }
+
+  .item-search__button {
+    width: 20%;
+  }
 }
 </style>

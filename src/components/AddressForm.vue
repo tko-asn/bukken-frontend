@@ -190,4 +190,10 @@ export default {
 [class*="item-address__input"]:read-only {
   background: rgb(216, 214, 214);
 }
+
+@media screen and (max-width: 599px) {
+  [class*="item-address__input"] {
+    width: 80%;
+  }
+}
 </style>

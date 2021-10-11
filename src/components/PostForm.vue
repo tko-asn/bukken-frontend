@@ -307,4 +307,10 @@ export default {
     transform: translateY(0);
   }
 }
+
+@media screen and (max-width: 599px) {
+  .form-post {
+    padding: 20px 5px;
+  }
+}
 </style>

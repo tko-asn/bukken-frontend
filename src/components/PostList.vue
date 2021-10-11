@@ -34,7 +34,7 @@
             <h4 class="block-property__title">質問対象の物件</h4>
             <p class="section-post__sub-title">{{ post.property }}</p>
             <p class="section-post__sub-title">
-              {{ addressData(post) }}
+              {{ postalCodeData(post) }}<span>{{ addressData(post) }}</span>
             </p>
           </section>
         </section>
@@ -63,14 +63,18 @@ export default {
     },
   },
   methods: {
-    // 住所のデータを連結して返す
-    addressData(post) {
+    // 郵便番号
+    postalCodeData(post) {
       return (
         "〒" +
         post.address?.["postalCode"].slice(0, 3) +
         "-" +
-        post.address?.["postalCode"].slice(3) +
-        " " +
+        post.address?.["postalCode"].slice(3)
+      );
+    },
+    // 住所のデータを連結して返す
+    addressData(post) {
+      return (
         post.address.prefecture +
         post.address.municipality +
         post.address.townName +
@@ -93,14 +97,14 @@ export default {
 /* 投稿リストの投稿ブロック */
 .container-post-list__block-posts {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   flex-wrap: wrap;
 }
 
 /* 投稿 */
 .section-post {
-  width: 45%;
-  max-height: 200px;
+  width: 40%;
+  max-height: 500px;
   margin-bottom: 30px;
   padding: 10px;
 }
@@ -108,8 +112,7 @@ export default {
 .section-post--exist {
   border: 2px solid rgb(189, 187, 187);
   border-radius: 5px;
-  box-shadow: inset 5px 5px 10px rgb(233, 231, 231),
-    inset -5px -5px 10px rgb(233, 231, 231), 0 4px 6px rgb(70, 69, 69);
+  box-shadow: 0 3px 4px rgb(70, 69, 69);
   background: #fff;
   cursor: pointer;
 }
@@ -131,6 +134,7 @@ export default {
 .section-post__title {
   max-height: 30px;
   margin: 0;
+  padding: 10px 0;
   overflow: hidden;
   font-size: 1.3em;
 }
@@ -158,6 +162,8 @@ export default {
 }
 
 .section-post__sub-title {
+  display: flex;
+  flex-wrap: wrap;
   margin: 0;
   color: rgb(78, 76, 76);
   font-size: 1.1em;
@@ -203,6 +209,24 @@ export default {
   }
   to {
     transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .container-post-list__block-posts {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section-post {
+    max-width: 500px;
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .section-post {
+    width: 90%;
   }
 }
 </style>

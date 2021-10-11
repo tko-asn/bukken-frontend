@@ -24,7 +24,7 @@
             class="container__btn"
             :to="{ name: 'editProfile' }"
             v-if="isMe"
-            >プロフィールを編集
+            ><span class="container__btn--pc">プロフィールを</span>編集
           </router-link>
 
           <!-- フォローボタン -->
@@ -34,14 +34,14 @@
               class="container__btn"
               v-show="!isYourFavoriteUser"
               @click.prevent="following"
-              >フォローする</a
+              >フォロー<span class="container__btn--pc">する</span></a
             >
             <a
               href=""
               class="container__btn"
               v-show="isYourFavoriteUser"
               @click.prevent="unfollowing"
-              >フォローを解除</a
+              ><span class="container__btn--pc">フォローを</span>解除</a
             >
           </template>
         </div>
@@ -52,7 +52,17 @@
       <div class="container container--space">
         <!-- コンテンツ -->
         <section class="container__section">
-          <h2 class="container__title">{{ contentListTitle[$route.name] }}</h2>
+          <h2 class="container__title">
+            <a
+              href=""
+              class="container__btn-menu"
+              v-if="width < 1025"
+              @click.prevent="showSideMenu = !showSideMenu"
+            >
+              <fa-icon class="container__icon-menu" icon="bars" />
+            </a>
+            {{ contentListTitle[$route.name] }}
+          </h2>
           <div :class="{ 'item-content': true, container__scroll: isScroll }">
             <transition name="fade" mode="out-in" appear>
               <router-view
@@ -67,53 +77,62 @@
         </section>
 
         <!-- メニュー -->
-        <aside class="side-menu">
-          <ul class="list">
-            <li
-              :class="{ list__item: true, 'list__link--active': item.open }"
-              v-for="item in sideMenuList"
-              :key="item.name"
-              v-show="showMenuItem(item)"
-            >
-              <router-link class="list__link" :to="item.link" v-if="item.link">
-                {{ item.name }}
-              </router-link>
-              <a
-                href=""
-                class="list__link"
-                @click.prevent="pullDownMenu(item)"
-                v-else
+        <transition name="slideLeft">
+          <aside class="side-menu" v-show="showSideMenu || width >= 1025">
+            <ul class="list">
+              <li
+                :class="{ list__item: true, 'list__link--active': item.open }"
+                v-for="item in sideMenuList"
+                :key="item.name"
+                v-show="showMenuItem(item)"
               >
-                {{ item.name }}
-              </a>
-              <transition name="open">
-                <ul class="list" v-show="item.children && item.open">
-                  <li
-                    class="list__item"
-                    v-for="child in item.children"
-                    :key="child.name"
+                <router-link
+                  class="list__link"
+                  :to="item.link"
+                  v-if="item.link"
+                >
+                  {{ item.name }}
+                </router-link>
+                <a
+                  href=""
+                  class="list__link"
+                  @click.prevent="pullDownMenu(item)"
+                  v-else
+                >
+                  {{ item.name }}
+                </a>
+                <transition name="open">
+                  <ul
+                    class="list list--sub"
+                    v-show="item.children && item.open"
                   >
-                    <router-link
-                      class="list__link list__link--small"
-                      :to="{ name: child.link.name }"
-                      v-if="child.link"
+                    <li
+                      class="list__item"
+                      v-for="child in item.children"
+                      :key="child.name"
                     >
-                      {{ child.name }}
-                    </router-link>
-                    <a
-                      href=""
-                      class="list__link list__link--small"
-                      @click.prevent="child.methodName"
-                      v-else
-                    >
-                      {{ child.name }}
-                    </a>
-                  </li>
-                </ul>
-              </transition>
-            </li>
-          </ul>
-        </aside>
+                      <router-link
+                        class="list__link list__link--small"
+                        :to="{ name: child.link.name }"
+                        v-if="child.link"
+                      >
+                        {{ child.name }}
+                      </router-link>
+                      <a
+                        href=""
+                        class="list__link list__link--small"
+                        @click.prevent="child.methodName"
+                        v-else
+                      >
+                        {{ child.name }}
+                      </a>
+                    </li>
+                  </ul>
+                </transition>
+              </li>
+            </ul>
+          </aside>
+        </transition>
       </div>
     </div>
 
@@ -165,6 +184,8 @@ export default {
         followList: "フォロー",
         followerList: "フォロワー",
       },
+      width: window.innerWidth,
+      showSideMenu: false,
       // サイドメニュー一覧
       sideMenuList: [
         {
@@ -300,6 +321,12 @@ export default {
       this.displayedIconURL = this.iconURL;
     }
   },
+  mounted() {
+    // 画面幅の変更を感知
+    window.addEventListener("resize", () => {
+      this.width = window.innerWidth;
+    });
+  },
   methods: {
     ...mapActions("follows", ["followUser", "unfollowUser"]),
     // サイドメニューの表示・非表示
@@ -375,8 +402,13 @@ export default {
   },
   watch: {
     id(val) {
+      // SP・タブレットの場合サイドメニューを閉じる
+      this.showSideMenu = false;
       // 開いていたサイドメニューを閉じる
       this.sideMenuList.map((el) => (el.open = false));
+
+      // ユーザーの投稿のidを変更
+      this.sideMenuList[0].link.params.userId = val;
 
       // URLのidが更新されたとき
       if (!this.isMe) {
@@ -397,6 +429,10 @@ export default {
         this.displayedIconURL = this.iconURL;
       }
     },
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.showSideMenu = false;
+    next();
   },
 };
 </script>
@@ -421,7 +457,7 @@ a {
 .container {
   display: flex;
   align-items: center;
-  width: 80%;
+  width: 70%;
   margin: 0 auto;
 }
 
@@ -493,8 +529,18 @@ a {
 }
 
 .container__title {
+  position: relative;
   font-size: 1.3em;
   text-align: center;
+}
+
+.container__btn-menu {
+  position: absolute;
+  left: 10px;
+}
+
+.container__icon-menu {
+  color: gray;
 }
 
 .item-content {
@@ -519,11 +565,10 @@ a {
 /* サイドメニュー */
 .side-menu {
   position: sticky;
-  width: 25%;
+  width: 30%;
   border: 3px solid rgb(185, 181, 181);
   border-radius: 5px;
   background: rgb(156, 154, 154);
-  animation: slideUp 0.8s;
 }
 
 /* サイドメニューのリスト */
@@ -584,6 +629,30 @@ a {
   animation: open 0.2s linear reverse;
 }
 
+.slideLeft-enter,
+.slideLeft-leave-to {
+  opacity: 0;
+}
+
+.slideLeft-enter-active {
+  transition: opacity 0.2s;
+  animation: slideLeft 0.2s;
+}
+
+.slideLeft-leave-active {
+  transition: opacity 0.2s;
+  animation: slideLeft 0.2s reverse;
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translateX(500px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -601,6 +670,57 @@ a {
   }
   to {
     transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .container {
+    width: 70%;
+  }
+
+  .container__section {
+    width: 90%;
+  }
+
+  .container__btn {
+    padding: 5px 10px;
+    font-size: 0.9em;
+  }
+
+  .container__btn--pc {
+    display: none;
+  }
+
+  .side-menu {
+    position: fixed;
+    right: 50px;
+    width: 30%;
+    z-index: 20;
+  }
+
+  .list--sub {
+    max-height: 160px;
+    overflow-y: scroll;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .container {
+    width: 95%;
+  }
+
+  .container__block-left {
+    width: 140px;
+    height: 140px;
+  }
+
+  .side-menu {
+    right: 20px;
+    width: 70%;
+  }
+
+  .list__link {
+    height: 50px;
   }
 }
 </style>

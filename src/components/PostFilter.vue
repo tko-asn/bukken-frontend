@@ -296,7 +296,34 @@ a {
 .open-enter-active {
   animation: open 0.4s;
 }
+
 .open-leave-active {
   animation: open 0.2s linear reverse;
+}
+
+@media screen and (max-width: 1024px) {
+  .item-filter__btn {
+    width: 60%;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .list {
+    flex: none;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .list-checkbox {
+    width: 100%;
+  }
+
+  .list-checkbox__label {
+    font-size: 0.9em;
+  }
+
+  .section__form-address {
+    width: 100%;
+  }
 }
 </style>

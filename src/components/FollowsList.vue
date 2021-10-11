@@ -74,20 +74,21 @@ export default {
   display: flex;
   align-items: center;
   height: 100px;
+  padding: 0 10px;
   box-shadow: 0 1px 2px gray;
   text-decoration: none;
 }
 
 /* アイコン */
 .item-icon {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   object-fit: cover;
 }
 
@@ -104,5 +105,18 @@ export default {
 .container-follows-list__text-no-follow {
   color: gray;
   font-size: 1.2em;
+  text-align: center;
+}
+
+@media screen and (max-width: 1024px) {
+  .block-follows {
+    height: 60px;
+  }
+
+  .item-icon,
+  .item-icon__img {
+    width: 50px;
+    height: 50px;
+  }
 }
 </style>

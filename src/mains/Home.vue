@@ -1,111 +1,153 @@
 <template>
   <div class="container">
+    <transition name="fadeModal">
+      <ModalWindow
+        class="container__modal"
+        :haveContent="false"
+        v-show="showSideMenu && $route.name == 'home'"
+        :closeWindow="toggleSideMenu"
+      />
+    </transition>
     <!-- サイドバー -->
-    <aside class="container__side-bar">
-      <nav class="nav">
-        <ul class="list">
-          <li
-            class="list__item"
-            v-for="obj in mainMenu"
-            :key="obj.name"
-            v-show="obj.login ? isLoggedIn : true"
-            @click.prevent="switchPosts(obj.type)"
-          >
-            <a
-              href=""
-              :class="{
-                list__link: true,
-                is_active_menu: obj.type === activeMenu,
-              }"
-            >
-              {{ obj.name }}
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <nav class="nav">
-        <ul class="list">
-          <!-- フォローしているユーザーのリストを表示 -->
-          <template v-if="isLoggedIn">
-            <li class="list__title">フォロー</li>
+    <transition name="slide">
+      <aside
+        class="container__side-bar"
+        v-show="(showSideMenu && $route.name == 'home') || width >= 1025"
+      >
+        <nav class="nav">
+          <ul class="list">
             <li
               class="list__item"
-              v-for="menuObj in followMenu"
-              :key="menuObj.name"
+              v-for="obj in mainMenu"
+              :key="obj.name"
+              v-show="obj.login ? isLoggedIn : true"
+              @click.prevent="switchPosts(obj.type)"
             >
               <a
                 href=""
-                class="list__link"
-                @click.prevent="toggleUser(menuObj.type)"
-                >{{ menuObj.name }}</a
+                :class="{
+                  list__link: true,
+                  is_active_menu: obj.type === activeMenu,
+                }"
               >
-              <!-- ドロップダウンメニュー -->
-              <transition name="open">
-                <ul
-                  class="list"
-                  v-show="
-                    menuObj.type === 'followee'
-                      ? showFolloweeList
-                      : showFollowerList
-                  "
-                >
-                  <li
-                    class="list__item"
-                    v-for="obj in followsList(menuObj.type)"
-                    :key="obj.id"
-                  >
-                    <router-link
-                      class="list__link list__link--small"
-                      :to="{
-                        name: 'userView',
-                        params: {
-                          id: followsObjKey(menuObj.type, obj).id,
-                        },
-                      }"
-                    >
-                      <div class="item-icon">
-                        <img
-                          class="item-icon__img"
-                          :src="followsObjKey(menuObj.type, obj).iconURL"
-                        />
-                      </div>
-                      <p class="list__username">
-                        {{ followsObjKey(menuObj.type, obj).username }}
-                      </p>
-                    </router-link>
-                  </li>
-                  <a
-                    class="list__link list__link--large"
-                    href=""
-                    @click.prevent="closeUserList(menuObj.type)"
-                    >閉じる</a
-                  >
-                </ul>
-              </transition>
+                {{ obj.name }}
+              </a>
             </li>
-          </template>
-          <template v-else>
-            <li class="item-no-login">
-              <p class="item-no-login__text">
-                ログインするとフォロー機能を使用できます
-              </p>
-              <router-link
-                to="/login"
-                class="item-no-login__btn-login"
-                tag="button"
+          </ul>
+        </nav>
+        <nav class="nav">
+          <ul class="list">
+            <!-- フォローしているユーザーのリストを表示 -->
+            <template v-if="isLoggedIn">
+              <li class="list__title">フォロー</li>
+              <li
+                class="list__item"
+                v-for="menuObj in followMenu"
+                :key="menuObj.name"
               >
-                ログイン
+                <a
+                  href=""
+                  class="list__link"
+                  @click.prevent="toggleUser(menuObj.type)"
+                  >{{ menuObj.name }}</a
+                >
+                <!-- ドロップダウンメニュー -->
+                <transition name="open">
+                  <ul
+                    class="list"
+                    v-show="
+                      menuObj.type === 'followee'
+                        ? showFolloweeList
+                        : showFollowerList
+                    "
+                  >
+                    <li
+                      class="list__item"
+                      v-for="obj in followsList(menuObj.type)"
+                      :key="obj.id"
+                    >
+                      <router-link
+                        class="list__link list__link--small"
+                        :to="{
+                          name: 'userView',
+                          params: {
+                            id: followsObjKey(menuObj.type, obj).id,
+                          },
+                        }"
+                      >
+                        <div class="item-icon">
+                          <img
+                            class="item-icon__img"
+                            :src="followsObjKey(menuObj.type, obj).iconURL"
+                          />
+                        </div>
+                        <p class="list__username">
+                          {{ followsObjKey(menuObj.type, obj).username }}
+                        </p>
+                      </router-link>
+                    </li>
+                    <a
+                      class="list__link list__link--large"
+                      href=""
+                      @click.prevent="closeUserList(menuObj.type)"
+                      >閉じる</a
+                    >
+                  </ul>
+                </transition>
+              </li>
+            </template>
+            <template v-else>
+              <li class="item-no-login">
+                <p class="item-no-login__text">
+                  ログインするとフォロー機能を使用できます
+                </p>
+                <router-link
+                  to="/login"
+                  class="item-no-login__btn-login"
+                  tag="button"
+                >
+                  ログイン
+                </router-link>
+              </li>
+            </template>
+          </ul>
+        </nav>
+        <nav class="nav nav--tablet_sp" v-if="isLoggedIn">
+          <ul class="list">
+            <li class="list__title">アカウント</li>
+            <li class="list__item">
+              <router-link
+                :to="{ name: 'userView', params: { id: userId } }"
+                class="list__link"
+                >マイページ</router-link
+              >
+            </li>
+            <li class="list__item">
+              <router-link
+                :to="{ name: 'editProfile', params: { id: userId } }"
+                class="list__link"
+                >プロフィール編集</router-link
+              >
+            </li>
+            <li class="list__item">
+              <router-link to="/post/form" class="list__link">
+                投稿する
               </router-link>
             </li>
-          </template>
-        </ul>
-      </nav>
-      <div class="side-footer">
-        <ul class="list">
-          <li class="list__item"><a href="">サイト概要</a></li>
-        </ul>
-      </div>
-    </aside>
+            <li class="list__item">
+              <a href="" class="list__link" @click.prevent="logout"
+                >ログアウト</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="side-footer">
+          <ul class="list">
+            <li class="list__item"><a href="">サイト概要</a></li>
+          </ul>
+        </div>
+      </aside>
+    </transition>
 
     <!-- メイン -->
     <div class="container__main">
@@ -129,13 +171,15 @@
 <script>
 import PostFilter from "@/components/PostFilter";
 import Pagination from "@/components/Pagination";
-import { mapGetters, mapActions } from "vuex";
+import ModalWindow from "@/components/ModalWindow";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import authInfoMixin from "@/mixins/authInfoMixin";
 
 export default {
   components: {
     PostFilter,
     Pagination,
+    ModalWindow,
   },
   data() {
     return {
@@ -158,6 +202,8 @@ export default {
         followee: { name: "フォロー", type: "followee" },
         follower: { name: "フォロワー", type: "follower" },
       },
+      // 画面幅
+      width: window.innerWidth,
     };
   },
   computed: {
@@ -171,6 +217,7 @@ export default {
       "filterType",
       "pageTotal",
       "activeMenu",
+      "showSideMenu",
     ]),
     ...mapGetters("follows", ["follow", "follower"]),
   },
@@ -186,6 +233,12 @@ export default {
       this.displayedPosts = this.latestPosts; // 最新の投稿を表示
     });
   },
+  mounted() {
+    // 画面幅の変更を感知
+    window.addEventListener("resize", () => {
+      this.width = window.innerWidth;
+    });
+  },
   methods: {
     ...mapActions("posts", [
       "getLatestPosts",
@@ -195,6 +248,7 @@ export default {
       "resetActiveMenu",
       "resetFilterType",
     ]),
+    ...mapMutations("posts", ["toggleSideMenu"]),
     // ページ別に適切な投稿を返す
     getPosts(postType) {
       const menuAndPosts = {
@@ -258,6 +312,15 @@ export default {
     // ページ移動時（フィルタリング・検索時は対象外）
     pagination() {
       this.displayedPosts = this.getPosts(this.activeMenu); // それ以外のページ
+    },
+    // ログアウト
+    logout() {
+      this.$store.dispatch("auth/logout").then(() => {
+        if (this.$route.path !== "/") {
+          // ホームページへ遷移
+          this.$router.push("/");
+        }
+      });
     },
   },
   watch: {
@@ -343,7 +406,8 @@ a {
   height: 50px;
   padding-left: 30px;
   color: white;
-  font-size: 1.2em;
+  font-size: 1.1em;
+  letter-spacing: 4px;
 }
 
 .list__link {
@@ -421,7 +485,7 @@ a {
   height: 40px;
   margin: 0 auto;
   border-radius: 3px;
-  border-color: rgb(76, 26, 92);
+  border: none;
   background: rgba(168, 129, 168, 0.966);
   color: white;
   font-size: 1.1em;
@@ -465,6 +529,14 @@ a {
   transition: opacity 2.5s;
 }
 
+.fadeModal-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fadeModal-leave-to {
+  opacity: 0;
+}
+
 @keyframes open {
   from {
     opacity: 0;
@@ -475,10 +547,46 @@ a {
   }
 }
 
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(-300px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 .open-enter-active {
   animation: open 0.4s ease-in;
 }
+
 .open-leave-active {
   animation: open 0.3s linear reverse;
+}
+
+.slide-enter-active {
+  animation: slide 0.1s ease-in;
+}
+
+.slide-leave-active {
+  animation: slide 0.1s ease-in reverse;
+}
+
+.nav--tablet_sp {
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .container__side-bar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 60;
+  }
+
+  .nav--tablet_sp {
+    display: block;
+  }
 }
 </style>

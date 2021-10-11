@@ -6,8 +6,13 @@
       class="item-category__select"
       v-model="selectedFirstCategory"
     >
-      <option value="">カテゴリを選択</option>
-      <option :value="key" v-for="(value, key) in firstCategories" :key="key">
+      <option class="item-category__option" value="">カテゴリを選択</option>
+      <option
+        class="item-category__option"
+        :value="key"
+        v-for="(value, key) in firstCategories"
+        :key="key"
+      >
         {{ value }}
       </option>
     </select>
@@ -23,8 +28,13 @@
       v-show="selectedFirstCategory === key"
       v-model="selectedSecondCategory"
     >
-      <option value="">さらに絞り込む</option>
-      <option :value="category" v-for="category in value" :key="category">
+      <option class="item-category__option" value="">さらに絞り込む</option>
+      <option
+        class="item-category__option"
+        :value="category"
+        v-for="category in value"
+        :key="category"
+      >
         {{ category }}
       </option>
     </select>
@@ -141,5 +151,25 @@ export default {
 
 .item-category__btn:disabled {
   opacity: 0.4;
+}
+
+@media screen and (max-width: 599px) {
+  .item-category {
+    flex-direction: column;
+  }
+
+  .item-category__span {
+    display: none;
+  }
+
+  .item-category__select {
+    width: 100%;
+    border: 1px solid gray;
+    margin-bottom: 10px;
+  }
+
+  .item-category__btn {
+    margin-left: 0;
+  }
 }
 </style>
