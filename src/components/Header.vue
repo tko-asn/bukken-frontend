@@ -256,6 +256,10 @@ ul {
   display: none;
 }
 
+.item-list__link-menu {
+  margin: 0 5px;
+}
+
 .slide-enter-active {
   animation: slide 0.2s;
 }
@@ -290,7 +294,7 @@ ul {
 
 @media screen and (max-width: 599px) {
   .item-logo__img {
-    width: 80px;
+    width: 70px;
     margin-right: 5px;
   }
 
