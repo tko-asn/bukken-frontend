@@ -15,7 +15,15 @@
       <span class="app-overview__text">質問できます。</span>
     </span>
     <span class="app-overview__paragraph">
-      <hr />
+      <span class="app-overview__text">賃貸物件サイトや内見では</span>
+      <span class="app-overview__text">知ることができないような</span>
+      <span class="app-overview__text">疑問がありましたら</span>
+      <span class="app-overview__text">当サイトで</span>
+      <span class="app-overview__text">さっそく質問して</span>
+      <span class="app-overview__text">みましょう。</span>
+    </span>
+    <hr />
+    <div class="app-overview__example">
       以下は質問の例です。
       <p class="app-overview__text app-overview__text--red">
         ・物件の周辺環境の治安
@@ -26,16 +34,7 @@
       <p class="app-overview__text app-overview__text--red">
         ・近所付き合いの有無
       </p>
-      <hr />
-    </span>
-    <span class="app-overview__paragraph">
-      <span class="app-overview__text">賃貸物件サイトや内見では</span>
-      <span class="app-overview__text">知ることができないような</span>
-      <span class="app-overview__text">疑問がありましたら</span>
-      <span class="app-overview__text">当サイトで</span>
-      <span class="app-overview__text">さっそく質問して</span>
-      <span class="app-overview__text">みましょう。</span>
-    </span>
+    </div>
   </div>
 </template>
 
