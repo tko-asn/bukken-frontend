@@ -312,4 +312,30 @@ export default {
   width: 90%;
   padding-bottom: 10px;
 }
+
+@media screen and (max-width: 599px) {
+  .container {
+    padding-top: 95px;
+  }
+
+  [class*="input"] {
+    height: 35px;
+    padding: 0 10px;
+    font-size: 1em;
+    letter-spacing: 1.5px;
+  }
+
+  .block-login {
+    padding-bottom: 30px;
+  }
+
+  .block-login__text {
+    margin-top: 30px;
+  }
+
+  .form-sign-up__btn-sign-up {
+    height: 40px;
+    margin-top: 10px;
+  }
+}
 </style>

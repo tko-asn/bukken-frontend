@@ -2,10 +2,7 @@
   <div class="app">
     <!-- ヘッダー -->
     <Header>
-      <Search
-        :userId="getUserId"
-        v-show="searchRoutes.includes($route.name)"
-      />
+      <Search :userId="getUserId" v-show="searchRoutes.includes($route.name)" />
     </Header>
 
     <!-- メイン -->
@@ -24,7 +21,7 @@ export default {
     Search,
   },
   mixins: [authInfoMixin],
-  data() { 
+  data() {
     return {
       searchRoutes: ["home", "userPosts"],
     };
@@ -37,8 +34,8 @@ export default {
         return this.$route.params.userId;
       }
       return undefined;
-    }
-  }
+    },
+  },
 };
 </script>
 

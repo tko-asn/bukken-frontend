@@ -1,50 +1,99 @@
 <template>
   <ul class="list-pagination">
-    <!-- 前のページ -->
-    <li class="item-page">
-      <a
-        href=""
-        :class="{
-          'item-page__link': true,
-          'item-page__link--direction': true,
-          'item-page__link--disabled': currentPage === 1,
-          'item-page__link--end': currentPage === 1,
-        }"
-        @click.prevent="movePage(currentPage - 1)"
-      >
-        前へ
-      </a>
-    </li>
-    <!-- ページ番号 -->
-    <li class="item-page" v-for="num in total" :key="num">
-      <a
-        href=""
-        :class="{
-          'item-page__link': true,
-          'item-page__link--current': num === currentPage,
-          'item-page__link--disabled': num === currentPage,
-        }"
-        @click.prevent="movePage(num)"
-        v-show="displayPageButton(num)"
-      >
-        {{ num }}
-      </a>
-    </li>
-    <!-- 次のページ -->
-    <li class="item-page">
-      <a
-        href=""
-        :class="{
-          'item-page__link': true,
-          'item-page__link--direction': true,
-          'item-page__link--disabled': total === currentPage,
-          'item-page__link--end': total === currentPage,
-        }"
-        @click.prevent="movePage(currentPage + 1)"
-      >
-        次へ
-      </a>
-    </li>
+    <template v-if="width >= 1025">
+      <!-- 前のページ -->
+      <li class="item-page">
+        <a
+          href=""
+          :class="{
+            'item-page__link': true,
+            'item-page__link--direction': true,
+            'item-page__link--disabled': currentPage === 1,
+            'item-page__link--end': currentPage === 1,
+          }"
+          @click.prevent="movePage(currentPage - 1)"
+        >
+          前へ
+        </a>
+      </li>
+      <!-- ページ番号 -->
+      <li class="item-page" v-for="num in total" :key="num">
+        <a
+          href=""
+          :class="{
+            'item-page__link': true,
+            'item-page__link--current': num === currentPage,
+            'item-page__link--disabled': num === currentPage,
+          }"
+          @click.prevent="movePage(num)"
+          v-show="displayPageButton(num)"
+        >
+          {{ num }}
+        </a>
+      </li>
+      <!-- 次のページ -->
+      <li class="item-page">
+        <a
+          href=""
+          :class="{
+            'item-page__link': true,
+            'item-page__link--direction': true,
+            'item-page__link--disabled': total === currentPage,
+            'item-page__link--end': total === currentPage,
+          }"
+          @click.prevent="movePage(currentPage + 1)"
+        >
+          次へ
+        </a>
+      </li>
+    </template>
+    <template v-else>
+      <!-- ページ番号 -->
+      <li class="item-page">
+        <a
+          href=""
+          :class="{
+            'item-page__link': true,
+            'item-page__link--current': num === currentPage,
+            'item-page__link--disabled': num === currentPage,
+          }"
+          @click.prevent="movePage(num)"
+          v-show="displayPageButton(num)"
+          v-for="num in total"
+          :key="num"
+        >
+          {{ num }}
+        </a>
+      </li>
+      <li class="item-page">
+        <!-- 前のページ -->
+        <a
+          href=""
+          :class="{
+            'item-page__link': true,
+            'item-page__link--direction': true,
+            'item-page__link--disabled': currentPage === 1,
+            'item-page__link--end': currentPage === 1,
+          }"
+          @click.prevent="movePage(currentPage - 1)"
+        >
+          前へ
+        </a>
+        <!-- 次のページ -->
+        <a
+          href=""
+          :class="{
+            'item-page__link': true,
+            'item-page__link--direction': true,
+            'item-page__link--disabled': total === currentPage,
+            'item-page__link--end': total === currentPage,
+          }"
+          @click.prevent="movePage(currentPage + 1)"
+        >
+          次へ
+        </a>
+      </li>
+    </template>
   </ul>
 </template>
 
@@ -89,7 +138,14 @@ export default {
         favorites: "getMyFavoritePosts",
         myPosts: "getMyPosts",
       },
+      width: window.innerWidth,
     };
+  },
+  mounted() {
+    // 画面幅の変更を感知
+    window.addEventListener("resize", () => {
+      this.width = window.innerWidth;
+    });
   },
   methods: {
     ...mapActions("posts", [
@@ -211,5 +267,17 @@ export default {
 
 .item-page__link--direction {
   width: 80px;
+}
+
+@media screen and (max-width: 1024px) {
+  .list-pagination {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .item-page {
+    display: flex;
+    margin-bottom: 10px;
+  }
 }
 </style>

@@ -3,13 +3,17 @@
   <div class="block-delete-account">
     <p class="block-delete-account__text">アカウントを閉鎖しますか？</p>
     <p class="block-delete-account__text block-delete-account__text--red">
-      アカウントを閉鎖すると二度と復元できなくなります。
+      アカウントを閉鎖すると<span class="block-delete-account__span"
+        >二度と復元できなくなります。</span
+      >
     </p>
     <p class="block-delete-account__text block-delete-account__text--red">
       投稿はすべて削除されます。
     </p>
     <p class="block-delete-account__text">
-      閉鎖する場合は「完全に削除」と入力して下さい。
+      閉鎖する場合は<span class="block-delete-account__span"
+        >「完全に削除」と入力して下さい。</span
+      >
     </p>
     <input
       class="block-delete-account__input"
@@ -103,5 +107,25 @@ export default {
 
 .item-btn__btn:disabled {
   opacity: 0.6;
+}
+
+@media screen and (max-width: 599px) {
+  .block-delete-account {
+    text-align: center;
+  }
+
+  .block-delete-account__text {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .item-btn {
+    justify-content: center;
+  }
+
+  .block-delete-account__input {
+    width: 90%;
+    height: 30px;
+  }
 }
 </style>

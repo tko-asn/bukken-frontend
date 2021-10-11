@@ -122,4 +122,21 @@ export default {
   letter-spacing: 1px;
   text-decoration: none;
 }
+
+@media screen and (max-width: 599px) {
+  .block-email {
+    flex-direction: column;
+  }
+
+  .block-email__label {
+    align-self: flex-start;
+    font-size: 1em;
+  }
+
+  .block-email__input {
+    width: 95%;
+    height: 20px;
+    margin-left: 0;
+  }
+}
 </style>

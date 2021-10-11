@@ -9,12 +9,12 @@
       <!-- ナビゲーションメニュー -->
       <nav class="block-nav">
         <ul class="block-nav__list">
-          <li class="item-list">
+          <li class="item-list item-list--sp_search">
             <slot />
           </li>
           <!-- ログイン済み -->
           <template v-if="isLoggedIn">
-            <li class="item-list" @mouseleave="pullUp">
+            <li class="item-list item-list--pc" @mouseleave="pullUp">
               <a
                 href=""
                 class="item-list__link-account"
@@ -55,26 +55,40 @@
             </li>
 
             <!-- 投稿ボタン -->
-            <li class="item-list">
+            <li class="item-list item-list--pc">
               <router-link class="item-list__btn-post" to="/post/form"
-                >投稿する</router-link
-              >
+                >投稿する
+              </router-link>
             </li>
           </template>
 
           <!-- 未ログイン -->
           <template v-else>
-            <li class="item-list">
+            <li class="item-list item-list--pc">
               <router-link class="item-list__btn-auth" to="/signup">
                 新規登録
               </router-link>
             </li>
-            <li class="item-list">
+            <li class="item-list item-list--pc">
               <router-link class="item-list__btn-auth" to="/login">
                 ログイン
               </router-link>
             </li>
           </template>
+
+          <!-- メニューアイコン -->
+          <li class="item-list item-list--tablet_sp">
+            <a
+              href=""
+              class="item-list__link-menu"
+              @click.prevent="toggleSideMenu"
+            >
+              <fa-icon icon="bars" />
+            </a>
+            <transition name="slide">
+              <SubMenu v-if="$route.name != 'home' && showSideMenu" />
+            </transition>
+          </li>
         </ul>
       </nav>
     </div>
@@ -82,11 +96,20 @@
 </template>
 
 <script>
+import SubMenu from "@/components/SubMenu";
 import authInfoMixin from "@/mixins/authInfoMixin";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
+  components: {
+    SubMenu,
+  },
+  computed: {
+    ...mapGetters("posts", ["showSideMenu"]),
+  },
   mixins: [authInfoMixin],
   methods: {
+    ...mapMutations("posts", ["toggleSideMenu", "hideSideMenu"]),
     // プルダウンメニュー展開
     pullDown() {
       this.$refs.pull_down_block.style.display = "block";
@@ -105,6 +128,12 @@ export default {
           this.$router.push("/");
         }
       });
+    },
+  },
+  watch: {
+    // SP・タブレット状態でページ遷移時にサイドバーを隠す
+    $route() {
+      this.hideSideMenu();
     },
   },
 };
@@ -128,7 +157,7 @@ ul {
 /* ヘッダー全体 */
 .header {
   position: fixed;
-  z-index: 10;
+  z-index: 100;
   width: 100%;
   box-shadow: 0 2px 3px rgb(75, 74, 74);
   background: #000;
@@ -165,13 +194,10 @@ ul {
   margin: 0 -15px;
 }
 
-.item-list {
-  padding: 0 15px;
-}
-
 /* プルダウンメニュー */
 .item-list {
   position: relative;
+  padding: 0 15px;
 }
 
 .item-list__list {
@@ -221,5 +247,64 @@ ul {
   background: rgb(81, 76, 119);
   color: #b3aaaa;
   top: 2px;
+}
+
+.item-list--tablet_sp {
+  display: none;
+}
+
+.slide-enter-active {
+  animation: slide 0.2s;
+}
+
+.slide-leave-active {
+  animation: slide 0.2s reverse;
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(300px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .header__container {
+    padding: 0 30px;
+  }
+
+  .item-list--tablet_sp {
+    display: block;
+  }
+
+  .item-list--pc {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .header__container {
+    justify-content: space-around;
+    margin: 0;
+    padding: 0;
+  }
+
+  .block-nav {
+    width: 80%;
+    margin: 0;
+  }
+
+  .block-nav__list {
+    justify-content: flex-end;
+    padding-left: 0;
+  }
+
+  .item-list--sp_search {
+    width: 80%;
+    padding-right: 0;
+  }
 }
 </style>

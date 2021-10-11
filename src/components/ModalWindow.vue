@@ -2,7 +2,7 @@
   <!-- 背景部分 -->
   <div class="modal-overlay" @click="closeWindow">
     <!-- コンテンツ -->
-    <div class="modal-content" @click.stop>
+    <div class="modal-content" @click.stop v-if="haveContent">
       <section class="modal-content__container">
         <!-- タイトル -->
         <h1 class="modal-content__title">{{ title }}</h1>
@@ -29,6 +29,10 @@ export default {
       type: Function,
       default: () => () => {},
     },
+    haveContent: {
+      type: Boolean,
+      default: true,
+    },
   },
 };
 </script>
@@ -49,7 +53,7 @@ export default {
   top: 50%;
   left: 50%;
   z-index: 100;
-  width: 80%;
+  width: 60%;
   border-radius: 15px;
   background: #fff;
   animation: slide 0.2s ease forwards;
@@ -74,6 +78,16 @@ export default {
   }
   to {
     transform: translate(-50%, -50%);
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .modal-content__title {
+    padding-left: 5px;
+  }
+
+  .modal-content {
+    width: 95%;
   }
 }
 </style>

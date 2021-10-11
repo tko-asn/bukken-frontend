@@ -14,11 +14,22 @@
     <PostFilter :myId="userId" />
 
     <!-- 投稿が存在する場合 -->
-    <PostList :postList="postList" v-if="postList.length" />
+    <transition name="fade" mode="out-in">
+      <template v-if="postList.length">
+        <PostList :postList="postList" />
+      </template>
 
-    <!-- 投稿が存在しない場合 -->
-    <p class="container__text-no-posts" v-else>投稿はありません</p>
-    <Pagination :total="total" :userId="userId" @movePage="pagination" />
+      <!-- 投稿が存在しない場合 -->
+      <p class="container__text-no-posts" v-else>投稿はありません</p>
+    </transition>
+    <transition name="fadePagination">
+      <Pagination
+        :total="total"
+        :userId="userId"
+        @movePage="pagination"
+        v-show="postList.length"
+      />
+    </transition>
   </div>
 </template>
 
@@ -47,10 +58,10 @@ export default {
   },
   computed: {
     ...mapGetters("posts", [
-      "filteredPosts", 
-      "searchedPosts", 
-      "pageTotal", 
-      "filterType"
+      "filteredPosts",
+      "searchedPosts",
+      "pageTotal",
+      "filterType",
     ]),
   },
   created() {
@@ -66,10 +77,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions("posts", [
-      "resetFilterType",
-      "resetActiveMenu",
-    ]),
+    ...mapActions("posts", ["resetFilterType", "resetActiveMenu"]),
     // ページネーション
     pagination(posts) {
       this.postList = posts;
@@ -87,7 +95,7 @@ export default {
         this.postList = this.searchedPosts;
         this.total = this.pageTotal.search;
       }
-    }
+    },
   },
 };
 </script>
@@ -116,5 +124,31 @@ export default {
   text-align: center;
   color: gray;
   font-size: 1.2em;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fadePagination-enter,
+.fadePagination-leave-to {
+  opacity: 0;
+}
+
+.fadePagination-enter-active,
+.fadePagination-leave-active {
+  transition: opacity 2.5s;
+}
+
+@media screen and (max-width: 599px) {
+  .container__title {
+    text-align: center;
+  }
 }
 </style>

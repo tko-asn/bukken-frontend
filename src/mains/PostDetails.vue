@@ -11,7 +11,8 @@
           <p class="item-property__text">{{ post.property }}</p>
           <!-- 物件住所 -->
           <p class="item-property__text">
-            {{ addressData(post.address) }}
+            {{ postalCodeData(post.address) }}
+            <span>{{ addressData(post.address) }}</span>
           </p>
         </div>
         <p class="block-content__updated-at">{{ post.updatedAt }}</p>
@@ -137,7 +138,7 @@
     </div>
 
     <!-- サイドメニュー -->
-    <SidePostList />
+    <SidePostList class="container__list-side-post" />
   </div>
 </template>
 
@@ -210,14 +211,18 @@ export default {
     categoryLength(post) {
       return post.categories?.length;
     },
-    // 所在地のデータを連結して返す
-    addressData(address) {
+    // 郵便番号のみ返す
+    postalCodeData(address) {
       return (
         "〒" +
         address?.["postalCode"].slice(0, 3) +
         "-" +
-        address?.["postalCode"].slice(3) +
-        " " +
+        address?.["postalCode"].slice(3)
+      );
+    },
+    // 所在地のデータを連結して返す
+    addressData(address) {
+      return (
         address?.["prefecture"] +
         address?.["municipality"] +
         address?.["townName"] +
@@ -402,6 +407,8 @@ a {
 }
 
 .item-property__text {
+  display: flex;
+  flex-wrap: wrap;
   margin: 0;
   font-size: 0.9em;
 }
@@ -544,5 +551,68 @@ a {
   margin: 0 0 30px;
   color: gray;
   text-align: center;
+}
+
+@media screen and (max-width: 1024px) {
+  .container {
+    width: 95%;
+    flex-direction: column;
+  }
+
+  .container__item-post-details {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+
+  .container__list-side-post {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .container {
+    width: 100%;
+  }
+
+  .block-content__title {
+    font-size: 1.2em;
+    letter-spacing: 0;
+  }
+
+  .item-property__title {
+    margin: 0;
+  }
+
+  .item-bottom {
+    flex-direction: column-reverse;
+  }
+
+  .item-bottom__author {
+    align-self: end;
+    height: 40px;
+    margin-bottom: 10px;
+    padding: 0 5px;
+  }
+
+  .item-bottom__btn {
+    width: 100%;
+    padding: 2px 0;
+    text-align: center;
+  }
+
+  .block-icon,
+  .block-icon__img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .block-content__updated-at {
+    margin: 5px 0 0;
+  }
+
+  .container__item-post-details {
+    padding-top: 0;
+  }
 }
 </style>

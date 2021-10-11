@@ -49,4 +49,14 @@ export default {
 .link__times-circle:hover {
   opacity: 0.7;
 }
+
+@media screen and (max-width: 599px) {
+  .link {
+    padding: 0.2em;
+  }
+
+  .link__times-circle {
+    margin-left: 1px;
+  }
+}
 </style>

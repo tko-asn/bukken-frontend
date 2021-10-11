@@ -1,9 +1,10 @@
 <template>
   <!-- 自己紹介 -->
   <div class="item-self-intro">
-    <p class="item-self-intro__text" v-if="selfIntroduction">{{ selfIntroduction }}</p>
-    <p class="item-self-intro__text item-self-intro__text--center" v-else>
-      自己紹介はありません
+    <p class="item-self-intro__text" v-if="selfIntroduction">{{ selfIntroduction }}
+    </p>
+    <p class="item-self-intro__text item-self-intro__text--no_text" v-else>
+      自己紹介は<span>ありません</span>
     </p>
   </div>
 </template>
@@ -29,7 +30,10 @@ export default {
   white-space: pre-wrap;
 }
 
-.item-self-intro__text--center {
-  text-align: center;
+.item-self-intro__text--no_text {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  color: gray;
 }
 </style>

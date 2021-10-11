@@ -193,4 +193,17 @@ export default {
   font-size: 1.2em;
   cursor: pointer;
 }
+
+@media screen and (max-width: 599px) {
+  .block-input {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .block-input__input {
+    width: 100%;
+    height: 20px;
+    border: 1px solid gray;
+  }
+}
 </style>
