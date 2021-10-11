@@ -46,7 +46,10 @@
             >お気に入り解除</a
           >
           <!-- 投稿者 -->
-          <div class="item-bottom__author" @click="moveToUserPage">
+          <div
+            class="item-bottom__author"
+            @click="moveToUserPage(post.user.id)"
+          >
             <!-- アイコン -->
             <div class="block-icon">
               <img
@@ -128,7 +131,10 @@
               @click.prevent="dislike(answer.id)"
               >いいね {{ answer.likedBy.length }}</a
             >
-            <div class="item-bottom__author">
+            <div
+              class="item-bottom__author"
+              @click="moveToUserPage(answer.user.id)"
+            >
               <div class="block-icon">
                 <img class="block-icon__img" :src="answer.user.icon_url" />
               </div>
@@ -264,10 +270,10 @@ export default {
       });
     },
     // 投稿者のページへ移動
-    moveToUserPage() {
+    moveToUserPage(id) {
       this.$router.push({
         name: "userView",
-        params: { id: this.post.user.id },
+        params: { id },
       });
     },
     // 回答を投稿する
