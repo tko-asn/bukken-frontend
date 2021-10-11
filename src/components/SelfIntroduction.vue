@@ -1,8 +1,7 @@
 <template>
   <!-- 自己紹介 -->
   <div class="item-self-intro">
-    <p class="item-self-intro__text" v-if="selfIntroduction">{{ selfIntroduction }}
-    </p>
+    <p class="item-self-intro__text" v-if="selfIntroduction">{{ selfIntroduction }}</p>
     <p class="item-self-intro__text item-self-intro__text--no_text" v-else>
       自己紹介は<span>ありません</span>
     </p>
@@ -35,5 +34,11 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
   color: gray;
+}
+
+@media screen and (max-width: 1024px) {
+  .item-self-intro {
+    padding: 10px;
+  }
 }
 </style>

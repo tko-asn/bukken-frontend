@@ -100,6 +100,7 @@ export default {
   flex-grow: 3;
   height: 30px;
   margin-left: 20px;
+  border: 1px solid silver;
 }
 
 /* 保存ボタン */

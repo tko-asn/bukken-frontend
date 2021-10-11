@@ -181,6 +181,7 @@ export default {
 .block-input__input {
   flex-grow: 3;
   height: 25px;
+  border: 1px solid gray;
 }
 
 /* ボタン */
@@ -203,7 +204,6 @@ export default {
   .block-input__input {
     width: 100%;
     height: 20px;
-    border: 1px solid gray;
   }
 }
 </style>
