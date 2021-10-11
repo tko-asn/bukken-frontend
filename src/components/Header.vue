@@ -3,7 +3,9 @@
     <div class="header__container">
       <!-- ロゴイメージ -->
       <div class="item-logo">
-        <router-link class="item-logo__logo" to="/"> ロゴ </router-link>
+        <router-link class="item-logo__logo" to="/">
+          <img class="item-logo__img" :src="logo" alt="logo" />
+        </router-link>
       </div>
 
       <!-- ナビゲーションメニュー -->
@@ -104,6 +106,11 @@ export default {
   components: {
     SubMenu,
   },
+  data() {
+    return {
+      logo: require("@/assets/BUKKEN_logo.png"),
+    };
+  },
   computed: {
     ...mapGetters("posts", ["showSideMenu"]),
   },
@@ -177,10 +184,6 @@ ul {
 .item-logo__logo {
   display: block;
 }
-
-/* .item-logo img {
-  height: 60px;
-} */
 
 /* ヘッダーナビ */
 .block-nav {
@@ -286,6 +289,11 @@ ul {
 }
 
 @media screen and (max-width: 599px) {
+  .item-logo__img {
+    width: 80px;
+    margin-right: 5px;
+  }
+
   .header__container {
     justify-content: space-around;
     margin: 0;
