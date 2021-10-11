@@ -14,6 +14,16 @@
             {{ postalCodeData(post.address) }}
             <span>{{ addressData(post.address) }}</span>
           </p>
+          <a
+            class="item-property__link-map"
+            :href="
+              'https://maps.google.co.jp/maps/search/' +
+              this.addressData(post.address)
+            "
+            target="_blank"
+            rel="noopener noreferrer"
+            >地図を表示</a
+          >
         </div>
         <p class="block-content__updated-at">{{ post.updatedAt }}</p>
         <!-- 内容 -->
@@ -402,6 +412,10 @@ a {
 }
 
 /* 物件情報 */
+.item-property {
+  font-size: 0.9em;
+}
+
 .item-property__title {
   margin: 20px 0 0;
 }
@@ -410,7 +424,6 @@ a {
   display: flex;
   flex-wrap: wrap;
   margin: 0;
-  font-size: 0.9em;
 }
 
 /* 投稿日時 */
