@@ -1,8 +1,8 @@
 module.exports = {
   pages: {
     index: {
-      entry: 'src/main.js',
-      // title: ''
-    }
-  }
+      entry: "src/main.js",
+      title: "BUKKEN",
+    },
+  },
 };
