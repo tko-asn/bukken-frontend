@@ -119,14 +119,14 @@
               href=""
               v-show="!answer.likedBy.find((el) => el.id === userId)"
               @click.prevent="like(answer.id)"
-              >いいね</a
+              >いいね {{ answer.likedBy.length }}</a
             >
             <a
-              class="item-bottom__btn"
+              class="item-bottom__btn item-bottom__btn--active"
               href=""
               v-show="answer.likedBy.find((el) => el.id === userId)"
               @click.prevent="dislike(answer.id)"
-              >いいね解除</a
+              >いいね {{ answer.likedBy.length }}</a
             >
             <div class="item-bottom__author">
               <div class="block-icon">
@@ -457,7 +457,12 @@ a {
 }
 
 .item-bottom__btn:hover {
-  background: rgb(173, 171, 171);
+  background: rgb(202, 200, 200);
+}
+
+.item-bottom__btn--active {
+  background: rgb(188, 250, 250);
+  color: rgba(145, 145, 238, 0.808);
 }
 
 /* 投稿者 */
