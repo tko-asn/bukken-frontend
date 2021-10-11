@@ -25,7 +25,7 @@
             >地図を表示</a
           >
         </div>
-        <p class="block-content__updated-at">{{ post.updatedAt }}</p>
+        <p class="block-content__updated-at">{{ datetime(post.updatedAt) }}</p>
         <!-- 内容 -->
         <p class="block-content__text">{{ post.text }}</p>
         <!-- 下部 -->
@@ -138,7 +138,7 @@
           <p
             class="block-content__updated-at block-content__updated-at--answer"
           >
-            {{ answer.updatedAt }}
+            {{ datetime(answer.updatedAt) }}
           </p>
         </section>
         <p class="block-content__no-text" v-if="!post.answers.length">
@@ -157,6 +157,7 @@ import { mapGetters, mapActions } from "vuex";
 import apiClient from "@/axios";
 import ValidationMessage from "@/components/ValidationMessage";
 import SidePostList from "@/components/SidePostList";
+import moment from "moment";
 
 export default {
   props: {
@@ -220,6 +221,10 @@ export default {
     // カテゴリーの数を返す
     categoryLength(post) {
       return post.categories?.length;
+    },
+    // 時間フォーマッター
+    datetime(date) {
+      return moment(date).format("YYYY年MM月D日 HH時mm分");
     },
     // 郵便番号のみ返す
     postalCodeData(address) {
