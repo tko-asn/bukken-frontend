@@ -104,9 +104,10 @@ export default {
 /* 投稿 */
 .section-post {
   width: 40%;
-  max-height: 500px;
+  max-height: 250px;
   margin-bottom: 30px;
   padding: 10px;
+  overflow: hidden;
 }
 
 .section-post--exist {
@@ -134,9 +135,8 @@ export default {
 .section-post__title {
   max-height: 30px;
   margin: 0;
-  padding: 10px 0;
   overflow: hidden;
-  font-size: 1.3em;
+  font-size: 1.1em;
 }
 
 /* 投稿者表示部分 */
@@ -166,7 +166,6 @@ export default {
   flex-wrap: wrap;
   margin: 0;
   color: rgb(78, 76, 76);
-  font-size: 1.1em;
   overflow: hidden;
 }
 

@@ -180,17 +180,21 @@ a {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  border-bottom: 3px solid rgb(184, 182, 182);
+  border-bottom: 2px solid rgb(184, 182, 182);
+}
+
+.section__title {
+  margin: 10px 0;
 }
 
 .item-title__title {
-  margin: 20px 0 10px;
+  margin-top: 20px;
   color: gray;
   cursor: pointer;
 }
 
 .item-title__icon {
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .section__list {
@@ -215,7 +219,7 @@ a {
 
 .list__item {
   display: flex;
-  padding: 10px 20px;
+  padding: 5px 10px;
   box-shadow: inset 2px 2px 2px rgb(218, 216, 216),
     inset -2px -2px 2px rgb(218, 216, 216);
 }
@@ -225,7 +229,6 @@ a {
   align-items: center;
   width: 50%;
   height: 50px;
-  font-size: 1.1em;
 }
 
 .list-checkbox__label {
@@ -266,13 +269,12 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 20%;
-  height: 50px;
-  margin: 30px auto;
+  width: 15%;
+  height: 40px;
+  margin: 20px auto;
   border-radius: 5px;
   background: rgb(68, 111, 252);
   color: white;
-  font-size: 1.1em;
 }
 
 .item-filter__btn:hover {

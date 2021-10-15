@@ -51,7 +51,10 @@
     <div class="block-my-page__item-bottom">
       <div class="container container--space">
         <!-- コンテンツ -->
-        <section class="container__section">
+        <section
+          class="container__section"
+          v-show="!showSideMenu || width >= 1025"
+        >
           <h2 class="container__title">
             <a
               href=""
@@ -513,6 +516,7 @@ a {
 /* ボトム部分 */
 .block-my-page__item-bottom {
   margin: 40px auto 0;
+  padding-bottom: 50px;
 }
 
 /* コンテンツのリスト */
@@ -689,15 +693,7 @@ a {
   }
 
   .side-menu {
-    position: fixed;
-    right: 50px;
-    width: 30%;
-    z-index: 20;
-  }
-
-  .list--sub {
-    max-height: 160px;
-    overflow-y: scroll;
+    width: 80%;
   }
 }
 
@@ -709,11 +705,6 @@ a {
   .container__block-left {
     width: 140px;
     height: 140px;
-  }
-
-  .side-menu {
-    right: 20px;
-    width: 70%;
   }
 
   .list__link {

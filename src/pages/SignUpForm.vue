@@ -209,7 +209,7 @@ export default {
 
 <style scoped>
 .container {
-  padding: 180px 0 0;
+  padding: 120px 0 0;
   animation: fadeIn 0.8s;
 }
 
@@ -227,7 +227,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 510px;
+  max-width: 450px;
   margin: 0 auto;
   border: 4px solid rgb(143, 141, 141);
   border-radius: 7px;
@@ -240,7 +240,7 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  font-size: 1.8em;
+  font-size: 1.6em;
   letter-spacing: 6px;
 }
 
@@ -249,15 +249,14 @@ export default {
   display: block;
   width: 90%;
   height: 4px;
-  margin-top: 5px;
   background: #0fc;
 }
 
 /* 入力欄 */
 [class*="input"] {
   width: 85%;
-  height: 40px;
-  padding: 0 15px;
+  height: 35px;
+  padding: 0 10px;
   border: 1px solid silver;
   border-radius: 5px;
   font-size: 1.1em;
@@ -271,13 +270,12 @@ export default {
 /* ボタン */
 .form-sign-up__btn-sign-up {
   width: 90%;
-  height: 50px;
-  margin: 0 0 30px;
+  height: 40px;
+  margin: 10px 0 30px;
   border-width: 0px;
   border-radius: 5px;
   background: rgb(16, 211, 65);
   color: #fff;
-  font-size: 1em;
   letter-spacing: 3px;
 }
 
@@ -291,14 +289,14 @@ export default {
 
 /* ログインフォームへのリンク部分 */
 .block-login {
+  height: 100px;
   color: gray;
-  font-size: 1.2em;
   letter-spacing: 2px;
   text-align: center;
 }
 
 .block-login__text {
-  margin: 35px 0 8px;
+  margin: 20px 0 8px;
   font-size: 0.8em;
 }
 
@@ -310,7 +308,7 @@ export default {
 /* バリデーションメッセージ */
 .item-validation {
   width: 90%;
-  padding-bottom: 10px;
+  padding-bottom: 2px;
 }
 
 @media screen and (max-width: 599px) {
@@ -319,8 +317,6 @@ export default {
   }
 
   [class*="input"] {
-    height: 35px;
-    padding: 0 10px;
     font-size: 1em;
     letter-spacing: 1.5px;
   }
@@ -334,7 +330,6 @@ export default {
   }
 
   .form-sign-up__btn-sign-up {
-    height: 40px;
     margin-top: 10px;
   }
 }

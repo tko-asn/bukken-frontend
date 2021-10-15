@@ -253,6 +253,10 @@ export default {
   .form-edit-profile {
     width: 70%;
   }
+
+  .container-form {
+    width: 90%;
+  }
 }
 
 @media screen and (max-width: 599px) {

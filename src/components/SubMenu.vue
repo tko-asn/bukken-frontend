@@ -85,9 +85,8 @@ a {
 .item-sub-menu__link {
   display: flex;
   align-items: center;
-  height: 30px;
+  height: 25px;
   padding: 5px 10px;
-  font-size: 1.1em;
 }
 
 .item-sub-menu__link:hover {

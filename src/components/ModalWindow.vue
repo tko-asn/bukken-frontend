@@ -49,6 +49,7 @@ export default {
   left: 50%;
   z-index: 100;
   width: 60%;
+  height: 70%;
   overflow: hidden;
   overflow-y: scroll;
   border-radius: 15px;
@@ -87,14 +88,13 @@ export default {
   }
 }
 
-@media screen and (max-width: 599px) {
+@media screen and (max-width: 1024px) {
   .modal-content__title {
     padding-left: 5px;
   }
 
   .modal-content {
     width: 95%;
-    height: 70%;
   }
 }
 </style>

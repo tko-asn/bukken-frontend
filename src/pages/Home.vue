@@ -398,14 +398,13 @@ a {
 .container {
   display: flex;
   height: 100vh;
-  font-size: 1.1em;
 }
 
 /* サイドバー */
 .container__side-bar {
   display: flex;
   flex-direction: column;
-  width: 25%;
+  width: 20%;
   min-width: 250px;
   margin-top: 50px;
   overflow-y: scroll;
@@ -467,7 +466,7 @@ a {
 
 .side-footer {
   flex: 1;
-  min-height: 250px;
+  min-height: 200px;
   padding: 30px 30px;
   background: rgb(76, 26, 92);
   color: white;
@@ -479,7 +478,6 @@ a {
 }
 
 .list__link--large {
-  padding: 5px 30px;
   font-size: 0.9em;
 }
 
