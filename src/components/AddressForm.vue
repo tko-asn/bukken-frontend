@@ -151,7 +151,7 @@ export default {
 <style scoped>
 /* 入力フォームすべて */
 [class*="input"] {
-  height: 30px;
+  height: 20px;
   padding: 5px 10px;
   border: 2px solid rgb(143, 142, 142);
   border-radius: 4px;
@@ -164,15 +164,15 @@ export default {
 }
 
 .block-address__span {
-  padding: 0 10px;
+  padding: 0 5px;
 }
 
 .block-address__input-postal-code-a {
-  width: 40px;
+  width: 30px;
 }
 
 .block-address__input-postal-code-b {
-  width: 60px;
+  width: 50px;
 }
 
 .item-address {

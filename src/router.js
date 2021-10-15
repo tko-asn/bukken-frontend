@@ -3,25 +3,25 @@ import VueRouter from 'vue-router';
 import store from '@/store';
 
 const Home = () => import(
-  /* webpackChankName: 'Home' */ './mains/Home'
+  /* webpackChankName: 'Home' */ './pages/Home'
 );
 const LoginForm = () => import(
-  /* webpackChankName: 'LoginForm' */ './mains/LoginForm'
+  /* webpackChankName: 'LoginForm' */ './pages/LoginForm'
 );
 const SignUpForm = () => import(
-  /* webpackChankName: 'SignUpForm' */ './mains/SignUpForm'
+  /* webpackChankName: 'SignUpForm' */ './pages/SignUpForm'
 );
 const UserView = () => import(
-  /* webpackChankName: 'UserView' */ './mains/UserView'
+  /* webpackChankName: 'UserView' */ './pages/UserView'
 );
 const EditProfileForm = () => import(
-  /* webpackChankName: 'EditProfileForm' */ './mains/EditProfileForm'
+  /* webpackChankName: 'EditProfileForm' */ './pages/EditProfileForm'
 );
 const PostDetails = () => import(
-  /* webpackChankName: 'PostDetails' */ './mains/PostDetails'
+  /* webpackChankName: 'PostDetails' */ './pages/PostDetails'
 );
 const UserPosts = () => import(
-  /* webpackChankName: 'UserPosts' */ './mains/UserPosts'
+  /* webpackChankName: 'UserPosts' */ './pages/UserPosts'
 );
 const PostForm = () => import(
   /* webpackChankName: 'PostForm' */ './components/PostForm'

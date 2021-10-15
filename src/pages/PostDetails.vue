@@ -363,13 +363,12 @@ a {
   width: 85%;
   margin: 0 auto;
   padding-top: 50px;
-  font-size: 1.2em;
 }
 
 /* 投稿詳細部分 */
 .container__item-post-details {
-  max-width: 750px;
-  width: 65%;
+  max-width: 700px;
+  width: 50%;
   margin-right: 50px;
   padding-top: 25px;
 }
@@ -411,7 +410,7 @@ a {
 /* タイトル */
 .block-content__title {
   margin: 10px 0;
-  font-size: 1.5em;
+  font-size: 1.2em;
   letter-spacing: 3px;
 }
 
@@ -425,11 +424,10 @@ a {
 /* 物件情報 */
 .item-property {
   overflow: hidden;
-  font-size: 0.9em;
 }
 
 .item-property__title {
-  margin: 20px 0 0;
+  margin: 5px 0 0;
 }
 
 .item-property__text {
@@ -585,7 +583,7 @@ a {
 
 @media screen and (max-width: 1024px) {
   .container {
-    width: 95%;
+    width: 80%;
     flex-direction: column;
   }
 
@@ -606,7 +604,6 @@ a {
   }
 
   .block-content__title {
-    font-size: 1.2em;
     letter-spacing: 0;
   }
 

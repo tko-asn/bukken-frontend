@@ -229,6 +229,7 @@ export default {
 .form-post {
   display: flex;
   flex-direction: column;
+  width: 60%;
   margin: 0 auto;
   padding: 20px 40px;
   animation: slideUp 0.5s;
@@ -308,8 +309,15 @@ export default {
   }
 }
 
+@media screen and (max-width: 1024px) {
+  .form-post {
+    width: 80%;
+  }
+}
+
 @media screen and (max-width: 599px) {
   .form-post {
+    width: 90%;
     padding: 20px 5px;
   }
 }
