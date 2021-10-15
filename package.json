@@ -8,12 +8,18 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^2.0.2",
     "axios": "^0.21.1",
     "compressorjs": "^1.0.7",
     "core-js": "^3.6.5",
+    "moment": "^2.29.1",
+    "qs": "^6.5.2",
     "vue": "^2.6.11",
     "vue-router": "^3.5.2",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "yubinbango-core2": "^0.6.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

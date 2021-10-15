@@ -1,39 +1,55 @@
 <template>
-  <header>
-    <div class="container">
+  <header class="header">
+    <div class="header__container">
       <!-- ロゴイメージ -->
-      <div class="area_logo_header">
-        <router-link class="logo" to="/"> ロゴ </router-link>
+      <div class="item-logo">
+        <router-link class="item-logo__logo" to="/">
+          <img class="item-logo__img" :src="logo" alt="logo" />
+        </router-link>
       </div>
 
       <!-- ナビゲーションメニュー -->
-      <nav class="nav_header">
-        <ul class="list_nav_header">
+      <nav class="block-nav">
+        <ul class="block-nav__list">
+          <li class="item-list item-list--sp_search">
+            <slot />
+          </li>
           <!-- ログイン済み -->
           <template v-if="isLoggedIn">
-            <li class="area_account_navbar" @mouseleave="pullUp">
-              <a href="" class="account" @click.prevent @mouseover="pullDown"
+            <li class="item-list item-list--pc" @mouseleave="pullUp">
+              <a
+                href=""
+                class="item-list__link-account"
+                @click.prevent
+                @mouseover="pullDown"
                 >アカウント</a
               >
 
               <!-- プルダウンメニュー -->
-              <ul ref="pull_down_block" class="pd_account" @mouseleave="pullUp">
-                <li>
+              <ul
+                ref="pull_down_block"
+                class="item-list__list"
+                @mouseleave="pullUp"
+              >
+                <li class="item-child-list">
                   <router-link
                     :to="{ name: 'userView', params: { id: userId } }"
-                    class="link_pull_down"
+                    class="item-child-list__link"
                     >マイページ</router-link
                   >
                 </li>
-                <li>
+                <li class="item-child-list">
                   <router-link
                     :to="{ name: 'editProfile', params: { id: userId } }"
-                    class="link_pull_down"
+                    class="item-child-list__link"
                     >プロフィール編集</router-link
                   >
                 </li>
-                <li>
-                  <a href="" class="link_pull_down" @click.prevent="logout"
+                <li class="item-child-list">
+                  <a
+                    href=""
+                    class="item-child-list__link"
+                    @click.prevent="logout"
                     >ログアウト</a
                   >
                 </li>
@@ -41,16 +57,40 @@
             </li>
 
             <!-- 投稿ボタン -->
-            <li>
-              <router-link class="btn_post" to="/post">投稿する</router-link>
+            <li class="item-list item-list--pc">
+              <router-link class="item-list__btn-post" to="/post/form"
+                >投稿する
+              </router-link>
             </li>
           </template>
 
           <!-- 未ログイン -->
           <template v-else>
-            <li><router-link to="/signup">新規登録</router-link></li>
-            <li><router-link to="/login">ログイン</router-link></li>
+            <li class="item-list item-list--pc">
+              <router-link class="item-list__btn-auth" to="/signup">
+                新規登録
+              </router-link>
+            </li>
+            <li class="item-list item-list--pc">
+              <router-link class="item-list__btn-auth" to="/login">
+                ログイン
+              </router-link>
+            </li>
           </template>
+
+          <!-- メニューアイコン -->
+          <li class="item-list item-list--tablet_sp">
+            <a
+              href=""
+              class="item-list__link-menu"
+              @click.prevent="toggleSideMenu"
+            >
+              <fa-icon icon="bars" />
+            </a>
+            <transition name="slide">
+              <SubMenu v-if="$route.name != 'home' && showSideMenu" />
+            </transition>
+          </li>
         </ul>
       </nav>
     </div>
@@ -58,20 +98,32 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import SubMenu from "@/components/SubMenu";
+import authInfoMixin from "@/mixins/authInfoMixin";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
-  computed: {
-    ...mapGetters("auth", ["isLoggedIn", "userId"]),
+  components: {
+    SubMenu,
   },
+  data() {
+    return {
+      logo: require("@/assets/BUKKEN_logo.png"),
+    };
+  },
+  computed: {
+    ...mapGetters("posts", ["showSideMenu"]),
+  },
+  mixins: [authInfoMixin],
   methods: {
+    ...mapMutations("posts", ["toggleSideMenu", "hideSideMenu"]),
     // プルダウンメニュー展開
     pullDown() {
       this.$refs.pull_down_block.style.display = "block";
     },
     // プルダウンメニュー縮小
     pullUp(event) {
-      if (!event.toElement.closest(".pd_account")) {
+      if (!event.toElement.closest(".item-list__list")) {
         this.$refs.pull_down_block.style.display = "none";
       }
     },
@@ -83,6 +135,12 @@ export default {
           this.$router.push("/");
         }
       });
+    },
+  },
+  watch: {
+    // SP・タブレット状態でページ遷移時にサイドバーを隠す
+    $route() {
+      this.hideSideMenu();
     },
   },
 };
@@ -104,16 +162,17 @@ ul {
 }
 
 /* ヘッダー全体 */
-header {
+.header {
   position: fixed;
-  z-index: 10;
+  z-index: 100;
   width: 100%;
+  box-shadow: 0 2px 3px rgb(75, 74, 74);
   background: #000;
   top: 0;
   left: 0;
 }
 
-header > .container {
+.header__container {
   display: flex;
   align-items: center;
   height: 50px;
@@ -122,36 +181,30 @@ header > .container {
 }
 
 /* ロゴ */
-.area_logo_header .logo {
+.item-logo__logo {
   display: block;
 }
 
-/* .area_logo_header img {
-  height: 60px;
-} */
-
 /* ヘッダーナビ */
-.nav_header {
+.block-nav {
   /* 右詰め */
   margin: 0 0 0 auto;
 }
 
-.list_nav_header {
+.block-nav__list {
   display: flex;
   align-items: center;
   margin: 0 -15px;
 }
 
-.list_nav_header > li {
+/* プルダウンメニュー */
+.item-list {
+  position: relative;
   padding: 0 15px;
 }
 
-/* プルダウンメニュー */
-.area_account_navbar {
-  position: relative;
-}
-
-.pd_account {
+.item-list__list {
+  z-index: 50;
   position: absolute;
   left: 12px;
   display: none;
@@ -164,19 +217,19 @@ header > .container {
 }
 
 /* プルダウンのボタン */
-.link_pull_down {
+.item-child-list__link {
   display: block;
   padding: 5px 10px;
   color: rgb(54, 53, 53);
 }
 
-.link_pull_down:hover {
+.item-child-list__link:hover {
   background: rgb(238, 235, 235);
   color: rgb(54, 53, 53);
 }
 
 /* 投稿ボタン */
-.btn_post {
+.item-list__btn-post {
   display: flex;
   align-items: center;
   height: 30px;
@@ -186,16 +239,84 @@ header > .container {
   background: slateblue;
 }
 
-.btn_post:hover {
+.item-list__btn-post:hover {
   background: rgb(127, 115, 207);
   color: #fff;
 }
 
-.btn_post:active {
+.item-list__btn-post:active {
   position: relative;
   box-shadow: none;
   background: rgb(81, 76, 119);
   color: #b3aaaa;
   top: 2px;
+}
+
+.item-list--tablet_sp {
+  display: none;
+}
+
+.item-list__link-menu {
+  margin: 0 5px;
+}
+
+.slide-enter-active {
+  animation: slide 0.2s;
+}
+
+.slide-leave-active {
+  animation: slide 0.2s reverse;
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(300px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .header__container {
+    padding: 0 30px;
+  }
+
+  .item-list--tablet_sp {
+    display: block;
+  }
+
+  .item-list--pc {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .item-logo__img {
+    width: 70px;
+    margin-right: 5px;
+  }
+
+  .header__container {
+    justify-content: space-around;
+    margin: 0;
+    padding: 0;
+  }
+
+  .block-nav {
+    width: 80%;
+    margin: 0;
+  }
+
+  .block-nav__list {
+    justify-content: flex-end;
+    padding-left: 0;
+  }
+
+  .item-list--sp_search {
+    width: 80%;
+    padding-right: 0;
+  }
 }
 </style>

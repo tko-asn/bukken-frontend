@@ -3,22 +3,34 @@ import VueRouter from 'vue-router';
 import store from '@/store';
 
 const Home = () => import(
-  /* webpackChankName: 'Home' */ './mains/Home'
+  /* webpackChankName: 'Home' */ './pages/Home'
 );
 const LoginForm = () => import(
-  /* webpackChankName: 'LoginForm' */ './mains/LoginForm'
+  /* webpackChankName: 'LoginForm' */ './pages/LoginForm'
 );
 const SignUpForm = () => import(
-  /* webpackChankName: 'SignUpForm' */ './mains/SignUpForm'
+  /* webpackChankName: 'SignUpForm' */ './pages/SignUpForm'
 );
 const UserView = () => import(
-  /* webpackChankName: 'UserView' */ './mains/UserView'
+  /* webpackChankName: 'UserView' */ './pages/UserView'
 );
 const EditProfileForm = () => import(
-  /* webpackChankName: 'EditProfileForm' */ './mains/EditProfileForm'
+  /* webpackChankName: 'EditProfileForm' */ './pages/EditProfileForm'
+);
+const PostDetails = () => import(
+  /* webpackChankName: 'PostDetails' */ './pages/PostDetails'
+);
+const UserPosts = () => import(
+  /* webpackChankName: 'UserPosts' */ './pages/UserPosts'
+);
+const PostForm = () => import(
+  /* webpackChankName: 'PostForm' */ './components/PostForm'
 );
 const PostList = () => import(
   /* webpackChankName: 'PostList' */ './components/PostList'
+);
+const SelfIntroduction = () => import(
+  /* webpackChankName: 'SelfIntroduction' */ './components/SelfIntroduction'
 );
 const AuthInfo = () => import(
   /* webpackChankName: 'AuthInfo' */ './components/AuthInfo'
@@ -26,13 +38,31 @@ const AuthInfo = () => import(
 const ChangePassword = () => import(
   /* webpackChankName: 'ChangePassword' */ './components/ChangePassword'
 );
+const Follow = () => import(
+  /* webpackChankName: 'Follow' */ './components/Follow'
+);
+const Follower = () => import(
+  /* webpackChankName: 'Follower' */ './components/Follower'
+);
 
 Vue.use(VueRouter);
 
 const router = new VueRouter({
   mode: 'history',
   routes: [
-    { path: '/', component: Home, name: 'home' },
+    {
+      path: '/',
+      component: Home,
+      children: [
+        { path: '', component: PostList, name: 'home' },
+        {
+          path: 'post/form',
+          component: PostForm,
+          name: 'postForm',
+          meta: { requiredAuth: true }
+        }
+      ]
+    },
     { path: '/login', component: LoginForm, name: 'login' },
     { path: '/signup', component: SignUpForm, name: 'signUp' },
     {
@@ -40,21 +70,21 @@ const router = new VueRouter({
       component: UserView,
       props: true,
       children: [
-        { path: '', component: PostList, name: 'userView' },
+        { path: '', component: SelfIntroduction, name: 'userView' },
         {
           path: 'auth/info',
           component: AuthInfo,
           name: 'authInfo',
           meta: { requiredAuth: true, myPageOnly: true },
         },
-        { 
-          path: 'change/password', 
-          component: ChangePassword, 
-          name: 'changePassword', 
+        {
+          path: 'change/password',
+          component: ChangePassword,
+          name: 'changePassword',
           meta: { requiredAuth: true, myPageOnly: true }
         },
-        // { path: 'favorite/users', component: FavoriteUsers, name: 'favoriteUsers' },
-        // { path: 'favorite/posts', component: FavoritePosts, name: 'favoritePosts' },
+        { path: 'follow/list', component: Follow, name: 'followList' },
+        { path: 'follower/list', component: Follower, name: 'followerList' },
       ]
     },
     {
@@ -62,6 +92,18 @@ const router = new VueRouter({
       component: EditProfileForm,
       name: 'editProfile',
       meta: { requiredAuth: true }
+    },
+    {
+      path: '/post/:postId',
+      component: PostDetails,
+      name: 'postDetails',
+      props: true,
+    },
+    {
+      path: '/user/:userId/posts/list',
+      component: UserPosts,
+      name: 'userPosts',
+      props: true,
     },
     { path: '*', redirect: '/' },
   ],
