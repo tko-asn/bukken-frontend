@@ -1,5 +1,16 @@
 <template>
   <div class="container">
+    <!-- ゲストユーザーの情報 -->
+    <div class="block-guest-data">
+      <h3 class="block-guest-data__text">ゲストユーザー</h3>
+      <p class="block-guest-data__help">
+        以下の情報からゲストユーザーとしてログインできます
+      </p>
+      <p class="block-guest-data__text">ユーザー名：test01</p>
+      <p class="block-guest-data__text">
+        パスワード：<span class="block-guest-data__password">test01-pass</span>
+      </p>
+    </div>
     <!-- ログインフォーム -->
     <form @submit.prevent="login" class="form-login">
       <!-- ラベル -->
@@ -140,7 +151,7 @@ export default {
 
 <style scoped>
 .container {
-  padding: 170px 0 0;
+  padding: 70px 0 0;
   animation: fadeIn 0.8s;
 }
 
@@ -151,6 +162,28 @@ export default {
   to {
     opacity: 1;
   }
+}
+
+.block-guest-data {
+  width: 35%;
+  margin: 0 auto 20px;
+  padding: 5px 10px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  background: #fff;
+  text-align: center;
+}
+
+.block-guest-data__text {
+  margin: 5px;
+}
+
+.block-guest-data__password {
+  display: inline-block;
+}
+
+.block-guest-data__help {
+  font-size: 0.8em;
 }
 
 /* ログインフォーム */
@@ -245,13 +278,17 @@ export default {
 
 @media screen and (max-width: 599px) {
   .container {
-    padding-top: 115px;
+    padding-top: 80px;
   }
 
   [class*="input"] {
     padding: 0 10px;
     font-size: 1em;
     letter-spacing: 1.5px;
+  }
+
+  .block-guest-data {
+    width: 80%;
   }
 }
 </style>
