@@ -11,12 +11,20 @@
         パスワード：<span class="block-guest-data__password">test01-pass</span>
       </p>
     </div>
+
     <!-- ログインフォーム -->
     <form @submit.prevent="login" class="form-login">
       <!-- ラベル -->
       <p class="form-login__title">Login</p>
 
       <!-- フォーム -->
+      <!-- ログインのバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validaton__validation"
+          :messages="loginMessage"
+        />
+      </div>
       <!-- ユーザー名 -->
       <input
         class="form-login__input-username"
@@ -77,6 +85,7 @@ export default {
       // バリデーションメッセージ
       usernameMessage: [],
       passwordMessage: [],
+      loginMessage: [],
     };
   },
   methods: {
@@ -88,18 +97,14 @@ export default {
 
       // バリデーションメッセージを初期化
       this.usernameMessage = [];
-      this.emailMessage = [];
       this.passwordMessage = [];
+      this.loginMessage = [];
 
       // バリデーションの実行
       this.validate();
 
       // バリデーションメッセージが格納されている場合は終了
-      if (
-        this.usernameMessage.length ||
-        this.emailMessage.length ||
-        this.passwordMessage.length
-      ) {
+      if (this.usernameMessage.length || this.passwordMessage.length) {
         // ボタンを有効化
         buttonElement.disabled = false;
         return;
@@ -125,7 +130,10 @@ export default {
           // ホームページへ
           this.$router.replace(nextPage);
         })
-        .catch(() => {
+        .catch((err) => {
+          if (err.response.status === 401) {
+            this.loginMessage.push("認証情報が間違っています。");
+          }
           // ボタンの有効化
           buttonElement.disabled = false;
         });
