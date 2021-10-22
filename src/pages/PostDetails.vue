@@ -80,19 +80,24 @@
         <div class="form-answer">
           <!-- ログイン済み -->
           <template v-if="isLoggedIn">
-            <textarea
-              class="form-answer__textarea"
-              cols="30"
-              rows="10"
-              placeholder="回答を投稿する"
-              v-model="newAnswer"
-            ></textarea>
-            <ValidationMessage
-              class="form-answer__validation"
-              :messages="answerValidations"
-              v-show="answerValidations.length"
-            />
-            <button class="form-answer__btn" @click="postAnswer">回答</button>
+            <template v-if="!haveYouAnswered">
+              <textarea
+                class="form-answer__textarea"
+                cols="30"
+                rows="10"
+                placeholder="回答を投稿する"
+                v-model="newAnswer"
+              ></textarea>
+              <ValidationMessage
+                class="form-answer__validation"
+                :messages="answerValidations"
+                v-show="answerValidations.length"
+              />
+              <button class="form-answer__btn" @click="postAnswer">回答</button>
+            </template>
+            <p class="form-answer__text form-answer__text--answered" v-else>
+              この質問には回答済みです
+            </p>
           </template>
 
           <!-- 未ログイン -->
@@ -214,12 +219,16 @@ export default {
   computed: {
     ...mapGetters("auth", ["isLoggedIn", "userId"]),
     ...mapGetters("posts", ["myFavoritePosts"]),
+    // ユーザーのお気に入りの投稿かどうか
     isYourFavoritePost() {
-      // ユーザーのお気に入りの投稿かどうか
       if (this.myFavoritePosts.find((el) => el.id === this.postId)) {
         return true;
       }
       return false;
+    },
+    // 質問に回答済みかどうか
+    haveYouAnswered() {
+      return this.post.answers.some((el) => el.user.id === this.userId);
     },
   },
   methods: {
@@ -524,7 +533,7 @@ a {
 .form-answer {
   display: flex;
   flex-direction: column;
-  padding-top: 30px;
+  padding-top: 10px;
   border-top: 1px solid silver;
 }
 
@@ -543,9 +552,13 @@ a {
   text-align: center;
 }
 
+.form-answer__text--answered {
+  padding: 10px 0;
+}
+
 .form-answer__btn {
-  height: 50px;
-  margin: 30px 0;
+  height: 40px;
+  margin: 20px 0;
   border-color: white;
   border-radius: 5px;
   background: rgb(172, 21, 192);
