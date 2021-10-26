@@ -9,6 +9,12 @@
       @keydown.enter.prevent
       v-model="postalCodeA"
       maxlength="3"
+      @input="
+        $emit('addressData', {
+          postalCode: $event.target.value + postalCodeB,
+          postalCodeA: $event.target.value,
+        })
+      "
     />
     <span class="block-address__span">-</span>
     <input
@@ -18,6 +24,12 @@
       @keydown.enter.prevent
       v-model="postalCodeB"
       maxlength="4"
+      @input="
+        $emit('addressData', {
+          postalCode: postalCodeA + $event.target.value,
+          postalCodeB: $event.target.value,
+        })
+      "
     />
 
     <!-- バリデーションメッセージ -->
@@ -51,6 +63,7 @@
               placeholder="町名・番地"
               @keydown.enter.prevent
               v-model="townName"
+              @input="$emit('addressData', { townName: $event.target.value })"
             />
           </li>
           <li class="item-address__list">
@@ -60,6 +73,9 @@
               placeholder="アパート・マンション名"
               @keydown.enter.prevent
               v-model="buildingName"
+              @input="
+                $emit('addressData', { buildingName: $event.target.value })
+              "
             />
           </li>
         </template>
@@ -86,6 +102,17 @@ export default {
       type: Array,
       default: () => [],
     },
+    addressProps: {
+      type: Object,
+      default: () => {
+        return {
+          postalCodeA: "",
+          postalCodeB: "",
+          townName: "",
+          buildingName: "",
+        };
+      },
+    },
   },
   data() {
     return {
@@ -93,27 +120,23 @@ export default {
       postalCode: "",
       prefecture: "",
       municipality: "",
-      townName: "",
-      buildingName: "",
+      townName: this.addressProps.townName,
+      buildingName: this.addressProps.buildingName,
       // 郵便番号の部品
-      postalCodeA: "",
-      postalCodeB: "",
+      postalCodeA: this.addressProps.postalCodeA,
+      postalCodeB: this.addressProps.postalCodeB,
     };
+  },
+  created() {
+    // propsに郵便番号が指定されwatchのpostalCodeを発火させる場合
+    this.postalCode = this.postalCodeA + this.postalCodeB;
   },
   watch: {
     postalCodeA(val) {
       this.postalCode = val + this.postalCodeB; // 郵便番号を結合
-      this.$emit("addressData", {
-        postalCode: this.postalCode,
-        postalCodeA: val,
-      }); // 親コンポーネントに郵便番号の値を渡す
     },
     postalCodeB(val) {
       this.postalCode = this.postalCodeA + val; // 郵便番号を結合
-      this.$emit("addressData", {
-        postalCode: this.postalCode,
-        postalCodeB: val,
-      }); // 親コンポーネントに郵便番号の値を渡す
     },
     // 郵便番号
     postalCode(val) {
@@ -135,14 +158,6 @@ export default {
         _this.prefecture = "";
         _this.municipality = "";
       }
-    },
-    // 町名・番地
-    townName(val) {
-      this.$emit("addressData", { townName: val }); // 親コンポーネントに町名・番地の値を渡す
-    },
-    // アパート・マンション名
-    buildingName(val) {
-      this.$emit("addressData", { buildingName: val }); // 親コンポーネントに町名・番地の値を渡す
     },
   },
 };
