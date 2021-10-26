@@ -34,7 +34,8 @@
             <h4 class="block-property__title">質問対象の物件</h4>
             <p class="section-post__sub-title">{{ post.property }}</p>
             <p class="section-post__sub-title">
-              {{ postalCodeData(post) }}<span>{{ addressData(post) }}</span>
+              {{ "〒" + postalCodeA(post) + "-" + postalCodeB(post)
+              }}<span>{{ addressData(post) }}</span>
             </p>
           </section>
         </section>
@@ -52,6 +53,8 @@
 </template>
 
 <script>
+import addressData from "@/mixins/addressData";
+
 export default {
   props: {
     postList: Array, // 投稿リスト
@@ -62,25 +65,8 @@ export default {
       return this.postList.length % 2 !== 0;
     },
   },
+  mixins: [addressData],
   methods: {
-    // 郵便番号
-    postalCodeData(post) {
-      return (
-        "〒" +
-        post.address?.["postalCode"].slice(0, 3) +
-        "-" +
-        post.address?.["postalCode"].slice(3)
-      );
-    },
-    // 住所のデータを連結して返す
-    addressData(post) {
-      return (
-        post.address.prefecture +
-        post.address.municipality +
-        post.address.townName +
-        post.address.buildingName
-      );
-    },
     moveToPostPage(id) {
       this.$router.push({ name: "postDetails", params: { postId: id } });
     },
