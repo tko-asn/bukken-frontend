@@ -80,13 +80,13 @@ export default {
   methods: {
     // カテゴリーをリストに追加
     addCategory() {
-      const first = this.firstCategories[this.selectedFirstCategory];
-      const id = first + this.selectedSecondCategory; // Tagコンポーネントのv-forのkeyとして利用
+      const firstCategory = this.firstCategories[this.selectedFirstCategory];
+      const id = firstCategory + this.selectedSecondCategory; // Tagコンポーネントのv-forのkeyとして利用
 
       const newCategory = {
         id,
-        first,
-        second: this.selectedSecondCategory,
+        firstCategory,
+        secondCategory: this.selectedSecondCategory,
       };
 
       // 同じカテゴリなら終了
@@ -123,9 +123,8 @@ export default {
 }
 
 .item-category__select {
-  height: 50px;
-  padding: 10px;
-  font-size: 1.1em;
+  height: 30px;
+  border: 2px solid rgb(143, 142, 142);
 }
 
 .item-category__span {
@@ -134,13 +133,12 @@ export default {
 
 .item-category__btn {
   width: 70px;
-  height: 40px;
+  height: 30px;
   margin-left: 40px;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgb(114, 113, 113);
   background: rgb(219, 16, 16);
   color: white;
-  font-size: 1.1em;
 }
 
 .item-category__btn:active {

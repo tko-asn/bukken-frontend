@@ -1,9 +1,9 @@
 <template>
   <div class="item-tags">
     <a v-for="tag in tags" :key="tag.id" class="link">
-      {{ tag.first }}
-      <span class="link__span" v-if="tag.second">/</span>
-      {{ tag.second }}
+      {{ tag.firstCategory }}
+      <span class="link__span" v-if="tag.secondCategory">/</span>
+      {{ tag.secondCategory }}
       <!-- ×アイコン -->
       <fa-icon
         class="link__times-circle"
@@ -34,16 +34,17 @@ export default {
 .link {
   display: inline-block;
   margin: 10px 15px 0 0;
-  padding: 0.6em;
+  padding: 0.3em;
   border: 3px solid rgb(61, 61, 221);
   border-radius: 2em;
   background: #fff;
   color: rgb(61, 61, 221);
+  font-size: 0.8em;
 }
 
 /* ×アイコン */
 .link__times-circle {
-  margin-left: 5px;
+  margin-left: 2px;
 }
 
 .link__times-circle:hover {
