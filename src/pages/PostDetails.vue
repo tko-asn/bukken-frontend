@@ -34,7 +34,7 @@
             {{ datetime(post.createdAt) }}
             <span
               class="block-content__span"
-              v-if="post.createdAt != post.updatedAt"
+              v-if="post.createdAt !== post.updatedAt"
               >(編集済み)</span
             >
           </p>
@@ -152,8 +152,6 @@
             <template v-if="!haveYouAnswered">
               <textarea
                 class="form-answer__textarea"
-                cols="30"
-                rows="10"
                 placeholder="回答を投稿する"
                 v-model="newAnswer"
               ></textarea>
@@ -216,37 +214,125 @@
           v-for="answer in post.answers"
           :key="answer.id"
         >
-          <p class="block-content__text">{{ answer.content }}</p>
-          <div class="item-bottom">
-            <a
-              class="item-bottom__btn"
-              href=""
-              v-show="!answer.likedBy.find((el) => el.id === userId)"
-              @click.prevent="like(answer.id)"
-              >いいね {{ answer.likedBy.length }}</a
-            >
-            <a
-              class="item-bottom__btn item-bottom__btn--active"
-              href=""
-              v-show="answer.likedBy.find((el) => el.id === userId)"
-              @click.prevent="dislike(answer.id)"
-              >いいね {{ answer.likedBy.length }}</a
-            >
-            <div
-              class="item-bottom__author"
-              @click="moveToUserPage(answer.user.id)"
-            >
-              <div class="block-icon">
-                <img class="block-icon__img" :src="answer.user.icon_url" />
+          <!-- 通常時 -->
+          <div
+            v-show="
+              !getEditAnswerData(answer.id).isEditing &&
+              !getEditAnswerData(answer.id).isDeleting
+            "
+          >
+            <p class="block-content__text">{{ answer.content }}</p>
+            <div class="item-bottom">
+              <a
+                class="item-bottom__btn"
+                href=""
+                v-show="!answer.likedBy.find((el) => el.id === userId)"
+                @click.prevent="like(answer.id)"
+                >いいね {{ answer.likedBy.length }}</a
+              >
+              <a
+                class="item-bottom__btn item-bottom__btn--active"
+                href=""
+                v-show="answer.likedBy.find((el) => el.id === userId)"
+                @click.prevent="dislike(answer.id)"
+                >いいね {{ answer.likedBy.length }}</a
+              >
+              <div
+                class="item-bottom__author"
+                @click="moveToUserPage(answer.user.id)"
+              >
+                <div class="block-icon">
+                  <img class="block-icon__img" :src="answer.user.icon_url" />
+                </div>
+                <p class="item-bottom__username">{{ answer.user.username }}</p>
               </div>
-              <p class="item-bottom__username">{{ answer.user.username }}</p>
+            </div>
+            <p
+              class="
+                block-content__updated-at block-content__updated-at--answer
+              "
+            >
+              {{ datetime(answer.updatedAt) }}
+              <span
+                class="block-content__span"
+                v-if="answer.createdAt !== answer.updatedAt"
+              >
+                (編集済み)</span
+              >
+            </p>
+            <div class="item-icon" v-if="userId === answer.user.id">
+              <fa-icon
+                class="item-icon__icon"
+                icon="edit"
+                @click="switchEditAnswerData(answer.id, true)"
+              />
+              <fa-icon
+                class="item-icon__icon"
+                icon="trash-alt"
+                @click="
+                  switchEditAnswerData(answer.id, true, { deleteAns: true })
+                "
+              />
             </div>
           </div>
-          <p
-            class="block-content__updated-at block-content__updated-at--answer"
+
+          <!-- 回答編集時 -->
+          <div
+            class="form-answer"
+            v-show="
+              userId === answer.user.id &&
+              getEditAnswerData(answer.id).isEditing
+            "
           >
-            {{ datetime(answer.updatedAt) }}
-          </p>
+            <textarea
+              class="form-answer__textarea"
+              placeholder="回答を入力"
+              v-model="getEditAnswerData(answer.id).content"
+            ></textarea>
+            <ValidationMessage
+              class="form-answer__validation"
+              :messages="getEditAnswerData(answer.id).validations"
+            />
+            <div class="form-answer__block-btn">
+              <button
+                class="form-answer__btn form-answer__btn--cancel"
+                @click="
+                  switchEditAnswerData(answer.id, false, { cancel: true })
+                "
+              >
+                キャンセル
+              </button>
+              <button class="form-answer__btn" @click="editAnswer(answer.id)">
+                保存
+              </button>
+            </div>
+          </div>
+
+          <!-- 回答削除時 -->
+          <div
+            class="form-answer"
+            v-show="getEditAnswerData(answer.id).isDeleting"
+          >
+            <p class="form-answer__content block-content__text">
+              {{ answer.content }}
+            </p>
+            <div class="form-answer__block-btn">
+              <button
+                class="form-answer__btn form-answer__btn--cancel"
+                @click="
+                  switchEditAnswerData(answer.id, false, { deleteAns: false })
+                "
+              >
+                キャンセル
+              </button>
+              <button
+                class="form-answer__btn form-answer__btn--delete"
+                @click="deleteAnswer(answer.id)"
+              >
+                削除
+              </button>
+            </div>
+          </div>
 
           <!-- コメント -->
           <div class="item-comment">
@@ -315,6 +401,10 @@
                       placeholder="コメントを入力"
                       v-model="editCommentData[comment.id].content"
                     ></textarea>
+                    <ValidationMessage
+                      class="form-answer__validation"
+                      :messages="editCommentData[comment.id].validations"
+                    />
                     <div class="form-comment__edit">
                       <button
                         class="form-comment__btn form-comment__btn--cancel"
@@ -339,7 +429,7 @@
                   {{ datetime(comment.createdAt) }}
                   <span
                     class="block-content__span"
-                    v-if="comment.createdAt != comment.updatedAt"
+                    v-if="comment.createdAt !== comment.updatedAt"
                     >(編集済み)</span
                   >
                   -
@@ -454,6 +544,7 @@ export default {
       },
       newAnswer: "", // 新しい回答文
       newComments: {}, // 新しいコメント
+      editAnswerData: {}, // 回答の編集用データ
       editCommentData: {}, // コメントの編集用データ
       answerValidations: [], // 回答のバリデーションメッセージ
       commentValidations: [], // コメントのバリデーションメッセージ
@@ -481,6 +572,8 @@ export default {
 
       // コメントの編集用データの初期値を作成
       this.setEditCommentData(this.post.answers);
+      // 回答の編集用データの初期値を作成
+      this.setEditAnswerData(this.post.answers);
 
       // 編集用データ
       this.editPostData.title = data.title;
@@ -544,7 +637,32 @@ export default {
         this.editCommentData[commentId].isEditing = boolean;
         this.editCommentData[commentId].isDeleting = false;
       }
+
+      this.editCommentData[commentId].validations = [];
       this.editCommentData = { ...this.editCommentData };
+    },
+    // 回答編集フォームの表示切り替え
+    switchEditAnswerData(
+      answerId,
+      boolean,
+      { deleteAns = false, cancel = false } = {}
+    ) {
+      // キャンセル時はcontentを初期化
+      const { content } = this.post.answers.find(({ id }) => id === answerId);
+      if (cancel) {
+        this.editAnswerData[answerId].content = content;
+      }
+
+      if (deleteAns) {
+        this.editAnswerData[answerId].isDeleting = boolean;
+        this.editAnswerData[answerId].isEditing = false;
+      } else {
+        this.editAnswerData[answerId].isEditing = boolean;
+        this.editAnswerData[answerId].isDeleting = false;
+      }
+
+      this.editAnswerData[answerId].validations = [];
+      this.editAnswerData = { ...this.editAnswerData };
     },
     ...mapActions("posts", ["addFavoritePost", "removeFavoritePost"]),
     // 時間フォーマッター
@@ -689,6 +807,9 @@ export default {
       const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
       this.post = data;
 
+      // 回答の編集用データを更新
+      this.setEditAnswerData(this.post.answers);
+
       // フォームの文章を初期化
       this.newAnswer = "";
     },
@@ -722,6 +843,40 @@ export default {
       const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
       this.post = data;
     },
+    // 回答を編集
+    async editAnswer(answerId) {
+      this.editAnswerData[answerId].validations = [];
+
+      if (!this.editAnswerData[answerId].content) {
+        this.editAnswerData[answerId].validations.push(
+          "回答を入力してください"
+        );
+        return;
+      }
+
+      const params = {
+        content: this.editAnswerData[answerId].content,
+      };
+      await apiClient.patch("/answers/update/" + answerId + "/", params);
+
+      // 回答を更新
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
+
+      // 回答編集フォームを閉じる
+      this.editAnswerData[answerId].isEditing = false;
+    },
+    // 回答を削除
+    async deleteAnswer(answerId) {
+      await apiClient.delete("/answers/destroy/" + answerId + "/");
+
+      // 回答を更新
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
+
+      // 編集用データを削除
+      delete this.editAnswerData[answerId];
+    },
     // コメントを作成
     async createComment(answerId) {
       this.commentValidations = [];
@@ -748,6 +903,15 @@ export default {
       this.newComments[answerId] = "";
     },
     async editComment(commentId) {
+      this.editCommentData[commentId].validations = [];
+
+      if (!this.editCommentData[commentId].content) {
+        this.editCommentData[commentId].validations.push(
+          "コメントを入力してください"
+        );
+        return;
+      }
+
       const params = {
         content: this.editCommentData[commentId].content,
       };
@@ -770,17 +934,33 @@ export default {
       // 編集用データを削除
       delete this.editCommentData[commentId];
     },
+    // コメントの編集用データを作成
     setEditCommentData(answers) {
-      // コメントの編集用データの初期値を作成
       answers.forEach((el) => {
         el.comments.forEach((comment) => {
           this.editCommentData[comment.id] = {
             isEditing: false,
             isDeleting: false,
             content: comment.content,
+            validations: [],
           };
         });
       });
+    },
+    // 回答の編集用データを作成
+    setEditAnswerData(answers) {
+      answers.forEach((el) => {
+        this.editAnswerData[el.id] = {
+          isEditing: false,
+          isDeleting: false,
+          content: el.content,
+          validations: [],
+        };
+      });
+    },
+    // 回答の編集用データを取得
+    getEditAnswerData(answerId) {
+      return this.editAnswerData[answerId] || {};
     },
   },
   watch: {
@@ -986,6 +1166,7 @@ ul {
 /* カテゴリ― */
 .item-category__body--no_editing {
   font-size: 0.8em;
+  border-bottom: 1px solid silver;
 }
 
 .item-category__title {
@@ -1007,11 +1188,10 @@ ul {
   display: flex;
   flex-direction: column;
   padding-top: 10px;
-  border-top: 1px solid silver;
 }
 
 .form-answer__textarea {
-  height: 200px;
+  height: 130px;
   padding: 10px;
   border-color: silver;
   border-radius: 3px;
@@ -1032,12 +1212,26 @@ ul {
 .form-answer__btn {
   height: 40px;
   margin: 20px 0;
-  border-color: white;
+  border: none;
   border-radius: 5px;
   background: rgb(172, 21, 192);
   color: white;
   letter-spacing: 2px;
   cursor: pointer;
+}
+
+.form-answer__block-btn {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-answer__btn--cancel {
+  background: rgb(167, 165, 165);
+  margin-right: 5px;
+}
+
+.form-answer__btn--delete {
+  background: rgb(231, 39, 39);
 }
 
 .form-answer__btn:hover {
@@ -1075,6 +1269,19 @@ ul {
   text-align: center;
 }
 
+/* 回答の編集アイコン */
+.item-icon {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0 5px;
+  color: gray;
+  cursor: pointer;
+}
+
+.item-icon__icon + .item-icon__icon {
+  margin-left: 5px;
+}
+
 /* コメントフォーム */
 .form-comment {
   display: flex;
@@ -1100,7 +1307,7 @@ ul {
 
 .form-comment__edit {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .form-comment__btn--cancel {
