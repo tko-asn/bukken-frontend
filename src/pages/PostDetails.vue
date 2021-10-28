@@ -126,8 +126,6 @@
           <!-- 内容 -->
           <textarea
             class="block-content__input-text"
-            cols="30"
-            rows="10"
             v-model="editPostData.text"
             placeholder="質問内容"
           ></textarea>
@@ -173,25 +171,43 @@
             <button
               class="form-answer__btn"
               @click="isEditingPost = true"
-              v-show="!isEditingPost"
+              v-if="!isEditingPost"
             >
               投稿を編集する
             </button>
             <!-- 編集モード -->
-            <div class="form-answer__edit-post" v-show="isEditingPost">
+            <template v-else>
+              <div class="form-answer__edit-post">
+                <button
+                  class="form-answer__btn form-answer__btn--half_cancel"
+                  @click="isEditingPost = false"
+                >
+                  キャンセル
+                </button>
+                <button
+                  class="form-answer__btn form-answer__btn--half_edit"
+                  @click="updatePost"
+                >
+                  編集
+                </button>
+              </div>
+              <h4 class="form-answer__title">質問を削除する</h4>
+              <p class="form-answer__text form-answer__text--delete">
+                「削除」と入力してください
+              </p>
+              <input
+                class="form-answer__input block-content__input-delete"
+                placeholder="削除"
+                v-model="deletePostText"
+              />
               <button
-                class="form-answer__btn form-answer__btn--half_cancel"
-                @click="isEditingPost = false"
+                class="form-answer__btn form-answer__btn--delete"
+                :disabled="deletePostText !== '削除'"
+                @click="deletePost"
               >
-                キャンセル
+                削除
               </button>
-              <button
-                class="form-answer__btn form-answer__btn--half_edit"
-                @click="updatePost"
-              >
-                編集
-              </button>
-            </div>
+            </template>
           </template>
 
           <!-- 未ログイン -->
@@ -559,6 +575,7 @@ export default {
       isEditingPost: false, // 質問を編集中かどうか
       editCategory: false, // カテゴリーを編集したかどうか
       isFullDisplay: false, // コメントを全表示するかどうか
+      deletePostText: "", // 投稿削除文
     };
   },
   created() {
@@ -812,6 +829,13 @@ export default {
 
       // フォームの文章を初期化
       this.newAnswer = "";
+    },
+    // 投稿を削除
+    deletePost() {
+      apiClient.delete("/posts/delete/" + this.post.id + "/")
+        .then(() => {
+          this.$router.replace("/");
+        });
     },
     // 回答にいいねする
     async like(answerId) {
@@ -1071,12 +1095,17 @@ ul {
   margin: 20px 0;
 }
 
+.block-content__input-delete {
+  height: 30px;
+}
+
 .form-answer__edit-post {
   display: flex;
+  justify-content: space-around;
 }
 
 [class*="form-answer__btn--half"] {
-  width: 50%;
+  width: 45%;
 }
 
 /* 物件情報 */
@@ -1209,6 +1238,16 @@ ul {
   padding: 10px 0;
 }
 
+.form-answer__text--delete {
+  display: flex;
+}
+
+.form-answer__title {
+  margin: 30px 0 20px;
+  padding-top: 10px;
+  border-top: 1px solid rgb(173, 172, 172);
+}
+
 .form-answer__btn {
   height: 40px;
   margin: 20px 0;
@@ -1232,6 +1271,10 @@ ul {
 
 .form-answer__btn--delete {
   background: rgb(231, 39, 39);
+}
+
+.form-answer__btn--delete:disabled {
+  opacity: 0.8;
 }
 
 .form-answer__btn:hover {
