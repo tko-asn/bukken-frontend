@@ -336,7 +336,13 @@
                   </template>
                 </div>
                 <p class="block-content__updated-at">
-                  {{ datetime(comment.createdAt) }} -
+                  {{ datetime(comment.createdAt) }}
+                  <span
+                    class="block-content__span"
+                    v-if="comment.createdAt != comment.updatedAt"
+                    >(編集済み)</span
+                  >
+                  -
                   <router-link
                     class="block-comment__author"
                     :to="{ name: 'userView', params: { id: comment.user.id } }"
