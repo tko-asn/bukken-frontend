@@ -313,8 +313,8 @@
             class="form-answer"
             v-show="getEditAnswerData(answer.id).isDeleting"
           >
-            <p class="form-answer__content block-content__text">
-              {{ answer.content }}
+            <!-- 改行するとスペースが入るので注意 -->
+            <p class="form-answer__content block-content__text">{{ answer.content }}
             </p>
             <div class="form-answer__block-btn">
               <button
