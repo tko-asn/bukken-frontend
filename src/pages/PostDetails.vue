@@ -38,7 +38,7 @@
               >(編集済み)</span
             >
           </p>
-          <!-- 内容（改行するとスペースが入る） -->
+          <!-- 内容 -->
           <p class="block-content__text">{{ post.text }}</p>
           <!-- 下部 -->
           <div class="item-bottom">
@@ -160,7 +160,6 @@
               <ValidationMessage
                 class="form-answer__validation"
                 :messages="answerValidations"
-                v-show="answerValidations.length"
               />
               <button class="form-answer__btn" @click="postAnswer">回答</button>
             </template>
@@ -248,6 +247,145 @@
           >
             {{ datetime(answer.updatedAt) }}
           </p>
+
+          <!-- コメント -->
+          <div class="item-comment">
+            <!-- コメントフォーム -->
+            <div
+              class="form-comment"
+              v-if="userId === answer.user.id || userId === post.user.id"
+            >
+              <textarea
+                class="form-comment__textarea"
+                placeholder="コメントを入力"
+                v-model="newComments[answer.id]"
+              ></textarea>
+              <ValidationMessage
+                class="form-comment__validation"
+                :messages="commentValidations"
+              />
+              <button
+                class="form-comment__btn"
+                @click="createComment(answer.id)"
+              >
+                コメントする
+              </button>
+            </div>
+            <!-- コメント一覧 -->
+            <ul class="item-comment__list" v-if="commentLength(answer)">
+              <li
+                class="block-comment"
+                v-for="comment in commentLimitCount(answer.comments)"
+                :key="comment.id"
+              >
+                <!-- 通常時 -->
+                <!-- 改行すると行頭にスペースが入るので注意 -->
+                <p
+                  class="block-comment__content"
+                  v-show="!editCommentData[comment.id].isEditing"
+                >{{ comment.content }}
+                </p>
+                <!-- コメント編集時 -->
+                <div class="form-comment">
+                  <div
+                    class="form-comment__edit"
+                    v-show="editCommentData[comment.id].isDeleting"
+                  >
+                    <button
+                      class="form-comment__btn form-comment__btn--cancel"
+                      @click="
+                        switchEditCommentData(comment.id, false, {
+                          answerId: answer.id,
+                          deleteCmt: true,
+                        })
+                      "
+                    >
+                      キャンセル
+                    </button>
+                    <button
+                      class="form-comment__btn form-comment__btn--delete"
+                      @click="deleteComment(comment.id)"
+                    >
+                      削除
+                    </button>
+                  </div>
+                  <template v-if="editCommentData[comment.id].isEditing">
+                    <textarea
+                      class="form-comment__textarea"
+                      placeholder="コメントを入力"
+                      v-model="editCommentData[comment.id].content"
+                    ></textarea>
+                    <div class="form-comment__edit">
+                      <button
+                        class="form-comment__btn form-comment__btn--cancel"
+                        @click="
+                          switchEditCommentData(comment.id, false, {
+                            answerId: answer.id,
+                          })
+                        "
+                      >
+                        キャンセル
+                      </button>
+                      <button
+                        class="form-comment__btn"
+                        @click="editComment(comment.id)"
+                      >
+                        保存
+                      </button>
+                    </div>
+                  </template>
+                </div>
+                <p class="block-content__updated-at">
+                  {{ datetime(comment.createdAt) }}
+                  <span
+                    class="block-content__span"
+                    v-if="comment.createdAt != comment.updatedAt"
+                    >(編集済み)</span
+                  >
+                  -
+                  <router-link
+                    class="block-comment__author"
+                    :to="{ name: 'userView', params: { id: comment.user.id } }"
+                    >{{ comment.user.username }}</router-link
+                  >
+                  <template v-if="userId === comment.user.id">
+                    <fa-icon
+                      class="block-comment__icon"
+                      icon="edit"
+                      v-show="!editCommentData[comment.id].isEditing"
+                      @click="switchEditCommentData(comment.id, true)"
+                    />
+                    <fa-icon
+                      class="block-comment__icon"
+                      icon="trash-alt"
+                      v-show="!editCommentData[comment.id].isDeleting"
+                      @click="
+                        switchEditCommentData(comment.id, true, {
+                          deleteCmt: true,
+                        })
+                      "
+                    />
+                  </template>
+                </p>
+              </li>
+              <a
+                href=""
+                class="link-comment"
+                v-show="commentLength(answer) >= 3 && isFullDisplay === false"
+                @click.prevent="isFullDisplay = true"
+                ><fa-icon class="link-comment__icon" icon="chevron-down" />
+                残りの{{ commentLength(answer) - 2 }}件を表示する</a
+              >
+              <a
+                href=""
+                class="link-comment"
+                v-show="commentLength(answer) >= 3 && isFullDisplay === true"
+                @click.prevent="isFullDisplay = false"
+                ><fa-icon class="link-comment__icon" icon="chevron-up" />
+                折りたたむ</a
+              >
+            </ul>
+          </div>
         </section>
         <p class="block-content__no-text" v-if="!post.answers.length">
           まだ回答がありません
@@ -315,7 +453,10 @@ export default {
         ],
       },
       newAnswer: "", // 新しい回答文
+      newComments: {}, // 新しいコメント
+      editCommentData: {}, // コメントの編集用データ
       answerValidations: [], // 回答のバリデーションメッセージ
+      commentValidations: [], // コメントのバリデーションメッセージ
       // 更新用質問データ
       editPostData: {
         title: "",
@@ -325,16 +466,21 @@ export default {
       editAddressData: {},
       editCategoryData: [],
       isEditingPost: false, // 質問を編集中かどうか
-      editFlag: {
-        address: false,
-        category: false,
-      },
       editCategory: false, // カテゴリーを編集したかどうか
+      isFullDisplay: false, // コメントを全表示するかどうか
     };
   },
   created() {
     apiClient.get("/posts/post/" + this.postId + "/").then(({ data }) => {
       this.post = data; // 対象の投稿データをセット
+
+      // コメントの初期値を作成
+      this.post.answers.forEach((el) => {
+        this.newComments[el.id] = "";
+      });
+
+      // コメントの編集用データの初期値を作成
+      this.setEditCommentData(this.post.answers);
 
       // 編集用データ
       this.editPostData.title = data.title;
@@ -376,10 +522,45 @@ export default {
     },
   },
   methods: {
+    // コメント編集フォームの表示切り替え
+    switchEditCommentData(
+      commentId,
+      boolean,
+      { answerId = "", deleteCmt = false } = {}
+    ) {
+      // キャンセル時はcontentを初期化
+      if (answerId) {
+        const answerObj = this.post.answers.find(({ id }) => id === answerId);
+        const commentObj = answerObj.comments.find(
+          ({ id }) => id === commentId
+        );
+        this.editCommentData[commentId].content = commentObj.content;
+      }
+
+      if (deleteCmt) {
+        this.editCommentData[commentId].isDeleting = boolean;
+        this.editCommentData[commentId].isEditing = false;
+      } else {
+        this.editCommentData[commentId].isEditing = boolean;
+        this.editCommentData[commentId].isDeleting = false;
+      }
+      this.editCommentData = { ...this.editCommentData };
+    },
     ...mapActions("posts", ["addFavoritePost", "removeFavoritePost"]),
     // 時間フォーマッター
     datetime(date) {
       return moment(date).format("YYYY年MM月D日 HH時mm分");
+    },
+    // コメントの数
+    commentLength(answer) {
+      return answer.comments?.length;
+    },
+    // コメント表示数
+    commentLimitCount(comments) {
+      if (this.isFullDisplay) {
+        return comments;
+      }
+      return comments.slice(0, 2);
     },
     // AddressFormから所在地データを取得
     getAddressData(addressObj) {
@@ -541,6 +722,66 @@ export default {
       const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
       this.post = data;
     },
+    // コメントを作成
+    async createComment(answerId) {
+      this.commentValidations = [];
+      if (!this.newComments[answerId]) {
+        this.commentValidations.push("コメントを入力してください");
+        return;
+      }
+
+      const params = {
+        content: this.newComments[answerId],
+        authorId: this.userId,
+        answerId,
+      };
+      await apiClient.post("/comments/create/", params);
+
+      // 回答を更新
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
+
+      // 編集用データを更新
+      this.setEditCommentData(this.post.answers);
+
+      // コメントフォームを初期化
+      this.newComments[answerId] = "";
+    },
+    async editComment(commentId) {
+      const params = {
+        content: this.editCommentData[commentId].content,
+      };
+      await apiClient.patch("/comments/update/" + commentId + "/", params);
+
+      // 回答を更新
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
+
+      // フォームを閉じる
+      this.editCommentData[commentId].isEditing = false;
+    },
+    async deleteComment(commentId) {
+      await apiClient.delete("/comments/delete/" + commentId + "/");
+
+      // 回答を更新
+      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      this.post = data;
+
+      // 編集用データを削除
+      delete this.editCommentData[commentId];
+    },
+    setEditCommentData(answers) {
+      // コメントの編集用データの初期値を作成
+      answers.forEach((el) => {
+        el.comments.forEach((comment) => {
+          this.editCommentData[comment.id] = {
+            isEditing: false,
+            isDeleting: false,
+            content: comment.content,
+          };
+        });
+      });
+    },
   },
   watch: {
     postId(val) {
@@ -557,6 +798,11 @@ export default {
 /* 基本設定 */
 a {
   text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
 }
 
 .container {
@@ -576,7 +822,7 @@ a {
 }
 
 .block-content * {
-  animation: fadeIn 1s;
+  animation: fadeIn 0.3s;
 }
 
 @keyframes fadeIn {
@@ -827,6 +1073,80 @@ a {
   margin: 0 0 30px;
   color: gray;
   text-align: center;
+}
+
+/* コメントフォーム */
+.form-comment {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 5px;
+}
+
+.form-comment__textarea {
+  height: 70px;
+  margin: 10px 0;
+  border: 1px solid silver;
+  border-radius: 5px;
+}
+
+.form-comment__btn {
+  height: 30px;
+  border: none;
+  border-radius: 3px;
+  background: rgb(19, 126, 214);
+  color: white;
+  cursor: pointer;
+}
+
+.form-comment__edit {
+  display: flex;
+  justify-content: end;
+}
+
+.form-comment__btn--cancel {
+  margin-right: 10px;
+  background: rgb(170, 170, 170);
+}
+
+.form-comment__btn--delete {
+  background: rgb(231, 39, 39);
+}
+
+.form-comment__validation {
+  font-size: 0.8em;
+}
+
+.form-comment__btn:hover {
+  opacity: 0.8;
+}
+
+/* コメント表示欄 */
+.item-comment__list {
+  width: 95%;
+  margin-left: auto;
+  border-top: 1px solid silver;
+  font-size: 0.8em;
+}
+
+.block-comment {
+  padding-left: 10px;
+}
+
+.block-comment__content {
+  white-space: pre-wrap;
+  padding: 0 5px;
+}
+
+.block-comment__author {
+  font-size: 1.2em;
+  color: black;
+  text-decoration: underline;
+}
+
+.block-comment__icon {
+  margin-left: 5px;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 1024px) {
