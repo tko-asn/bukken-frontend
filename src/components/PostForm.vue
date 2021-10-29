@@ -258,7 +258,7 @@ export default {
   width: 40%;
   height: 50px;
   margin: 10px auto;
-  border-color: white;
+  border: none;
   border-radius: 3px;
   background: rgb(126, 79, 170);
   color: #fff;

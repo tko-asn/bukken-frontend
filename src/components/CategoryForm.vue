@@ -125,20 +125,27 @@ export default {
 .item-category__select {
   height: 30px;
   border: 2px solid rgb(143, 142, 142);
+  border-radius: 5px;
 }
 
 .item-category__span {
-  margin: 0 20px;
+  margin: 0 10px;
 }
 
 .item-category__btn {
   width: 70px;
   height: 30px;
-  margin-left: 40px;
+  margin-left: 20px;
+  border: none;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgb(114, 113, 113);
   background: rgb(219, 16, 16);
   color: white;
+  cursor: pointer;
+}
+
+.item-category__btn:hover {
+  opacity: 0.8;
 }
 
 .item-category__btn:active {
@@ -161,8 +168,7 @@ export default {
   }
 
   .item-category__select {
-    width: 100%;
-    border: 1px solid gray;
+    width: 80%;
     margin-bottom: 10px;
   }
 

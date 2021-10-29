@@ -182,6 +182,7 @@ export default {
   flex-grow: 3;
   height: 25px;
   border: 1px solid gray;
+  border-radius: 4px;
 }
 
 /* ボタン */
@@ -189,9 +190,9 @@ export default {
   margin-top: 20px;
   padding: 5px 10px;
   border: none;
+  border-radius: 5px;
   background: green;
   color: white;
-  font-size: 1.2em;
   cursor: pointer;
 }
 

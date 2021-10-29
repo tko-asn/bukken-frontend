@@ -93,7 +93,7 @@
                       </router-link>
                     </li>
                     <a
-                      class="list__link list__link--large"
+                      class="list__link list__link--small"
                       href=""
                       @click.prevent="closeUserList(menuObj.type)"
                       >閉じる</a
@@ -428,7 +428,7 @@ a {
 .list__link {
   display: flex;
   align-items: center;
-  height: 50px;
+  height: 45px;
   padding-left: 30px;
 }
 
@@ -443,30 +443,33 @@ a {
 }
 
 .list__link--small {
-  height: 40px;
+  height: 35px;
+  font-size: 0.8em;
 }
 
 .list__username {
-  margin-left: 20px;
+  margin-left: 10px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   color: white;
 }
 
 .item-icon {
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   object-fit: cover;
 }
 
 .side-footer {
   flex: 1;
-  min-height: 200px;
+  min-height: 150px;
   padding: 30px 30px;
   background: rgb(76, 26, 92);
   color: white;
@@ -475,10 +478,6 @@ a {
 
 .nav {
   border-bottom: 2px solid gray;
-}
-
-.list__link--large {
-  font-size: 0.9em;
 }
 
 /* ログインしていない場合のフォロー部分 */

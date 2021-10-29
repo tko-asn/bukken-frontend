@@ -22,7 +22,6 @@ export default {
   padding: 10px 50px;
   overflow-wrap: break-word;
   background: #fff;
-  font-size: 1.1em;
 }
 
 .item-self-intro__text {

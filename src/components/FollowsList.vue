@@ -73,22 +73,28 @@ export default {
 .block-follows {
   display: flex;
   align-items: center;
-  height: 100px;
+  height: 60px;
   padding: 0 10px;
-  box-shadow: 0 1px 2px gray;
+  white-space: nowrap;
+  overflow: hidden;
+  background: #fff;
   text-decoration: none;
+}
+
+.block-follows:hover {
+  filter: brightness(80%);
 }
 
 /* アイコン */
 .item-icon {
-  width: 90px;
-  height: 90px;
+  width: 50px;
+  height: 50px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 90px;
-  height: 90px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
 }
 
@@ -97,26 +103,13 @@ export default {
   margin-left: 30px;
   overflow: hidden;
   color: rgb(83, 81, 81);
-  font-size: 1.5em;
+  font-size: 1.2em;
   letter-spacing: 2px;
 }
 
 /* 表示するユーザーがいないときのメッセージ */
 .container-follows-list__text-no-follow {
   color: gray;
-  font-size: 1.2em;
   text-align: center;
-}
-
-@media screen and (max-width: 1024px) {
-  .block-follows {
-    height: 60px;
-  }
-
-  .item-icon,
-  .item-icon__img {
-    width: 50px;
-    height: 50px;
-  }
 }
 </style>
