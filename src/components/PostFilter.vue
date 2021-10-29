@@ -212,16 +212,15 @@ a {
 }
 
 .list--active {
-  box-shadow: inset 2px 2px 2px rgb(129, 129, 129);
-  background: rgb(205, 206, 206);
+  background: rgb(191, 194, 194);
   color: rgb(99, 99, 99);
+  font-size: 0.8em;
 }
 
 .list__item {
   display: flex;
   padding: 5px 10px;
-  box-shadow: inset 2px 2px 2px rgb(218, 216, 216),
-    inset -2px -2px 2px rgb(218, 216, 216);
+  border: 2px solid rgb(143, 142, 142);
 }
 
 .list-checkbox {
@@ -234,6 +233,7 @@ a {
 .list-checkbox__label {
   display: flex;
   align-items: center;
+  font-size: 0.9em;
 }
 
 .list-checkbox__label:before {
@@ -305,7 +305,7 @@ a {
 
 @media screen and (max-width: 1024px) {
   .item-filter__btn {
-    width: 60%;
+    width: 40%;
   }
 }
 
@@ -318,10 +318,6 @@ a {
 
   .list-checkbox {
     width: 100%;
-  }
-
-  .list-checkbox__label {
-    font-size: 0.9em;
   }
 
   .section__form-address {

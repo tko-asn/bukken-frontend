@@ -11,12 +11,20 @@
         パスワード：<span class="block-guest-data__password">test01-pass</span>
       </p>
     </div>
+
     <!-- ログインフォーム -->
     <form @submit.prevent="login" class="form-login">
       <!-- ラベル -->
       <p class="form-login__title">Login</p>
 
       <!-- フォーム -->
+      <!-- ログインのバリデーションメッセージ -->
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validaton__validation"
+          :messages="loginMessage"
+        />
+      </div>
       <!-- ユーザー名 -->
       <input
         class="form-login__input-username"
@@ -77,6 +85,7 @@ export default {
       // バリデーションメッセージ
       usernameMessage: [],
       passwordMessage: [],
+      loginMessage: [],
     };
   },
   methods: {
@@ -88,18 +97,14 @@ export default {
 
       // バリデーションメッセージを初期化
       this.usernameMessage = [];
-      this.emailMessage = [];
       this.passwordMessage = [];
+      this.loginMessage = [];
 
       // バリデーションの実行
       this.validate();
 
       // バリデーションメッセージが格納されている場合は終了
-      if (
-        this.usernameMessage.length ||
-        this.emailMessage.length ||
-        this.passwordMessage.length
-      ) {
+      if (this.usernameMessage.length || this.passwordMessage.length) {
         // ボタンを有効化
         buttonElement.disabled = false;
         return;
@@ -125,7 +130,10 @@ export default {
           // ホームページへ
           this.$router.replace(nextPage);
         })
-        .catch(() => {
+        .catch((err) => {
+          if (err.response.status === 401) {
+            this.loginMessage.push("認証情報が間違っています。");
+          }
           // ボタンの有効化
           buttonElement.disabled = false;
         });
@@ -168,7 +176,7 @@ export default {
   width: 35%;
   margin: 0 auto 20px;
   padding: 5px 10px;
-  border: 1px solid gray;
+  border: 2px solid gray;
   border-radius: 5px;
   background: #fff;
   text-align: center;
@@ -191,7 +199,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 450px;
+  max-width: 400px;
   margin: 0 auto;
   border: 4px solid rgb(143, 141, 141);
   border-radius: 7px;
@@ -204,6 +212,7 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  margin: 15px 0;
   font-size: 1.8em;
   letter-spacing: 6px;
 }
@@ -219,23 +228,21 @@ export default {
 /* 入力欄 */
 [class*="input"] {
   width: 85%;
-  height: 40px;
-  padding: 0 10px;
+  height: 35px;
+  padding: 0 5px;
   border: 1px solid silver;
   border-radius: 5px;
-  font-size: 1.2em;
 }
 
 .form-login::placeholder {
   color: rgb(170, 167, 167);
-  letter-spacing: 2px;
 }
 
 /* ボタン */
 .form-login__btn-login {
   width: 90%;
-  height: 40px;
-  margin: 10px 0 30px;
+  height: 30px;
+  margin: 10px 0 20px;
   border: none;
   border-radius: 5px;
   background: rgb(16, 211, 65);
@@ -268,12 +275,14 @@ export default {
 .block-sign-up__link {
   color: rgb(52, 189, 161);
   text-decoration: none;
+  font-size: 0.9em;
 }
 
 /* バリデーションメッセージ */
 .item-validation {
   width: 90%;
   padding-bottom: 5px;
+  font-size: 0.9em;
 }
 
 @media screen and (max-width: 599px) {

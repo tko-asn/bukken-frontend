@@ -44,7 +44,7 @@
       <p class="item-form__text">郵便番号を入力してください（半角）</p>
       <AddressForm
         :optionInput="true"
-        :validations="validations.postalCode"
+        :validations="addressMessages"
         @addressData="getAddressData"
       />
     </div>
@@ -75,6 +75,7 @@ import ValidationMessage from "@/components/ValidationMessage";
 import CategoryForm from "@/components/CategoryForm";
 import Tag from "@/components/Tag";
 import AddressForm from "@/components/AddressForm";
+import addressValidationMixin from "@/mixins/addressValidationMixin";
 
 export default {
   components: {
@@ -90,28 +91,30 @@ export default {
       property: "",
       text: "",
       // 所在地
-      postalCodeA: "",
-      postalCodeB: "",
-      postalCode: "", // 郵便番号
-      prefecture: "",
-      municipality: "",
-      townName: "",
-      buildingName: "",
+      addressData: {
+        postalCodeA: "",
+        postalCodeB: "",
+        postalCode: "", // 郵便番号
+        prefecture: "",
+        municipality: "",
+        townName: "",
+        buildingName: "",
+      },
       isDisabled: true, // ボタン無効化
       // 選択したカテゴリーのリスト
       selectedCategories: [],
       // バリデーションメッセージ
       validations: {
         property: [], // 物件名
-        postalCode: [], // 郵便番号
       },
     };
   },
+  mixins: [addressValidationMixin],
   methods: {
     // 子コンポーネントから所在地のデータを取得
     getAddressData(addressObj) {
       Object.keys(addressObj).forEach((key) => {
-        this.$data[key] = addressObj[key];
+        this.addressData[key] = addressObj[key];
       });
     },
     // バリデーション
@@ -126,28 +129,12 @@ export default {
         // 必須入力
         this.validations.property.push("物件名を入力してください");
       }
-
-      // 郵便番号
-      if (!this.postalCode) {
-        this.validations.postalCode.push("物件の郵便番号を入力してください"); // 必須入力
-      } else if (this.postalCode.match(/[^0-9]/g)) {
-        // 半角数字のみ
-        this.validations.postalCode.push("半角数字で入力してください");
-      } else if (
-        // 文字数チェック
-        this.postalCodeA.length !== 3 ||
-        this.postalCodeB.length !== 4
-      ) {
-        this.validations.postalCode.push("郵便番号を正しく入力してください");
-      } else if (!this.prefecture || !this.municipality) {
-        // 郵便番号チェック
-        this.validations.postalCode.push("正しい郵便番号を入力してください");
-      }
     },
     // 投稿を作成
     async createPost() {
       // バリデーション実行
       this.validate();
+      this.addressValidation(this.addressData);
 
       // バリデーションメッセージの有無を確認
       Object.keys(this.validations).forEach((key) => {
@@ -156,21 +143,12 @@ export default {
         }
       });
 
-      // 住所の情報
-      const addressData = {
-        postalCode: this.postalCode,
-        prefecture: this.prefecture,
-        municipality: this.municipality,
-        townName: this.townName,
-        buildingName: this.buildingName,
-      };
-
       // 住所とカテゴリーのIDを取得
       const [addressRes, categoryRes] = await Promise.all([
         apiClient.post(
           // 住所のIDを取得
           "/addresses/find/or/create/",
-          addressData
+          this.addressData
         ),
         apiClient.post(
           // カテゴリーのIDのリストを取得
@@ -280,7 +258,7 @@ export default {
   width: 40%;
   height: 50px;
   margin: 10px auto;
-  border-color: white;
+  border: none;
   border-radius: 3px;
   background: rgb(126, 79, 170);
   color: #fff;

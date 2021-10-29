@@ -71,8 +71,8 @@ export default {
 .item__link {
   display: flex;
   align-items: center;
-  height: 50px;
-  padding-left: 10px;
+  height: 40px;
+  white-space: nowrap;
   overflow: hidden;
   border-bottom: 2px solid rgb(194, 193, 193);
   color: rgb(105, 104, 104);

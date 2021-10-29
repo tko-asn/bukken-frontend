@@ -26,15 +26,21 @@
             <div class="item-icon">
               <img class="item-icon__img" :src="post.user.icon_url" />
             </div>
-            <p class="section-post__sub-title">{{ post.user.username }}</p>
+            <p class="section-post__sub-title section-post__sub-title--nowrap">
+              {{ post.user.username }}
+            </p>
           </div>
 
           <!-- 物件情報 -->
           <section class="block-property">
-            <h4 class="block-property__title">質問対象の物件</h4>
-            <p class="section-post__sub-title">{{ post.property }}</p>
+            <h4 class="block-property__title">物件名</h4>
+            <p class="section-post__sub-title section-post__sub-title--nowrap">
+              {{ post.property }}
+            </p>
+            <h4 class="block-property__title">所在地</h4>
             <p class="section-post__sub-title">
-              {{ postalCodeData(post) }}<span>{{ addressData(post) }}</span>
+              {{ "〒" + postalCodeA(post) + "-" + postalCodeB(post)
+              }}<span>{{ addressData(post) }}</span>
             </p>
           </section>
         </section>
@@ -52,6 +58,8 @@
 </template>
 
 <script>
+import addressData from "@/mixins/addressData";
+
 export default {
   props: {
     postList: Array, // 投稿リスト
@@ -62,25 +70,8 @@ export default {
       return this.postList.length % 2 !== 0;
     },
   },
+  mixins: [addressData],
   methods: {
-    // 郵便番号
-    postalCodeData(post) {
-      return (
-        "〒" +
-        post.address?.["postalCode"].slice(0, 3) +
-        "-" +
-        post.address?.["postalCode"].slice(3)
-      );
-    },
-    // 住所のデータを連結して返す
-    addressData(post) {
-      return (
-        post.address.prefecture +
-        post.address.municipality +
-        post.address.townName +
-        post.address.buildingName
-      );
-    },
     moveToPostPage(id) {
       this.$router.push({ name: "postDetails", params: { postId: id } });
     },
@@ -104,7 +95,7 @@ export default {
 /* 投稿 */
 .section-post {
   width: 40%;
-  max-height: 250px;
+  max-height: 270px;
   margin-bottom: 30px;
   padding: 10px;
   overflow: hidden;
@@ -118,24 +109,17 @@ export default {
   cursor: pointer;
 }
 
-.section-post--exist:active {
-  animation: zoomIn 1s;
-}
-
-@keyframes zoomIn {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(0.9);
-  }
+.section-post--exist:hover {
+  filter: brightness(90%);
 }
 
 /* タイトル */
 .section-post__title {
   max-height: 30px;
   margin: 0;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 1.1em;
 }
 
@@ -143,35 +127,42 @@ export default {
 .section-post__author {
   max-height: 40px;
   display: flex;
+  white-space: nowrap;
   overflow: hidden;
   align-items: center;
   margin: 10px 0;
 }
 
 .item-icon {
-  width: 40px;
-  height: 40px;
-  margin-right: 15px;
+  width: 35px;
+  height: 35px;
+  margin-right: 10px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   object-fit: cover;
 }
 
 .section-post__sub-title {
-  display: flex;
-  flex-wrap: wrap;
   margin: 0;
+  overflow-wrap: break-word;
   color: rgb(78, 76, 76);
+  font-size: 0.9em;
+}
+
+.section-post__sub-title--nowrap {
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .block-property__title {
-  margin: 0;
+  margin: 10px 0 0;
   color: rgb(97, 97, 97);
+  letter-spacing: 1px;
 }
 
 /* 投稿がない場合 */
@@ -212,20 +203,14 @@ export default {
 }
 
 @media screen and (max-width: 1024px) {
-  .container-post-list__block-posts {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .section-post {
-    max-width: 500px;
-    width: 80%;
+    width: 40%;
   }
 }
 
 @media screen and (max-width: 599px) {
   .section-post {
-    width: 90%;
+    width: 85%;
   }
 }
 </style>
