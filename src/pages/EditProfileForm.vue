@@ -157,12 +157,12 @@ export default {
 }
 
 .form-edit-profile {
-  max-width: 650px;
-  width: 50%;
+  max-width: 430px;
+  width: 40%;
   margin: 0 auto;
-  border-radius: 2px;
   padding: 20px 0;
-  box-shadow: 0 5px 3px rgb(134, 134, 134);
+  border: 2px solid rgb(189, 187, 187);
+  border-radius: 10px;
   background: #fff;
   animation: slideUp 0.5s;
 }
@@ -193,14 +193,14 @@ export default {
 
 /* 入力部分 */
 .item-icon {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
 }
 
@@ -208,11 +208,12 @@ export default {
   width: 100%;
   margin: 10px 0;
   border: 0.5px solid rgb(172, 170, 170);
-  font-size: 1.1rem;
+  border-radius: 5px;
+  font-size: 1rem;
 }
 
 .container-form__input-username {
-  height: 40px;
+  height: 30px;
   padding: 0 10px;
 }
 
@@ -221,13 +222,12 @@ export default {
 }
 
 .container-form__btn-input {
-  height: 50px;
+  height: 35px;
   margin-top: 10px;
   border: 1px solid #fff;
   border-radius: 5px;
   background: rgb(15, 207, 25);
   color: #fff;
-  font-size: 1.2em;
 }
 
 .container-form__btn-input:hover {
@@ -251,11 +251,7 @@ export default {
 
 @media screen and (max-width: 1024px) {
   .form-edit-profile {
-    width: 70%;
-  }
-
-  .container-form {
-    width: 90%;
+    width: 60%;
   }
 }
 

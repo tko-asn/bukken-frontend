@@ -51,7 +51,7 @@
               >お気に入りに追加</a
             >
             <a
-              class="item-bottom__btn"
+              class="item-bottom__btn item-bottom__btn--active"
               href=""
               @click.prevent="deleteFavoritePost"
               v-show="isYourFavoritePost"
@@ -992,6 +992,8 @@ export default {
       // サイドバーからページをpostIdを切り替えたとき
       apiClient.get("/posts/post/" + val + "/").then(({ data }) => {
         this.post = data; // 対象の投稿データをセット
+        this.setEditCommentData(this.post.answers);
+        this.setEditAnswerData(this.post.answers);
       });
     },
   },
@@ -1051,10 +1053,9 @@ ul {
 .block-content {
   margin-bottom: 40px;
   padding: 10px 20px;
-  border-radius: 2px;
+  border: 2px solid rgb(189, 187, 187);
+  border-radius: 5px;
   background: white;
-  box-shadow: 0 3px 2px rgb(158, 156, 156), inset 1px 1px 5px rgb(224, 224, 224),
-    inset -1px -1px 5px rgb(224, 224, 224);
   overflow-wrap: break-word;
   animation: slideUp 0.5s;
 }
@@ -1092,6 +1093,7 @@ ul {
 }
 
 .block-content__input-text {
+  height: 150px;
   margin: 20px 0;
 }
 
@@ -1109,17 +1111,12 @@ ul {
 }
 
 /* 物件情報 */
-.item-property {
-  overflow: hidden;
-}
-
 .item-property__title {
   margin: 5px 0 0;
 }
 
 .item-property__text {
-  display: flex;
-  flex-wrap: wrap;
+  overflow-wrap: break-word;
   margin: 0;
 }
 
@@ -1164,21 +1161,25 @@ ul {
 .item-bottom__author {
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 5px 10px;
   background: rgba(165, 167, 165, 0.315);
   cursor: pointer;
 }
 
+.item-bottom__author:hover {
+  filter: brightness(80%);
+}
+
 /* アイコン */
 .block-icon {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   background: silver;
 }
 
 .block-icon__img {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   object-fit: cover;
 }
 
@@ -1186,8 +1187,10 @@ ul {
 .item-bottom__username {
   min-width: 80px;
   max-width: 100px;
-  margin-left: 10px;
+  margin: 0 0 0 5px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   color: rgb(97, 94, 94);
   font-size: 0.9em;
 }
@@ -1388,6 +1391,12 @@ ul {
 }
 
 .block-comment__author {
+  display: inline-block;
+  vertical-align: top;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 1.2em;
   color: black;
   text-decoration: underline;

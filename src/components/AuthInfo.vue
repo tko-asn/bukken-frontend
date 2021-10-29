@@ -101,16 +101,17 @@ export default {
   height: 30px;
   margin-left: 20px;
   border: 1px solid silver;
+  border-radius: 4px;
 }
 
 /* 保存ボタン */
 .container-auth-info__btn {
   margin-top: 20px;
   padding: 5px 10px;
-  border-color: #fff;
+  border: none;
+  border-radius: 3px;
   background: green;
   color: white;
-  font-size: 1.2em;
   cursor: pointer;
 }
 

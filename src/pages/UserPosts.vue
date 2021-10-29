@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- タイトル -->
-    <h1 class="container__title">
+    <h2 class="container__title">
       <router-link
         class="container__link-username"
         :to="{ name: 'userView', params: { id: userId } }"
@@ -9,7 +9,7 @@
         {{ userData.username }}
       </router-link>
       の投稿
-    </h1>
+    </h2>
     <!-- 投稿フィルター -->
     <PostFilter :myId="userId" />
 
@@ -112,6 +112,7 @@ export default {
 .container__title {
   margin-bottom: 0;
   padding-left: 10px;
+  font-size: 1.7em;
 }
 
 /* ユーザー名のリンク */
@@ -123,7 +124,6 @@ export default {
 .container__text-no-posts {
   text-align: center;
   color: gray;
-  font-size: 1.2em;
 }
 
 .fade-enter,

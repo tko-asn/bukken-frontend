@@ -53,13 +53,13 @@
         <!-- コンテンツ -->
         <section
           class="container__section"
-          v-show="!showSideMenu || width >= 1025"
+          v-show="!showSideMenu || width >= 600"
         >
           <h2 class="container__title">
             <a
               href=""
               class="container__btn-menu"
-              v-if="width < 1025"
+              v-if="width < 600"
               @click.prevent="showSideMenu = !showSideMenu"
             >
               <fa-icon class="container__icon-menu" icon="bars" />
@@ -81,7 +81,7 @@
 
         <!-- メニュー -->
         <transition name="slideLeft">
-          <aside class="side-menu" v-show="showSideMenu || width >= 1025">
+          <aside class="side-menu" v-show="showSideMenu || width >= 600">
             <ul class="list">
               <li
                 :class="{ list__item: true, 'list__link--active': item.open }"
@@ -457,6 +457,8 @@ a {
 .container {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   width: 70%;
   margin: 0 auto;
 }
@@ -469,8 +471,8 @@ a {
 
 /* プロフィールの左部分 */
 .container__block-left {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
 }
 
 /* アイコン画像 */
@@ -493,9 +495,8 @@ a {
 
 /* ユーザー名 */
 .container__username {
-  width: 100%;
   overflow: hidden;
-  font-size: 1.7em;
+  font-size: 1.3em;
   letter-spacing: 2px;
 }
 
@@ -505,7 +506,6 @@ a {
   margin-top: 20px;
   border-radius: 3px;
   background: rgb(42, 85, 226);
-  font-size: 1.08em;
   text-align: center;
 }
 
@@ -521,7 +521,7 @@ a {
 
 /* コンテンツのリスト */
 .container__section {
-  width: 60%;
+  width: 50%;
   min-height: 90px;
   overflow: hidden;
   border: 3px solid gray;
@@ -531,7 +531,7 @@ a {
 
 .container__title {
   position: relative;
-  font-size: 1.3em;
+  font-size: 1em;
   text-align: center;
 }
 
@@ -565,10 +565,9 @@ a {
 
 /* サイドメニュー */
 .side-menu {
-  position: sticky;
   width: 30%;
-  border: 3px solid rgb(185, 181, 181);
-  border-radius: 5px;
+  border: 1px solid gray;
+  border-radius: 2px;
   background: rgb(156, 154, 154);
 }
 
@@ -583,7 +582,7 @@ a {
 .list__link {
   display: flex;
   align-items: center;
-  height: 70px;
+  height: 50px;
   padding-left: 20px;
 }
 
@@ -598,8 +597,9 @@ a {
 
 /* ネストされたリスト */
 .list__link--small {
-  height: 50px;
+  height: 35px;
   background: rgb(134, 131, 131);
+  font-size: 0.8em;
 }
 
 /* アニメーション */
@@ -679,10 +679,6 @@ a {
     width: 70%;
   }
 
-  .container__section {
-    width: 90%;
-  }
-
   .container__btn {
     padding: 5px 10px;
     font-size: 0.9em;
@@ -693,13 +689,21 @@ a {
   }
 
   .side-menu {
-    width: 80%;
+    width: 40%;
+  }
+
+  .list__link--small {
+    padding-left: 10px;
   }
 }
 
 @media screen and (max-width: 599px) {
   .container {
     width: 95%;
+  }
+
+  .container__section {
+    width: 80%;
   }
 
   .container__block-left {
@@ -709,6 +713,10 @@ a {
 
   .list__link {
     height: 50px;
+  }
+
+  .side-menu {
+    width: 70%;
   }
 }
 </style>
