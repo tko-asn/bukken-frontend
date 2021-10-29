@@ -994,6 +994,17 @@ export default {
         this.post = data; // 対象の投稿データをセット
         this.setEditCommentData(this.post.answers);
         this.setEditAnswerData(this.post.answers);
+
+        // 編集用データ
+        this.editPostData.title = data.title;
+        this.editPostData.text = data.text;
+        this.editPostData.property = data.property;
+        this.editAddressData = { ...data.address };
+        this.editCategoryData = [...data.categories];
+        this.editAddressData.postalCodeA = this.postalCodeA(this.post);
+        this.editAddressData.postalCodeB = this.postalCodeB(this.post);
+
+        this.isEditingPost = false;
       });
     },
   },
