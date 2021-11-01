@@ -32,6 +32,8 @@ export default {
       "resetFilterType",
     ]),
     async search() {
+      this.$store.commit("posts/setIsLoading", true);
+
       // watchでfilterTypeの変更を感知できるように検索データを初期化
       this.resetFilterType();
 
@@ -40,6 +42,8 @@ export default {
 
       const params = { page: 1, userId: this.userId };
       await this.registerSearchedPosts(params);
+
+      this.$store.commit("posts/setIsLoading", false);
     },
   },
   watch: {

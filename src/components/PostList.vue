@@ -3,10 +3,13 @@
   <div class="container-post-list">
     <!-- 投稿がある場合 -->
     <transition name="fade" mode="out-in" appear>
+      <div class="container-post-list__loader" v-if="isLoading">
+        <vue-loaders name="ball-spin-fade-loader" color="black" scale="1" />
+      </div>
       <transition-group
-        name="fade"
+        name="fadeGroup"
         class="container-post-list__block-posts"
-        v-if="postList.length"
+        v-else-if="postList.length"
         key="showPosts"
       >
         <!-- 投稿 -->
@@ -59,12 +62,14 @@
 
 <script>
 import addressData from "@/mixins/addressData";
+import { mapGetters } from "vuex";
 
 export default {
   props: {
     postList: Array, // 投稿リスト
   },
   computed: {
+    ...mapGetters("posts", ["isLoading"]),
     // 投稿リストの要素数が奇数か判定
     isOdd() {
       return this.postList.length % 2 !== 0;
@@ -82,6 +87,7 @@ export default {
 <style scoped>
 /* 投稿リスト */
 .container-post-list {
+  min-height: 270px;
   padding: 20px 0;
 }
 
@@ -90,6 +96,11 @@ export default {
   display: flex;
   justify-content: space-evenly;
   flex-wrap: wrap;
+}
+
+/* ロード中 */
+.container-post-list__loader {
+  text-align: center;
 }
 
 /* 投稿 */
@@ -175,21 +186,28 @@ export default {
 
 /* アニメーション */
 .fade-enter,
-.fade-leave-to {
+.fade-leave-to,
+.fadeGroup-enter,
+.fadeGroup-leave-to {
   opacity: 0;
 }
 
-.fade-enter-active {
+.fade-enter-active,
+.fadeGroup-enter-active {
   transition: opacity 0.5s;
   animation: slideUp 0.5s;
 }
 
-.fade-leave-active {
+.fade-leave-active,
+.fadeGroup-leave-active {
   transition: opacity 0.2s;
+}
+
+.fadeGroup-leave-active {
   position: absolute;
 }
 
-.fade-move {
+.fadeGroup-move {
   transition: transform 0.8s;
 }
 

@@ -242,6 +242,8 @@ export default {
       this.resetActiveMenu("home");
       this.total = this.pageTotal["home"]; // 最新の投稿の総ページ数
       this.displayedPosts = this.latestPosts; // 最新の投稿を表示
+
+      this.$store.commit("posts/setIsLoading", false);
     });
   },
   mounted() {
@@ -376,6 +378,8 @@ export default {
     }
     // 投稿を初期化
     Promise.all(params).then(() => {
+      // isLoadingを初期化
+      this.$store.commit("posts/setIsLoading", true);
       next();
     });
   },

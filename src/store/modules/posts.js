@@ -24,6 +24,7 @@ const state = {
   postalCode: "", // 指定中の郵便番号
   keyword: "", // 検索用キーワード
   showSideMenu: false, // SP・タブレット状態でのメニューの表示切り替え
+  isLoading: true,
 };
 
 const getters = {
@@ -37,6 +38,7 @@ const getters = {
   activeMenu: (state) => state.activeMenu,
   filterType: (state) => state.filterType,
   showSideMenu: (state) => state.showSideMenu,
+  isLoading: (state) => state.isLoading,
 };
 
 const mutations = {
@@ -98,6 +100,9 @@ const mutations = {
   // SP・タブレット状態のでのサイドメニューの非表示
   hideSideMenu() {
     state.showSideMenu = false;
+  },
+  setIsLoading(state, boolean) {
+    state.isLoading = boolean;
   },
 };
 
