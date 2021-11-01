@@ -172,6 +172,8 @@ export default {
     },
     // ページ移動
     async movePage(page) {
+      this.$store.commit("posts/setIsLoading", true);
+
       // フィルタリング条件指定時
       if (this.filterType === "filter") {
         // watchでfilterTypeの変更を感知できるように検索データを初期化
@@ -211,6 +213,8 @@ export default {
         this.$emit("movePage");
         this.currentPageList[this.activeMenu] = page;
       }
+
+      this.$store.commit("posts/setIsLoading", false);
     },
   },
   watch: {

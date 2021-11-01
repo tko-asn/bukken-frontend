@@ -13,15 +13,7 @@
     <!-- 投稿フィルター -->
     <PostFilter :myId="userId" />
 
-    <!-- 投稿が存在する場合 -->
-    <transition name="fade" mode="out-in">
-      <template v-if="postList.length">
-        <PostList :postList="postList" />
-      </template>
-
-      <!-- 投稿が存在しない場合 -->
-      <p class="container__text-no-posts" v-else>投稿はありません</p>
-    </transition>
+    <PostList :postList="postList" />
     <transition name="fadePagination">
       <Pagination
         :total="total"
@@ -74,6 +66,8 @@ export default {
       this.postList = values[0].data.posts; // ユーザーの投稿はdataに保存
       this.total = values[0].data.total;
       this.userData = values[1].data;
+
+      this.$store.commit("posts/setIsLoading", false);
     });
   },
   methods: {
@@ -96,6 +90,11 @@ export default {
         this.total = this.pageTotal.search;
       }
     },
+  },
+  beforeRouteLeave(to, from, next) {
+    // isLoadingを初期化
+    this.$store.commit("posts/setIsLoading", true);
+    next();
   },
 };
 </script>

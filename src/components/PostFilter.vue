@@ -147,6 +147,8 @@ export default {
     },
     // 絞り込み
     async filter() {
+      this.$store.commit("posts/setIsLoading", true);
+
       // filterの現在のページ数の初期化のため
       this.resetFilterType();
 
@@ -161,6 +163,8 @@ export default {
         userId: this.myId,
       };
       await this.registerFilteredPosts(params);
+
+      this.$store.commit("posts/setIsLoading", false);
     },
     // フィルターの開閉
     toggleFilter() {
@@ -214,7 +218,6 @@ a {
 .list--active {
   background: rgb(191, 194, 194);
   color: rgb(99, 99, 99);
-  font-size: 0.8em;
 }
 
 .list__item {
