@@ -64,7 +64,12 @@
             >
               <fa-icon class="container__icon-menu" icon="bars" />
             </a>
-            {{ contentListTitle[$route.name] }}
+            <span v-show="$route.name !== 'answerList'">
+              {{ contentListTitle[$route.name] }}
+            </span>
+            <span v-show="$route.name === 'answerList'">
+              {{ answerListTitle[$route.params.answerType] }}
+            </span>
           </h2>
           <div :class="{ 'item-content': true, container__scroll: isScroll }">
             <transition name="fade" mode="out-in" appear>
@@ -76,30 +81,6 @@
                 :selfIntroduction="displayedSelfIntroduction"
               />
             </transition>
-            <div class="item-content__bottom">
-              <router-link 
-                class="item-content__link"
-                :to="{ 
-                  name: 'userAnswer', 
-                  params: { userId: id, answerType: 'answer' } 
-                }" 
-                v-show="
-                  $route.name === 'answerList' && 
-                  $route.params.answerType === 'answer'
-                "
-              >ユーザーの回答一覧へ</router-link>
-              <router-link 
-                class="item-content__link"
-                :to="{ 
-                  name: 'userAnswer', 
-                  params: { userId: id, answerType: 'like' } 
-                }" 
-                v-show="
-                  $route.name === 'answerList' && 
-                  $route.params.answerType === 'like'
-                "
-              >いいねした回答一覧へ</router-link>
-            </div>
           </div>
         </section>
 
@@ -207,7 +188,10 @@ export default {
         changePassword: "パスワードの変更",
         followList: "フォロー",
         followerList: "フォロワー",
-        answerList: "いいねした回答",
+      },
+      answerListTitle: {
+        answer: "ユーザーの回答",
+        like: "いいねした回答",
       },
       width: window.innerWidth,
       showSideMenu: false,
