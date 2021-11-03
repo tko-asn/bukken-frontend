@@ -14,14 +14,22 @@
 
 <script>
 import { mapActions } from "vuex";
+import qs from "qs";
 
 export default {
   props: {
     userId: String,
+    searchPosts: {
+      type: Function,
+      default: () => {},
+    },
+    switchType: {
+      type: Function,
+      default: () => {},
+    },
   },
   data() {
     return {
-      routeList: [],
       keyword: "",
     };
   },
@@ -32,6 +40,20 @@ export default {
       "resetFilterType",
     ]),
     async search() {
+      if (this.$route.name === "userPosts") {
+        this.switchType("search");
+        const params = { 
+          keyword: this.keyword,
+          authorId: this.userId,
+        };
+        const search = {
+          params, 
+          paramsSerializer: (params) => qs.stringify(params),
+        };
+        this.searchPosts(1, search);
+        return;
+      }
+
       this.$store.commit("posts/setIsLoading", true);
 
       // watchでfilterTypeの変更を感知できるように検索データを初期化
