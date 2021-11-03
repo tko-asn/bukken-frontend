@@ -98,7 +98,6 @@
 </template>
 
 <script>
-import apiClient from "@/axios";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -114,14 +113,9 @@ export default {
       type: Function,
       default: () => {},
     },
-    // ユーザーの回答画面での回答の種類
-    answerType: {
-      type: String,
-      default: "",
-    },
     pageNumber: {
       type: Number,
-      default: 1,
+      default: 0,
     },
   },
   computed: {
@@ -129,7 +123,7 @@ export default {
     currentPage() {
       if (this.filterType === "filter" || this.filterType === "search") {
         return this.currentPageList[this.filterType];
-      } else if (this.answerType) {
+      } else if (this.pageNumber) {
         return this.pageNumber;
       }
       return this.currentPageList[this.activeMenu];
@@ -190,7 +184,11 @@ export default {
       this.$store.commit("posts/setIsLoading", true);
 
       // 回答一覧ページ
-      if (this.$route.name === "userAnswer") {
+      // ユーザーの投稿一覧ページ
+      if (
+        this.$route.name === "userAnswer" ||
+        this.$route.name === "userPosts"
+      ) {
         this.paginationFunc(page);
       }
 
@@ -215,14 +213,6 @@ export default {
           userId: this.userId,
         });
         this.currentPageList.search = page;
-
-        // UserPosts.vue
-      } else if (this.$route.name === "userPosts") {
-        const { data } = await apiClient.get(
-          "/posts/" + this.userId + "/page/" + page + "/"
-        );
-        this.$emit("movePage", data.posts);
-        this.currentPageList[this.activeMenu] = page;
 
         // Home.vue
       } else {
