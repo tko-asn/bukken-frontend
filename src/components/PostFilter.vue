@@ -74,6 +74,7 @@
 <script>
 import AddressForm from "@/components/AddressForm";
 import { mapGetters, mapActions } from "vuex";
+import qs from "qs";
 
 export default {
   components: {
@@ -81,6 +82,14 @@ export default {
   },
   props: {
     myId: String,
+    filterPosts: {
+      type: Function,
+      default: () => {},
+    },
+    switchType: {
+      type: Function, 
+      default: () => {},
+    },
   },
   computed: {
     ...mapGetters("posts", ["activeMenu"]),
@@ -147,6 +156,21 @@ export default {
     },
     // 絞り込み
     async filter() {
+      if (this.$route.name === "userPosts") {
+        this.switchType("filter");
+        const params = {
+          categories: this.selectedCategories,
+          address: this.postalCode,
+          authorId: this.myId,
+        };
+        const filter = {
+          params,
+          paramsSerializer: (params) => qs.stringify(params),
+        };
+        this.filterPosts(1, filter);
+        return;
+      }
+
       this.$store.commit("posts/setIsLoading", true);
 
       // filterの現在のページ数の初期化のため
