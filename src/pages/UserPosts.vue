@@ -1,5 +1,12 @@
 <template>
   <div class="container">
+    <Header>
+      <Search
+        :userId="userId"
+        :searchPosts="getPosts"
+        :switchType="switchPostType"
+      />
+    </Header>
     <!-- タイトル -->
     <h2 class="container__title">
       <router-link
@@ -11,14 +18,19 @@
       の投稿
     </h2>
     <!-- 投稿フィルター -->
-    <PostFilter :myId="userId" />
+    <PostFilter
+      :myId="userId"
+      :filterPosts="getPosts"
+      :switchType="switchPostType"
+    />
 
     <PostList :postList="postList" />
     <transition name="fadePagination">
       <Pagination
         :total="total"
         :userId="userId"
-        @movePage="pagination"
+        :paginationFunc="getPosts"
+        :pageNumber="page"
         v-show="postList.length"
       />
     </transition>
@@ -30,13 +42,16 @@ import apiClient from "@/axios";
 import PostList from "@/components/PostList";
 import PostFilter from "@/components/PostFilter";
 import Pagination from "@/components/Pagination";
-import { mapGetters, mapActions } from "vuex";
+import Header from "@/components/Header";
+import Search from "@/components/Search";
 
 export default {
   components: {
     PostList,
     PostFilter,
     Pagination,
+    Header,
+    Search,
   },
   props: {
     userId: String, // ユーザーのID
@@ -46,49 +61,40 @@ export default {
       postList: [], // 表示する投稿
       userData: {}, // ユーザーのデータ
       total: 0,
+      page: 0,
+      postType: "",
+      conditions: {},
     };
-  },
-  computed: {
-    ...mapGetters("posts", [
-      "filteredPosts",
-      "searchedPosts",
-      "pageTotal",
-      "filterType",
-    ]),
   },
   created() {
     Promise.all([
-      apiClient.get("/posts/" + this.userId + "/page/" + 1 + "/"), // ユーザーの投稿のリストを取得
+      this.getPosts(1), // ユーザーの投稿のリストを取得
       apiClient.get("/users/" + this.userId + "/"), // ユーザーデータを取得
     ]).then((values) => {
-      this.resetFilterType(); // filterTypeの初期化
-      this.resetActiveMenu("myPosts"); // フィルタリング時に使用
-      this.postList = values[0].data.posts; // ユーザーの投稿はdataに保存
-      this.total = values[0].data.total;
       this.userData = values[1].data;
-
       this.$store.commit("posts/setIsLoading", false);
     });
   },
   methods: {
-    ...mapActions("posts", ["resetFilterType", "resetActiveMenu"]),
-    // ページネーション
-    pagination(posts) {
-      this.postList = posts;
-    },
-  },
-  watch: {
-    filterType(val) {
-      // 投稿がフィルタリングした場合
-      if (val === "filter") {
-        this.postList = this.filteredPosts;
-        this.total = this.pageTotal.filter;
-
-        // 投稿が検索された場合
-      } else if (val === "search") {
-        this.postList = this.searchedPosts;
-        this.total = this.pageTotal.search;
+    async getPosts(page, payload = {}) {
+      let route = "/posts/" + this.userId + "/page/" + page + "/";
+      if (this.postType === "filter") {
+        route = "/posts/filter/query/page/" + page + "/";
+      } else if (this.postType === "search") {
+        route = "/posts/search/query/page/" + page + "/";
       }
+      // フィルタリング・検索条件に変更があった場合
+      if ("params" in payload) {
+        this.conditions = payload;
+      }
+      // ページ切り替え時も条件を引き継ぐ
+      const { data } = await apiClient.get(route, this.conditions);
+      this.postList = data.posts;
+      this.total = data.total;
+      this.page = page;
+    },
+    switchPostType(type) {
+      this.postType = type;
     },
   },
   beforeRouteLeave(to, from, next) {

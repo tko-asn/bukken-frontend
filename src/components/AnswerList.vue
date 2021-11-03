@@ -29,7 +29,6 @@
     <Pagination
       :total="total"
       :paginationFunc="getAnswers"
-      :answerType="answerType"
       :pageNumber="page[answerType]"
       v-if="pagination && answers.length"
     />
