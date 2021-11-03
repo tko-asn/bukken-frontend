@@ -76,6 +76,30 @@
                 :selfIntroduction="displayedSelfIntroduction"
               />
             </transition>
+            <div class="item-content__bottom">
+              <router-link 
+                class="item-content__link"
+                :to="{ 
+                  name: 'userAnswer', 
+                  params: { userId: id, answerType: 'answer' } 
+                }" 
+                v-show="
+                  $route.name === 'answerList' && 
+                  $route.params.answerType === 'answer'
+                "
+              >ユーザーの回答一覧へ</router-link>
+              <router-link 
+                class="item-content__link"
+                :to="{ 
+                  name: 'userAnswer', 
+                  params: { userId: id, answerType: 'like' } 
+                }" 
+                v-show="
+                  $route.name === 'answerList' && 
+                  $route.params.answerType === 'like'
+                "
+              >いいねした回答一覧へ</router-link>
+            </div>
           </div>
         </section>
 
@@ -116,7 +140,7 @@
                     >
                       <router-link
                         class="list__link list__link--small"
-                        :to="{ name: child.link.name }"
+                        :to="child.link"
                         v-if="child.link"
                       >
                         {{ child.name }}
@@ -183,6 +207,7 @@ export default {
         changePassword: "パスワードの変更",
         followList: "フォロー",
         followerList: "フォロワー",
+        answerList: "いいねした回答",
       },
       width: window.innerWidth,
       showSideMenu: false,
@@ -199,8 +224,30 @@ export default {
           },
         },
         {
+          name: "回答",
+          open: false,
+          myPageItem: "both",
+          children: [
+            {
+              name: "ユーザーの回答",
+              link: {
+                name: "answerList",
+                params: { answerType: "answer" },
+              },
+            },
+            {
+              name: "いいねした回答",
+              link: {
+                name: "answerList",
+                params: { answerType: "like" },
+              },
+            },
+          ],
+        },
+        {
           name: "フォロー",
           open: false, // 展開するメニューにのみ指定
+          myPageItem: "both",
           children: [
             {
               name: "フォローしているユーザー",
@@ -331,8 +378,8 @@ export default {
     ...mapActions("follows", ["followUser", "unfollowUser"]),
     // サイドメニューの表示・非表示
     showMenuItem(item) {
-      // フォローはマイページでもユーザーページでも表示
-      if (item.name === "フォロー") {
+      // マイページでもユーザーページでも表示
+      if (item.myPageItem === "both") {
         return true;
       }
 
