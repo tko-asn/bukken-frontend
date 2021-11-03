@@ -110,12 +110,27 @@ export default {
       required: false,
       default: "",
     },
+    paginationFunc: {
+      type: Function,
+      default: () => {},
+    },
+    // ユーザーの回答画面での回答の種類
+    answerType: {
+      type: String,
+      default: "",
+    },
+    pageNumber: {
+      type: Number,
+      default: 1,
+    },
   },
   computed: {
     ...mapGetters("posts", ["activeMenu", "filterType"]),
     currentPage() {
       if (this.filterType === "filter" || this.filterType === "search") {
         return this.currentPageList[this.filterType];
+      } else if (this.answerType) {
+        return this.pageNumber;
       }
       return this.currentPageList[this.activeMenu];
     },
@@ -173,6 +188,11 @@ export default {
     // ページ移動
     async movePage(page) {
       this.$store.commit("posts/setIsLoading", true);
+
+      // 回答一覧ページ
+      if (this.$route.name === "userAnswer") {
+        this.paginationFunc(page);
+      }
 
       // フィルタリング条件指定時
       if (this.filterType === "filter") {

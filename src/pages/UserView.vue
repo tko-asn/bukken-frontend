@@ -64,7 +64,12 @@
             >
               <fa-icon class="container__icon-menu" icon="bars" />
             </a>
-            {{ contentListTitle[$route.name] }}
+            <span v-show="$route.name !== 'answerList'">
+              {{ contentListTitle[$route.name] }}
+            </span>
+            <span v-show="$route.name === 'answerList'">
+              {{ answerListTitle[$route.params.answerType] }}
+            </span>
           </h2>
           <div :class="{ 'item-content': true, container__scroll: isScroll }">
             <transition name="fade" mode="out-in" appear>
@@ -116,7 +121,7 @@
                     >
                       <router-link
                         class="list__link list__link--small"
-                        :to="{ name: child.link.name }"
+                        :to="child.link"
                         v-if="child.link"
                       >
                         {{ child.name }}
@@ -184,6 +189,10 @@ export default {
         followList: "フォロー",
         followerList: "フォロワー",
       },
+      answerListTitle: {
+        answer: "ユーザーの回答",
+        like: "いいねした回答",
+      },
       width: window.innerWidth,
       showSideMenu: false,
       // サイドメニュー一覧
@@ -199,8 +208,30 @@ export default {
           },
         },
         {
+          name: "回答",
+          open: false,
+          myPageItem: "both",
+          children: [
+            {
+              name: "ユーザーの回答",
+              link: {
+                name: "answerList",
+                params: { answerType: "answer" },
+              },
+            },
+            {
+              name: "いいねした回答",
+              link: {
+                name: "answerList",
+                params: { answerType: "like" },
+              },
+            },
+          ],
+        },
+        {
           name: "フォロー",
           open: false, // 展開するメニューにのみ指定
+          myPageItem: "both",
           children: [
             {
               name: "フォローしているユーザー",
@@ -331,8 +362,8 @@ export default {
     ...mapActions("follows", ["followUser", "unfollowUser"]),
     // サイドメニューの表示・非表示
     showMenuItem(item) {
-      // フォローはマイページでもユーザーページでも表示
-      if (item.name === "フォロー") {
+      // マイページでもユーザーページでも表示
+      if (item.myPageItem === "both") {
         return true;
       }
 
