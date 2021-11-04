@@ -235,11 +235,6 @@ export default {
 }
 
 @media screen and (max-width: 1024px) {
-  .block-answer-list__list-answer {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .item-answer {
     width: 80%;
   }
