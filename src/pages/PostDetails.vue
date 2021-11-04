@@ -505,7 +505,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters } from "vuex";
 import apiClient from "@/axios";
 import ValidationMessage from "@/components/ValidationMessage";
 import SidePostList from "@/components/SidePostList";
@@ -576,9 +576,14 @@ export default {
       editCategory: false, // カテゴリーを編集したかどうか
       isFullDisplay: false, // コメントを全表示するかどうか
       deletePostText: "", // 投稿削除文
+      favoritePostList: [],
     };
   },
   created() {
+    // ユーザーのお気に入りの投稿のidリスト取得
+    if (this.isLoggedIn) {
+      this.getFavoritePostList();
+    }
     apiClient.get("/posts/post/" + this.postId + "/").then(({ data }) => {
       this.post = data; // 対象の投稿データをセット
 
@@ -604,10 +609,9 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["isLoggedIn", "userId"]),
-    ...mapGetters("posts", ["myFavoritePosts"]),
     // ユーザーのお気に入りの投稿かどうか
     isYourFavoritePost() {
-      return this.myFavoritePosts.some((el) => el.id === this.postId);
+      return this.favoritePostList.some((el) => el.id === this.postId);
     },
     // 質問に回答済みかどうか
     haveYouAnswered() {
@@ -681,7 +685,6 @@ export default {
       this.editAnswerData[answerId].validations = [];
       this.editAnswerData = { ...this.editAnswerData };
     },
-    ...mapActions("posts", ["addFavoritePost", "removeFavoritePost"]),
     // 時間フォーマッター
     datetime(date) {
       return moment(date).format("YYYY年MM月D日 HH時mm分");
@@ -704,23 +707,26 @@ export default {
       });
     },
     // お気に入りの投稿を追加
-    createFavoritePost() {
+    async createFavoritePost() {
       // ログインしていない場合はログインページへ
       if (!this.isLoggedIn) {
         this.$router.push("/login");
         return;
       }
-      this.addFavoritePost({
+      const params = {
         userId: this.userId,
         postId: this.postId,
-      });
+      };
+      // お気に入りの投稿を追加
+      await apiClient.post("/posts/create/favorite/", params);
+      await this.getFavoritePostList();
     },
     // お気に入りの投稿を削除
-    deleteFavoritePost() {
-      this.removeFavoritePost({
-        userId: this.userId,
-        postId: this.postId,
-      });
+    async deleteFavoritePost() {
+      // お気に入りの投稿を削除
+      await apiClient
+        .delete("/posts/" + this.postId + "/remove/favorite/" + this.userId + "/");
+      await this.getFavoritePostList();
     },
     // 投稿者のページへ移動
     moveToUserPage(id) {
@@ -728,6 +734,12 @@ export default {
         name: "userView",
         params: { id },
       });
+    },
+    async getFavoritePostList() {
+      const { data } = await apiClient.get(
+        "/posts/favorite/user/" + this.userId + "/id/list/"
+      );
+      this.favoritePostList = data;
     },
     // 選択中のカテゴリを削除
     removeCategory(id) {
