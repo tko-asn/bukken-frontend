@@ -1,15 +1,15 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import auth from './modules/auth';
-import posts from './modules/posts';
-import follows from './modules/follows';
+import Vue from "vue";
+import Vuex from "vuex";
+import auth from "./modules/auth";
+import follows from "./modules/follows";
+import home from "./modules/home";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
     auth,
-    posts,
-    follows
+    follows,
+    home,
   },
 });

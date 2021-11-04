@@ -5,13 +5,15 @@
         <li class="item">
           <h3 class="item__title">最新の質問</h3>
         </li>
-        <li v-for="post in latestPosts" :key="post.id" class="item">
+        <li v-for="post in posts" :key="post.id" class="item">
           <a
             href=""
             class="item__link"
             @click.prevent="moveToPostPage(post.id)"
           >
-            {{ post.property }}
+            <p class="item__text">
+              {{ post.property }}
+            </p>
           </a>
         </li>
       </ul>
@@ -20,14 +22,17 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import apiClient from "@/axios";
 
 export default {
-  computed: {
-    ...mapGetters("posts", ["latestPosts"]),
+  data() {
+    return {
+      posts: [],
+    };
   },
-  created() {
-    this.$store.dispatch("posts/getLatestPosts");
+  async created() {
+    const { data } = await apiClient.get("/posts/page/1/");
+    this.posts = data.posts;
   },
   methods: {
     // 投稿のページへ移動
@@ -72,10 +77,14 @@ export default {
   display: flex;
   align-items: center;
   height: 40px;
-  white-space: nowrap;
-  overflow: hidden;
   border-bottom: 2px solid rgb(194, 193, 193);
   color: rgb(105, 104, 104);
   text-decoration: none;
+}
+
+.item__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

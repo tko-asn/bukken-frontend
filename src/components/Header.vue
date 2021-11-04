@@ -112,11 +112,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("posts", ["showSideMenu"]),
+    ...mapGetters("home", ["showSideMenu"]),
   },
   mixins: [authInfoMixin],
   methods: {
-    ...mapMutations("posts", ["toggleSideMenu", "hideSideMenu"]),
+    ...mapMutations("home", ["toggleSideMenu", "hideSideMenu"]),
     // プルダウンメニュー展開
     pullDown() {
       this.$refs.pull_down_block.style.display = "block";
