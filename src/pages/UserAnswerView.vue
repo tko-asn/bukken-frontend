@@ -1,35 +1,37 @@
 <template>
   <div class="container">
     <!-- メニュー -->
-    <aside class="side-menu">
-      <nav class="side-menu__nav">
-        <ul class="list">
-          <li class="list__item">
-            <router-link
-              class="list__link"
-              :to="{ name: 'userView', params: { id: userId } }"
-            >
-              <div class="item-icon">
-                <img class="item-icon__img" :src="userData.icon_url" />
-              </div>
-              <p class="list__username">{{ userData.username }}</p>
-            </router-link>
-          </li>
-          <li class="list__item" v-for="menu in sideMenu" :key="menu.name">
-            <a
-              href=""
-              :class="{
-                list__link: true,
-                'list__link--active': menu.type === type,
-              }"
-              @click.prevent="switchAnswerType(menu.type)"
-              >{{ menu.name }}</a
-            >
-          </li>
-        </ul>
-      </nav>
-      <div class="side-menu__footer"></div>
-    </aside>
+    <transition name="slide">
+      <aside class="side-menu" v-show="showSideMenu || width >= 600">
+        <nav class="side-menu__nav">
+          <ul class="list">
+            <li class="list__item">
+              <router-link
+                class="list__link"
+                :to="{ name: 'userView', params: { id: userId } }"
+              >
+                <div class="item-icon">
+                  <img class="item-icon__img" :src="userData.icon_url" />
+                </div>
+                <p class="list__username">{{ userData.username }}</p>
+              </router-link>
+            </li>
+            <li class="list__item" v-for="menu in sideMenu" :key="menu.name">
+              <a
+                href=""
+                :class="{
+                  list__link: true,
+                  'list__link--active': menu.type === type,
+                }"
+                @click.prevent="switchAnswerType(menu.type)"
+                >{{ menu.name }}</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="side-menu__footer"></div>
+      </aside>
+    </transition>
     <!-- 回答一覧 -->
     <AnswerList
       class="container__answer-list"
@@ -43,6 +45,7 @@
 <script>
 import AnswerList from "@/components/AnswerList";
 import apiClient from "@/axios";
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -58,16 +61,31 @@ export default {
       ],
       type: this.answerType,
       userData: {},
+      width: window.innerWidth,
     };
   },
   async created() {
     const { data } = await apiClient.get("/users/" + this.userId + "/");
     this.userData = data;
+    this.$store.commit("home/setIsLoading", false);
+  },
+  mounted() {
+    // 画面幅の変更を感知
+    window.addEventListener("resize", () => {
+      this.width = window.innerWidth;
+    });
+  },
+  computed: {
+    ...mapGetters("home", ["showSideMenu"]),
   },
   methods: {
     switchAnswerType(type) {
       this.type = type;
     },
+  },
+  beforeRouteLeave(to, from, next) {
+    this.$store.commit("home/setIsLoading", true);
+    next();
   },
 };
 </script>
@@ -82,7 +100,7 @@ export default {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  min-width: 230px;
+  min-width: 210px;
   width: 20%;
   margin-top: 50px;
   overflow-y: scroll;
@@ -142,7 +160,7 @@ export default {
 
 .container__answer-list {
   margin: 50px auto 0;
-  padding: 0 30px;
+  padding: 0 50px;
   overflow-y: scroll;
 }
 
@@ -154,5 +172,36 @@ export default {
 ::-webkit-scrollbar-thumb {
   border-radius: 5px;
   background: rgba(146, 145, 146, 0.795);
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(-300px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.slide-enter-active {
+  animation: slide 0.3s ease-in;
+}
+
+.slide-leave-active {
+  animation: slide 0.3s ease-in reverse;
+}
+
+@media screen and (max-width: 599px) {
+  .side-menu {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+  }
+
+  .container__answer-list {
+    padding: 0 10px;
+  }
 }
 </style>

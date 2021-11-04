@@ -1,7 +1,15 @@
 <template>
   <div class="block-answer-list">
-    <ul class="block-answer-list__list-answer">
-      <template v-if="answers.length">
+    <transition name="fade" mode="out-in" appear>
+      <div class="block-answer-list__spin" v-if="isLoading">
+        <vue-loaders name="ball-spin-fade-loader" color="black" scale="1" />
+      </div>
+      <transition-group
+        name="fadeGroup"
+        class="block-answer-list__list-answer"
+        v-else-if="answers.length"
+        key="showAnswers"
+      >
         <li
           class="item-answer"
           v-for="answer in answers"
@@ -22,16 +30,19 @@
         <li
           class="block-answer-list__no-answer"
           v-show="answers.length % 2"
+          key="emptyAnswer"
         ></li>
-      </template>
-      <li class="item-no-answer__text" v-else>回答がありません</li>
-    </ul>
-    <Pagination
-      :total="total"
-      :paginationFunc="getAnswers"
-      :pageNumber="page[answerType]"
-      v-if="pagination && answers.length"
-    />
+      </transition-group>
+      <p class="block-answer-list__no-text" v-else>回答がありません</p>
+    </transition>
+    <transition name="fade">
+      <Pagination
+        :total="total"
+        :paginationFunc="getAnswers"
+        :pageNumber="page[answerType]"
+        v-if="pagination && answers.length && !isLoading"
+      />
+    </transition>
     <div class="block-answer-list__bottom" v-if="$route.name === 'answerList'">
       <router-link
         class="block-answer-list__link"
@@ -58,6 +69,7 @@
 <script>
 import apiClient from "@/axios";
 import Pagination from "./Pagination.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: { Pagination },
@@ -81,6 +93,9 @@ export default {
   },
   async created() {
     this.getAnswers(1);
+  },
+  computed: {
+    ...mapGetters("home", ["isLoading"]),
   },
   methods: {
     async getAnswers(page) {
@@ -116,8 +131,13 @@ export default {
   list-style: none;
   display: flex;
   justify-content: center;
-  padding: 0;
+  padding: 20px 0 0;
   flex-wrap: wrap;
+}
+
+.block-answer-list__spin {
+  margin-top: 20px;
+  text-align: center;
 }
 
 .item-answer {
@@ -162,7 +182,7 @@ export default {
   text-overflow: ellipsis;
 }
 
-.item-no-answer__text {
+.block-answer-list__no-text {
   width: 100%;
   color: gray;
   text-align: center;
@@ -172,10 +192,51 @@ export default {
   width: 100%;
   text-align: right;
   font-size: 0.9em;
+  margin: 20px 0;
 }
 
 .block-answer-list__link {
-  padding: 10px 5px 10px 0;
   color: blue;
+}
+
+.fade-enter,
+.fade-leave-to,
+.fadeGroup-enter,
+.fadeGroup-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fadeGroup-enter-active {
+  transition: opacity 0.5s;
+  animation: slideUp 0.5s;
+}
+
+.fade-leave-active,
+.fadeGroup-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fadeGroup-leave-active {
+  position: absolute;
+}
+
+.fadeGroup-move {
+  transition: transform 0.8s;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .item-answer {
+    width: 80%;
+  }
 }
 </style>
