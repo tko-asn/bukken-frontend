@@ -180,9 +180,6 @@ export default {
         )
       );
 
-      // Vuexの自分の投稿を更新
-      await this.$store.dispatch("posts/getMyPosts");
-
       // ホームページへ
       this.$router.replace("/");
     },

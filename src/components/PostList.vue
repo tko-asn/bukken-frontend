@@ -69,7 +69,7 @@ export default {
     postList: Array, // 投稿リスト
   },
   computed: {
-    ...mapGetters("posts", ["isLoading"]),
+    ...mapGetters("home", ["isLoading"]),
     // 投稿リストの要素数が奇数か判定
     isOdd() {
       return this.postList.length % 2 !== 0;

@@ -72,7 +72,7 @@ export default {
       apiClient.get("/users/" + this.userId + "/"), // ユーザーデータを取得
     ]).then((values) => {
       this.userData = values[1].data;
-      this.$store.commit("posts/setIsLoading", false);
+      this.$store.commit("home/setIsLoading", false);
     });
   },
   methods: {
@@ -85,6 +85,7 @@ export default {
       }
       // フィルタリング・検索条件に変更があった場合
       if ("params" in payload) {
+        payload.params.authorId = this.userId;
         this.conditions = payload;
       }
       // ページ切り替え時も条件を引き継ぐ
@@ -99,7 +100,7 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     // isLoadingを初期化
-    this.$store.commit("posts/setIsLoading", true);
+    this.$store.commit("home/setIsLoading", true);
     next();
   },
 };

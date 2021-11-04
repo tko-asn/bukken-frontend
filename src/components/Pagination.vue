@@ -8,10 +8,10 @@
           :class="{
             'item-page__link': true,
             'item-page__link--direction': true,
-            'item-page__link--disabled': currentPage === 1,
-            'item-page__link--end': currentPage === 1,
+            'item-page__link--disabled': pageNumber === 1,
+            'item-page__link--end': pageNumber === 1,
           }"
-          @click.prevent="movePage(currentPage - 1)"
+          @click.prevent="movePage(pageNumber - 1)"
         >
           前へ
         </a>
@@ -22,8 +22,8 @@
           href=""
           :class="{
             'item-page__link': true,
-            'item-page__link--current': num === currentPage,
-            'item-page__link--disabled': num === currentPage,
+            'item-page__link--current': num === pageNumber,
+            'item-page__link--disabled': num === pageNumber,
           }"
           @click.prevent="movePage(num)"
           v-show="displayPageButton(num)"
@@ -38,10 +38,10 @@
           :class="{
             'item-page__link': true,
             'item-page__link--direction': true,
-            'item-page__link--disabled': total === currentPage,
-            'item-page__link--end': total === currentPage,
+            'item-page__link--disabled': total === pageNumber,
+            'item-page__link--end': total === pageNumber,
           }"
-          @click.prevent="movePage(currentPage + 1)"
+          @click.prevent="movePage(pageNumber + 1)"
         >
           次へ
         </a>
@@ -54,8 +54,8 @@
           href=""
           :class="{
             'item-page__link': true,
-            'item-page__link--current': num === currentPage,
-            'item-page__link--disabled': num === currentPage,
+            'item-page__link--current': num === pageNumber,
+            'item-page__link--disabled': num === pageNumber,
           }"
           @click.prevent="movePage(num)"
           v-show="displayPageButton(num)"
@@ -72,10 +72,10 @@
           :class="{
             'item-page__link': true,
             'item-page__link--direction': true,
-            'item-page__link--disabled': currentPage === 1,
-            'item-page__link--end': currentPage === 1,
+            'item-page__link--disabled': pageNumber === 1,
+            'item-page__link--end': pageNumber === 1,
           }"
-          @click.prevent="movePage(currentPage - 1)"
+          @click.prevent="movePage(pageNumber - 1)"
         >
           前へ
         </a>
@@ -85,10 +85,10 @@
           :class="{
             'item-page__link': true,
             'item-page__link--direction': true,
-            'item-page__link--disabled': total === currentPage,
-            'item-page__link--end': total === currentPage,
+            'item-page__link--disabled': total === pageNumber,
+            'item-page__link--end': total === pageNumber,
           }"
-          @click.prevent="movePage(currentPage + 1)"
+          @click.prevent="movePage(pageNumber + 1)"
         >
           次へ
         </a>
@@ -98,8 +98,6 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-
 export default {
   props: {
     total: Number, // 総ページ数
@@ -118,35 +116,8 @@ export default {
       default: 0,
     },
   },
-  computed: {
-    ...mapGetters("posts", ["activeMenu", "filterType"]),
-    currentPage() {
-      if (this.filterType === "filter" || this.filterType === "search") {
-        return this.currentPageList[this.filterType];
-      } else if (this.pageNumber) {
-        return this.pageNumber;
-      }
-      return this.currentPageList[this.activeMenu];
-    },
-  },
   data() {
     return {
-      currentPageList: {
-        // それぞれのメニューでの現在のページ数
-        home: 1,
-        followee: 1,
-        favorites: 1,
-        myPosts: 1,
-        filter: 1,
-        search: 1,
-      },
-      getPostAction: {
-        // 投稿取得アクション名
-        home: "getLatestPosts",
-        followee: "getFolloweePosts",
-        favorites: "getMyFavoritePosts",
-        myPosts: "getMyPosts",
-      },
       width: window.innerWidth,
     };
   },
@@ -157,86 +128,28 @@ export default {
     });
   },
   methods: {
-    ...mapActions("posts", [
-      "registerFilteredPosts",
-      "registerSearchedPosts",
-      "resetFilterType",
-    ]),
     // ページボタンの表示・非表示
     displayPageButton(num) {
-      if (this.currentPage === 1 || this.currentPage === 2) {
+      if (this.pageNumber === 1 || this.pageNumber === 2) {
         return num <= 5;
       } else if (
-        this.currentPage === this.total ||
-        this.currentPage === this.total - 1
+        this.pageNumber === this.total ||
+        this.pageNumber === this.total - 1
       ) {
         return num >= this.total - 4;
-      } else if (num === this.currentPage) {
+      } else if (num === this.pageNumber) {
         return true;
-      } else if (num < this.currentPage) {
-        return num >= this.currentPage - 2;
-      } else if (num > this.currentPage) {
-        return num <= this.currentPage + 2;
+      } else if (num < this.pageNumber) {
+        return num >= this.pageNumber - 2;
+      } else if (num > this.pageNumber) {
+        return num <= this.pageNumber + 2;
       }
     },
     // ページ移動
     async movePage(page) {
-      this.$store.commit("posts/setIsLoading", true);
-
-      // 回答一覧ページ
-      // ユーザーの投稿一覧ページ
-      if (
-        this.$route.name === "userAnswer" ||
-        this.$route.name === "userPosts"
-      ) {
-        this.paginationFunc(page);
-      }
-
-      // フィルタリング条件指定時
-      if (this.filterType === "filter") {
-        // watchでfilterTypeの変更を感知できるように検索データを初期化
-        this.resetFilterType();
-
-        await this.registerFilteredPosts({
-          page,
-          userId: this.userId,
-        });
-        this.currentPageList.filter = page;
-
-        // 検索キーワード指定時
-      } else if (this.filterType === "search") {
-        // watchでfilterTypeの変更を感知できるように検索データを初期化
-        this.resetFilterType();
-
-        await this.registerSearchedPosts({
-          page,
-          userId: this.userId,
-        });
-        this.currentPageList.search = page;
-
-        // Home.vue
-      } else {
-        await this.$store.dispatch(
-          "posts/" + this.getPostAction[this.activeMenu],
-          page
-        );
-        this.$emit("movePage");
-        this.currentPageList[this.activeMenu] = page;
-      }
-
-      this.$store.commit("posts/setIsLoading", false);
-    },
-  },
-  watch: {
-    filterType(val, old) {
-      // フィルタリングされた投稿を非表示にした場合
-      if (!val && old === "filter") {
-        this.currentPageList.filter = 1;
-
-        // 検索された投稿を非表示にした場合
-      } else if (!val && old === "search") {
-        this.currentPageList.search = 1;
-      }
+      this.$store.commit("home/setIsLoading", true);
+      await this.paginationFunc(page);
+      this.$store.commit("home/setIsLoading", false);
     },
   },
 };
