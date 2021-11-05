@@ -84,22 +84,23 @@ export default {
 /* フォーム部分 */
 .block-email {
   display: flex;
+  flex-direction: column;
   align-items: center;
   width: 100%;
 }
 
 /* ラベル要素 */
 .block-email__label {
+  align-self: flex-start;
   font-weight: bold;
-  font-size: 1.2em;
   letter-spacing: 1px;
 }
 
 /* input要素 */
 .block-email__input {
   flex-grow: 3;
-  height: 30px;
-  margin-left: 20px;
+  width: 95%;
+  height: 20px;
   border: 1px solid silver;
   border-radius: 4px;
 }
@@ -121,24 +122,7 @@ export default {
   justify-content: flex-end;
   width: 100%;
   margin: 15px 10px 0;
-  letter-spacing: 1px;
   text-decoration: none;
-}
-
-@media screen and (max-width: 599px) {
-  .block-email {
-    flex-direction: column;
-  }
-
-  .block-email__label {
-    align-self: flex-start;
-    font-size: 1em;
-  }
-
-  .block-email__input {
-    width: 95%;
-    height: 20px;
-    margin-left: 0;
-  }
+  font-size: 0.8em;
 }
 </style>

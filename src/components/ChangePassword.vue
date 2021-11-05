@@ -158,7 +158,7 @@ export default {
   flex-direction: column;
   width: 80%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px 20px 20px;
   background: #fff;
 }
 
@@ -166,21 +166,22 @@ export default {
 .block-input__label {
   margin-right: 20px;
   font-weight: bold;
-  font-size: 1.2em;
   letter-spacing: 1px;
 }
 
 /* 各入力部分 */
 .block-input {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   width: 100%;
   margin-top: 10px;
 }
 
 .block-input__input {
   flex-grow: 3;
-  height: 25px;
+  width: 100%;
+  height: 20px;
   border: 1px solid gray;
   border-radius: 4px;
 }
@@ -194,17 +195,5 @@ export default {
   background: green;
   color: white;
   cursor: pointer;
-}
-
-@media screen and (max-width: 599px) {
-  .block-input {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .block-input__input {
-    width: 100%;
-    height: 20px;
-  }
 }
 </style>
