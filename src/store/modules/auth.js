@@ -4,22 +4,22 @@ import store from "@/store";
 const state = {
   // 認証情報
   isLoggedIn: false,
-  userId: '',
-  email: '',
+  userId: "",
+  email: "",
   // プロフィール情報
-  username: '',
-  selfIntroduction: '',
-  iconURL: '',
+  username: "",
+  selfIntroduction: "",
+  iconURL: "",
 };
 
 const getters = {
-  isLoggedIn: state => state.isLoggedIn,
-  userId: state => state.userId,
-  email: state => state.email,
-  username: state => state.username,
-  iconURL: state => state.iconURL,
-  selfIntroduction: state => state.selfIntroduction,
-  favoriteUsers: state => state.favoriteUsers,
+  isLoggedIn: (state) => state.isLoggedIn,
+  userId: (state) => state.userId,
+  email: (state) => state.email,
+  username: (state) => state.username,
+  iconURL: (state) => state.iconURL,
+  selfIntroduction: (state) => state.selfIntroduction,
+  favoriteUsers: (state) => state.favoriteUsers,
 };
 
 const mutations = {
@@ -35,11 +35,11 @@ const mutations = {
   // 認証情報・プロフィール情報の初期化
   clear(state) {
     state.isLoggedIn = false;
-    state.userId = '';
-    state.email = '';
-    state.username = '';
-    state.selfIntroduction = '';
-    state.iconURL = '';
+    state.userId = "";
+    state.email = "";
+    state.username = "";
+    state.selfIntroduction = "";
+    state.iconURL = "";
   },
   // 認証情報(email)のみセット
   setAuthInfo(state, payload) {
@@ -55,68 +55,79 @@ const mutations = {
   setProfileNoIcon(state, payload) {
     state.username = payload.username;
     state.selfIntroduction = payload.self_introduction;
-  }
+  },
 };
 
 const actions = {
   // ログイン
   async login({ commit, state }, payload) {
     // APIを実行
-    const { data } = await apiClient.post('/auth/login/', payload).catch(err => Promise.reject(err));
-    
+    const { data } = await apiClient
+      .post("/auth/login/", payload)
+      .catch((err) => Promise.reject(err));
+
     // トークンを保存
-    localStorage.setItem('token', data.token);
-    
+    localStorage.setItem("token", data.token);
+
     // id, username, email, selfIntroduciton, iconURLを保存
-    commit('set', data);
-    
+    commit("set", data);
+
     await Promise.all([
-      store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }), // フォローデータ
-      store.dispatch('follows/getFollower', { followId: state.userId, isMe: true}), // フォロワーデータ
-      store.dispatch('posts/getMyPosts'), // 自分の投稿
-      store.dispatch('posts/getMyFavoritePosts') // お気に入りの投稿
+      store.dispatch("follows/getFollow", { userId: state.userId, isMe: true }), // フォローデータ
+      store.dispatch("follows/getFollower", {
+        followId: state.userId,
+        isMe: true,
+      }), // フォロワーデータ
     ]);
   },
   // サインアップ
   signUp({ dispatch }, payload) {
-    return apiClient.post('/users/register/', payload)
-    .then(() => dispatch('login', payload))
-    .catch(err => Promise.reject(err));
+    return apiClient
+      .post("/users/register/", payload)
+      .then(() => dispatch("login", payload))
+      .catch((err) => Promise.reject(err));
   },
   // トークンの検証
   async verify({ commit, state }) {
     // APIを実行
-    const { data } = await apiClient.get('/auth/verify/').catch(err => Promise.reject(err));
-    
+    const { data } = await apiClient
+      .get("/auth/verify/")
+      .catch((err) => Promise.reject(err));
+
     // ユーザー情報をセット(stateが初期化されている状態でトークンが残っている場合)
-    commit('set', data);
-    
+    commit("set", data);
+
     await Promise.all([
-      store.dispatch('follows/getFollow', { userId: state.userId, isMe: true }), // フォローデータ
-      store.dispatch('follows/getFollower', { followId: state.userId, isMe: true}), // フォロワーデータ
-      store.dispatch('posts/getMyPosts'), // 自分の投稿
-      store.dispatch('posts/getMyFavoritePosts') // お気に入りの投稿
+      store.dispatch("follows/getFollow", { userId: state.userId, isMe: true }), // フォローデータ
+      store.dispatch("follows/getFollower", {
+        followId: state.userId,
+        isMe: true,
+      }), // フォロワーデータ
     ]);
   },
   // ログアウト
   logout({ commit }) {
-    return apiClient.get('/auth/logout/').then(() => {
-      localStorage.removeItem('token');
-      commit('clear');
-    })
-      .catch(err => Promise.reject(err));
+    return apiClient
+      .get("/auth/logout/")
+      .then(() => {
+        localStorage.removeItem("token");
+        commit("clear");
+      })
+      .catch((err) => Promise.reject(err));
   },
   // 認証情報変更
-  editAuthInfo({ commit, state }, authInfo) { // emailかpasswordの編集（どちらか）
-    return apiClient.patch('/users/change/' + state.userId + '/', authInfo)
+  editAuthInfo({ commit, state }, authInfo) {
+    // emailかpasswordの編集（どちらか）
+    return apiClient
+      .patch("/users/change/" + state.userId + "/", authInfo)
       .then(() => {
         // emailの変更の場合
         if (authInfo.email) {
-          commit('setAuthInfo', authInfo);
+          commit("setAuthInfo", authInfo);
         }
         // パスワードはvuexで管理していないので特になし
       })
-      .catch(err => Promise.reject(err));
+      .catch((err) => Promise.reject(err));
   },
   // プロフィール編集
   editProfile({ commit, state }, params) {
@@ -126,39 +137,38 @@ const actions = {
 
     // paramsがFormDataの場合（アイコンに変更があった場合）
     if (!params.username) {
-      url = '/users/profile/' + state.userId + '/edit/';
-      headers = { 'Content-Type': 'multipart/form-data' }; // multerを使用
-      mutation = 'setProfile';
+      url = "/users/profile/" + state.userId + "/edit/";
+      headers = { "Content-Type": "multipart/form-data" }; // multerを使用
+      mutation = "setProfile";
 
       // paramsがFormDataではない場合（アイコンに変更がなかった場合）
     } else {
-      url = '/users/profile/' + state.userId + '/edit/noicon/';
-      headers = { 'Content-Type': 'application/json' }; // 通常通り
+      url = "/users/profile/" + state.userId + "/edit/noicon/";
+      headers = { "Content-Type": "application/json" }; // 通常通り
       mutation = "setProfileNoIcon";
     }
 
     // APIを実行
-    return apiClient.patch(
-      url,
-      params,
-      {
+    return apiClient
+      .patch(url, params, {
         headers, // headersをセット
-      }
-    ).then(({ data }) => {
-      // vuexの値を更新
-      commit(mutation, data);
-    })
-      .catch(err => Promise.reject(err));
+      })
+      .then(({ data }) => {
+        // vuexの値を更新
+        commit(mutation, data);
+      })
+      .catch((err) => Promise.reject(err));
   },
   // アカウント閉鎖
   delete({ dispatch, state }) {
-    return apiClient.delete('/users/delete/' + state.userId + '/')
-      .then(() => dispatch('logout')); // 成功したらログアウト
+    return apiClient
+      .delete("/users/delete/" + state.userId + "/")
+      .then(() => dispatch("logout")); // 成功したらログアウト
   },
 };
 
 export default {
-  strict: process.env.NODE_ENV !== 'production',
+  strict: process.env.NODE_ENV !== "production",
   namespaced: true,
   state,
   getters,

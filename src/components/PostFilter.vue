@@ -73,17 +73,21 @@
 
 <script>
 import AddressForm from "@/components/AddressForm";
-import { mapGetters, mapActions } from "vuex";
+import qs from "qs";
 
 export default {
   components: {
     AddressForm,
   },
   props: {
-    myId: String,
-  },
-  computed: {
-    ...mapGetters("posts", ["activeMenu"]),
+    filterPosts: {
+      type: Function,
+      default: () => {},
+    },
+    switchType: {
+      type: Function,
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -114,11 +118,6 @@ export default {
     };
   },
   methods: {
-    ...mapActions("posts", [
-      "resetFilterType",
-      "registerFilterData",
-      "registerFilteredPosts",
-    ]),
     // 絞り込みの住所のデータを取得
     getAddressData(addressData) {
       Object.keys(addressData).forEach((key) => {
@@ -147,20 +146,20 @@ export default {
     },
     // 絞り込み
     async filter() {
-      // filterの現在のページ数の初期化のため
-      this.resetFilterType();
+      this.$store.commit("home/setIsLoading", true);
 
-      const payload = {
-        categories: this.selectedCategories,
-        postalCode: this.postalCode,
-      };
-      this.registerFilterData(payload);
-
+      this.switchType("filter");
       const params = {
-        page: 1,
-        userId: this.myId,
+        categories: this.selectedCategories,
+        address: this.postalCode,
       };
-      await this.registerFilteredPosts(params);
+      const filter = {
+        params,
+        paramsSerializer: (params) => qs.stringify(params),
+      };
+      await this.filterPosts(1, filter);
+
+      this.$store.commit("home/setIsLoading", false);
     },
     // フィルターの開閉
     toggleFilter() {
@@ -214,7 +213,6 @@ a {
 .list--active {
   background: rgb(191, 194, 194);
   color: rgb(99, 99, 99);
-  font-size: 0.8em;
 }
 
 .list__item {

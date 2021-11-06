@@ -88,7 +88,13 @@
               <fa-icon icon="bars" />
             </a>
             <transition name="slide">
-              <SubMenu v-if="$route.name != 'home' && showSideMenu" />
+              <SubMenu
+                :class="{
+                  'item-list__side-menu--user_answer':
+                    $route.name === 'userAnswer' && width < 600,
+                }"
+                v-if="!noSubMenuRoute.includes($route.name) && showSideMenu"
+              />
             </transition>
           </li>
         </ul>
@@ -109,14 +115,22 @@ export default {
   data() {
     return {
       logo: require("@/assets/BUKKEN_logo.png"),
+      noSubMenuRoute: ["home"],
+      width: window.innerWidth,
     };
   },
   computed: {
-    ...mapGetters("posts", ["showSideMenu"]),
+    ...mapGetters("home", ["showSideMenu"]),
+  },
+  mounted() {
+    // 画面幅の変更を感知
+    window.addEventListener("resize", () => {
+      this.width = window.innerWidth;
+    });
   },
   mixins: [authInfoMixin],
   methods: {
-    ...mapMutations("posts", ["toggleSideMenu", "hideSideMenu"]),
+    ...mapMutations("home", ["toggleSideMenu", "hideSideMenu"]),
     // プルダウンメニュー展開
     pullDown() {
       this.$refs.pull_down_block.style.display = "block";
@@ -258,6 +272,11 @@ ul {
 
 .item-list__link-menu {
   margin: 0 5px;
+}
+
+.item-list__side-menu--user_answer {
+  top: 180px;
+  z-index: 100;
 }
 
 .slide-enter-active {

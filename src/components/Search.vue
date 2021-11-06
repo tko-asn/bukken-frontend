@@ -13,33 +13,39 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import qs from "qs";
 
 export default {
   props: {
-    userId: String,
+    searchPosts: {
+      type: Function,
+      default: () => {},
+    },
+    switchType: {
+      type: Function,
+      default: () => {},
+    },
   },
   data() {
     return {
-      routeList: [],
       keyword: "",
     };
   },
   methods: {
-    ...mapActions("posts", [
-      "registerSearchedPosts",
-      "registerSearchData",
-      "resetFilterType",
-    ]),
     async search() {
-      // watchでfilterTypeの変更を感知できるように検索データを初期化
-      this.resetFilterType();
+      this.$store.commit("home/setIsLoading", true);
 
-      // 検索キーワードを保存
-      this.registerSearchData(this.keyword);
+      this.switchType("search");
+      const params = {
+        keyword: this.keyword,
+      };
+      const search = {
+        params,
+        paramsSerializer: (params) => qs.stringify(params),
+      };
+      await this.searchPosts(1, search);
 
-      const params = { page: 1, userId: this.userId };
-      await this.registerSearchedPosts(params);
+      this.$store.commit("home/setIsLoading", false);
     },
   },
   watch: {

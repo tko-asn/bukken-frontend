@@ -1,5 +1,12 @@
 <template>
   <div class="container">
+    <Header>
+      <Search
+        :userId="userId"
+        :searchPosts="getPosts"
+        :switchType="switchPostType"
+      />
+    </Header>
     <transition name="fadeModal">
       <ModalWindow
         class="container__modal"
@@ -14,6 +21,7 @@
       :closeWindow="toggleAppOverview"
       ><AppOverview
     /></ModalWindow>
+
     <!-- サイドバー -->
     <transition name="slide">
       <aside
@@ -27,7 +35,7 @@
               v-for="obj in mainMenu"
               :key="obj.name"
               v-show="obj.login ? isLoggedIn : true"
-              @click.prevent="switchPosts(obj.type)"
+              @click.prevent="switchMenu(obj.type)"
             >
               <a
                 href=""
@@ -160,15 +168,23 @@
     <!-- メイン -->
     <div class="container__main">
       <div class="container-main">
-        <PostFilter :myId="userId" v-show="$route.name === 'home'" />
-        <router-view :postList="displayedPosts" />
+        <PostFilter
+          :myId="userId"
+          :filterPosts="getPosts"
+          :switchType="switchPostType"
+          v-show="$route.name === 'home'"
+        />
+        <router-view :postList="postObj[postType].posts" />
         <!-- ページネーション -->
         <transition name="fade">
           <Pagination
             :total="total"
-            @movePage="pagination"
             :userId="userId"
-            v-show="$route.name === 'home' && displayedPosts.length > 0"
+            :paginationFunc="getPosts"
+            :pageNumber="postObj[postType].page"
+            v-show="
+              $route.name === 'home' && postObj[postType].posts.length > 0
+            "
           />
         </transition>
       </div>
@@ -177,26 +193,38 @@
 </template>
 
 <script>
-import PostFilter from "@/components/PostFilter";
-import Pagination from "@/components/Pagination";
+import Header from "@/components/Header";
+import Search from "@/components/Search";
 import ModalWindow from "@/components/ModalWindow";
 import AppOverview from "@/components/AppOverview";
-import { mapGetters, mapActions, mapMutations } from "vuex";
-import authInfoMixin from "@/mixins/authInfoMixin";
+import PostFilter from "@/components/PostFilter";
+import Pagination from "@/components/Pagination";
+import apiClient from "@/axios";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   components: {
-    PostFilter,
-    Pagination,
+    Header,
+    Search,
     ModalWindow,
     AppOverview,
+    PostFilter,
+    Pagination,
   },
   data() {
     return {
-      displayedPosts: [], // 表示する投稿
-      showFolloweeList: false,
-      showFollowerList: false,
-      total: 0, // 総ページ数
+      total: 0,
+      postObj: {
+        home: { posts: [], page: 1 },
+        favorites: { posts: [], page: 1 },
+        followee: { posts: [], page: 1 },
+        myPosts: { posts: [], page: 1 },
+        filter: { posts: [], page: 1 },
+        search: { posts: [], page: 1 },
+      },
+      postType: "home",
+      activeMenu: "home",
+      conditions: {},
       mainMenu: {
         // サイドメニュー一覧
         home: { login: false, name: "ホーム", type: "home" },
@@ -212,37 +240,23 @@ export default {
         followee: { name: "フォロー", type: "followee" },
         follower: { name: "フォロワー", type: "follower" },
       },
-      // 画面幅
       width: window.innerWidth,
+      showFolloweeList: false,
+      showFollowerList: false,
       showAppOverview: false, // 概要の表示・非表示
+      getPostMethods: {
+        home: this.getLatestPosts,
+        followee: this.getFolloweePosts,
+        favorites: this.getFavoritePosts,
+        myPosts: this.getMyPosts,
+        filter: this.getFilteredPosts,
+        search: this.getSearchedPosts,
+      },
     };
   },
-  computed: {
-    ...mapGetters("posts", [
-      "latestPosts",
-      "followeePosts",
-      "myPosts",
-      "myFavoritePosts",
-      "filteredPosts",
-      "searchedPosts",
-      "filterType",
-      "pageTotal",
-      "activeMenu",
-      "showSideMenu",
-    ]),
-    ...mapGetters("follows", ["follow", "follower"]),
-  },
-  mixins: [authInfoMixin],
-  created() {
-    Promise.all([
-      this.getLatestPosts(), // 最新の投稿をVuexに保存
-      this.getFolloweePosts(), // フォロイーの投稿をVuexに保存
-    ]).then(() => {
-      this.resetFilterType(); // filterTypeを初期化
-      this.resetActiveMenu("home");
-      this.total = this.pageTotal["home"]; // 最新の投稿の総ページ数
-      this.displayedPosts = this.latestPosts; // 最新の投稿を表示
-    });
+  async created() {
+    await this.getLatestPosts(1);
+    this.setIsLoading(false);
   },
   mounted() {
     // 画面幅の変更を感知
@@ -250,26 +264,119 @@ export default {
       this.width = window.innerWidth;
     });
   },
+  computed: {
+    ...mapGetters("auth", ["userId", "isLoggedIn"]),
+    ...mapGetters("home", ["showSideMenu", "isLoading"]),
+    ...mapGetters("follows", ["follow", "follower"]),
+  },
   methods: {
-    ...mapActions("posts", [
-      "getLatestPosts",
-      "getFolloweePosts",
-      "getMyFavoritePosts",
-      "getMyPosts",
-      "resetActiveMenu",
-      "resetFilterType",
-    ]),
-    ...mapMutations("posts", ["toggleSideMenu", "hideSideMenu"]),
-    // ページ別に適切な投稿を返す
-    getPosts(postType) {
-      const menuAndPosts = {
-        // メニューの種類と表示する投稿の対応表
-        home: this.latestPosts,
-        followee: this.followeePosts,
-        favorites: this.myFavoritePosts,
-        myPosts: this.myPosts,
-      };
-      return menuAndPosts[postType];
+    ...mapMutations("home", ["toggleSideMenu", "hideSideMenu", "setIsLoading"]),
+    async getLatestPosts(page) {
+      const { data } = await apiClient.get("/posts/page/" + page + "/");
+      this.postObj.home.posts = data.posts;
+      this.total = data.total;
+      this.postObj.home.page = page;
+    },
+    async getFavoritePosts(page) {
+      const { data } = await apiClient.get(
+        "/posts/favorite/user/" + this.userId + "/page/" + page + "/"
+      );
+      this.postObj.favorites.posts = data.posts;
+      this.total = data.total;
+      this.postObj.favorites.page = page;
+    },
+    async getFolloweePosts(page) {
+      const followsId = [];
+      for (const obj of this.$store.getters["follows/follow"]) {
+        followsId.push(obj.follow.id);
+      }
+      const { data } = await apiClient.post(
+        "/posts/followee/page/" + page + "/",
+        { followsId }
+      );
+      this.postObj.followee.posts = data.posts;
+      this.total = data.total;
+      this.postObj.followee.page = page;
+    },
+    async getMyPosts(page) {
+      const { data } = await apiClient.get(
+        "/posts/" + this.userId + "/page/" + page + "/"
+      );
+      this.postObj.myPosts.posts = data.posts;
+      this.total = data.total;
+      this.postObj.myPosts.page = page;
+    },
+    async getFilteredPosts(page, conditions = {}) {
+      const { data } = await apiClient.get(
+        "/posts/filter/query/page/" + page + "/",
+        conditions
+      );
+
+      this.postObj.filter.posts = data.posts;
+      this.total = data.total;
+      this.postObj.filter.page = page;
+    },
+    async getSearchedPosts(page, conditions = {}) {
+      const { data } = await apiClient.get(
+        "/posts/search/query/page/" + page + "/",
+        conditions
+      );
+      this.postObj.search.posts = data.posts;
+      this.total = data.total;
+      this.postObj.search.page = page;
+    },
+    async switchMenu(type) {
+      // 投稿ページからメニューを押した場合
+      if (this.$route.name !== "home") {
+        this.$router.push("/");
+      }
+      await this.getPostMethods[type](this.postObj[type].page);
+      this.activeMenu = this.postType = type;
+    },
+    // ページネーション・フィルタリング・検索
+    async getPosts(page, payload = {}) {
+      if ("params" in payload) {
+        // myPostsで絞り込み
+        if (this.activeMenu === "myPosts") {
+          payload.params.authorId = this.userId;
+
+          // followeeで絞り込み
+        } else if (this.activeMenu === "followee") {
+          const followsId = []; // フォローしているユーザーのIDの配列
+          for (const obj of this.$store.getters["follows/follow"]) {
+            followsId.push(obj.follow.id);
+          }
+          payload.params.authorId = followsId;
+
+          // お気に入りの投稿表示中の絞り込み
+        } else if (this.activeMenu === "favorites") {
+          payload.params.userId = this.userId;
+        }
+        this.conditions = payload;
+      }
+      // フィルタリングor検索orフィルタリング・検索でのページネーション
+      if (this.postType === "filter" || this.postType === "search") {
+        // ページ切り替え時も条件を引き継ぐ
+        await this.getPostMethods[this.postType](page, this.conditions);
+
+        // 通常メニューでのページネーション
+      } else {
+        await this.getPostMethods[this.postType](page);
+      }
+    },
+    switchPostType(type) {
+      this.postType = type;
+    },
+    // フォローしているユーザーの表示切り替え
+    toggleUser(userType) {
+      // フォローしているユーザーのドロップダウンメニュー
+      if (userType === "followee") {
+        this.showFolloweeList = !this.showFolloweeList;
+
+        // フォロワーのドロップダウンメニュー
+      } else if (userType === "follower") {
+        this.showFollowerList = !this.showFollowerList;
+      }
     },
     // フォローデータの種類を判定しデータのリストを返す
     followsList(type) {
@@ -290,28 +397,6 @@ export default {
         return obj.user;
       }
     },
-    // 投稿を切り替え表示
-    switchPosts(type) {
-      // 投稿ページからメニューを押した場合
-      if (this.$route.name !== "home") {
-        this.$router.push("/");
-      }
-      this.displayedPosts = this.getPosts(type); // 投稿を切り替え
-      this.total = this.pageTotal[type]; // 総ページ数を更新
-      this.resetActiveMenu(type); // メニューのタイプを切り替え
-      this.resetFilterType(); // filterTypeを初期化
-    },
-    // フォローしているユーザーの表示を切り替える
-    toggleUser(userType) {
-      // フォローしているユーザーのドロップダウンメニュー
-      if (userType === "followee") {
-        this.showFolloweeList = !this.showFolloweeList;
-
-        // フォロワーのドロップダウンメニュー
-      } else if (userType === "follower") {
-        this.showFollowerList = !this.showFollowerList;
-      }
-    },
     // ユーザーのドロップダウンメニューを閉じる
     closeUserList(userType) {
       if (userType === "followee") {
@@ -319,10 +404,6 @@ export default {
       } else if (userType === "follower") {
         this.showFollowerList = false;
       }
-    },
-    // ページ移動時（フィルタリング・検索時は対象外）
-    pagination() {
-      this.displayedPosts = this.getPosts(this.activeMenu); // それ以外のページ
     },
     // ログアウト
     logout() {
@@ -339,45 +420,16 @@ export default {
       this.showAppOverview = !this.showAppOverview;
     },
   },
-  watch: {
-    filterType(val) {
-      // 投稿がフィルタリングされた場合
-      if (val === "filter") {
-        this.displayedPosts = this.filteredPosts;
-        this.total = this.pageTotal.filter;
-
-        // 投稿が検索された場合
-      } else if (val === "search") {
-        this.displayedPosts = this.searchedPosts;
-        this.total = this.pageTotal.search;
-      }
-    },
-  },
   beforeRouteUpdate(to, from, next) {
-    // 投稿画面から遷移したとき
     if (to.name === "home") {
-      Promise.all([
-        this.getLatestPosts(), // 最新の投稿をVuexに保存
-        this.getFolloweePosts(), // フォロイーの投稿をVuexに保存
-      ]).then(() => {
-        this.resetActiveMenu("home");
-        this.total = this.pageTotal["home"]; // 最新の投稿
-        this.displayedPosts = this.latestPosts; // 初期は最新の投稿を表示
-        next();
-      });
+      this.getLatestPosts(1);
     }
     next();
   },
   beforeRouteLeave(to, from, next) {
-    const params = [this.getLatestPosts(), this.getFolloweePosts()];
-    if (this.isLoggedIn) {
-      params.push(this.getMyPosts());
-      params.push(this.getMyFavoritePosts());
-    }
-    // 投稿を初期化
-    Promise.all(params).then(() => {
-      next();
-    });
+    // isLoadingを初期化
+    this.$store.commit("home/setIsLoading", true);
+    next();
   },
 };
 </script>
