@@ -98,6 +98,8 @@
 </template>
 
 <script>
+import widthMixin from "@/mixins/widthMixin";
+
 export default {
   props: {
     total: Number, // 総ページ数
@@ -110,17 +112,7 @@ export default {
       default: 0,
     },
   },
-  data() {
-    return {
-      width: window.innerWidth,
-    };
-  },
-  mounted() {
-    // 画面幅の変更を感知
-    window.addEventListener("resize", () => {
-      this.width = window.innerWidth;
-    });
-  },
+  mixins: [widthMixin],
   methods: {
     // ページボタンの表示・非表示
     displayPageButton(num) {

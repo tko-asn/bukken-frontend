@@ -55,30 +55,13 @@
           class="container__section"
           v-show="!showSideMenu || width >= 600"
         >
-          <h2 class="container__title">
-            <a
-              href=""
-              class="container__btn-menu"
-              v-if="width < 600"
-              @click.prevent="showSideMenu = !showSideMenu"
-            >
-              <fa-icon class="container__icon-menu" icon="bars" />
-            </a>
-            <span v-show="$route.name !== 'answerList'">
-              {{ contentListTitle[$route.name] }}
-            </span>
-            <span v-show="$route.name === 'answerList'">
-              {{ answerListTitle[$route.params.answerType] }}
-            </span>
-          </h2>
-          <div :class="{ 'item-content': true, container__scroll: isScroll }">
-            <transition name="fade" mode="out-in" appear>
-              <router-view
-                :userIdProps="id"
-                :selfIntroduction="displayedSelfIntroduction"
-              />
-            </transition>
-          </div>
+          <transition name="fade" mode="out-in" appear>
+            <router-view
+              :userIdProps="id"
+              :selfIntroduction="displayedSelfIntroduction"
+              :showMenuFunc="toggleShowSideMenu"
+            />
+          </transition>
         </section>
 
         <!-- メニュー -->
@@ -157,6 +140,7 @@
 import ModalWindow from "@/components/ModalWindow";
 import DeleteAccount from "@/components/DeleteAccount";
 import authInfoMixin from "@/mixins/authInfoMixin";
+import widthMixin from "@/mixins/widthMixin";
 import apiClient from "@/axios";
 import { mapGetters, mapActions } from "vuex";
 
@@ -179,18 +163,6 @@ export default {
       slotName: "", // 表示するモーダルウィンドウ
       modalTitle: "", // モーダルのタイトル
       showWindow: false, // モーダルウィンドウの表示・非表示
-      contentListTitle: {
-        userView: "プロフィール",
-        authInfo: "認証情報",
-        changePassword: "パスワードの変更",
-        followList: "フォロー",
-        followerList: "フォロワー",
-      },
-      answerListTitle: {
-        answer: "ユーザーの回答",
-        like: "いいねした回答",
-      },
-      width: window.innerWidth,
       showSideMenu: false,
       // サイドメニュー一覧
       sideMenuList: [
@@ -287,7 +259,7 @@ export default {
       ],
     };
   },
-  mixins: [authInfoMixin],
+  mixins: [authInfoMixin, widthMixin],
   computed: {
     ...mapGetters("followeeId", ["followeeId"]),
     // 自分のページかどうか判定
@@ -297,17 +269,6 @@ export default {
     // フォローしているユーザーか判定
     isYourFavoriteUser() {
       return this.followeeId.some((el) => el === this.id);
-    },
-    isScroll() {
-      // コンテンツリストにスクロールバーを表示しないルート
-      const notScrollRoutes = ["authInfo", "changePassword"];
-
-      // スクロールバーを表示しない場合
-      if (notScrollRoutes.includes(this.$route.name)) {
-        return false;
-      }
-      // スクロールバーを表示する場合
-      return true;
     },
     userInfo() {
       // マイページではないときにユーザーの情報のオブジェクトを返す
@@ -342,12 +303,6 @@ export default {
       this.displayedIconURL = this.iconURL;
     }
     this.$store.commit("home/setIsLoading", false);
-  },
-  mounted() {
-    // 画面幅の変更を感知
-    window.addEventListener("resize", () => {
-      this.width = window.innerWidth;
-    });
   },
   methods: {
     ...mapActions("followeeId", ["createFolloweeId", "deleteFolloweeId"]),
@@ -407,6 +362,10 @@ export default {
       } else {
         await this.deleteFolloweeId({ followId: this.id, userId: this.userId });
       }
+    },
+    // サイドメニュー表示切り替え
+    toggleShowSideMenu() {
+      this.showSideMenu = !this.showSideMenu;
     },
   },
   beforeRouteEnter(to, from, next) {
@@ -543,45 +502,11 @@ a {
 /* コンテンツのリスト */
 .container__section {
   width: 50%;
-  min-height: 90px;
   overflow: hidden;
-  border: 3px solid gray;
+  border: 2px solid gray;
   border-radius: 5px;
-  animation: slideUp 0.8s;
-}
-
-.container__title {
-  position: relative;
-  font-size: 1em;
-  text-align: center;
-}
-
-.container__btn-menu {
-  position: absolute;
-  left: 10px;
-}
-
-.container__icon-menu {
-  color: gray;
-}
-
-.item-content {
-  max-height: 300px;
   background: #fff;
-}
-
-/* スクロールバー */
-.container__scroll {
-  overflow-y: scroll;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-  background: rgba(158, 154, 154, 0.781);
+  animation: slideUp 0.8s;
 }
 
 /* サイドメニュー */
@@ -631,7 +556,7 @@ a {
 
 .fade-enter-active,
 .fade-leave-acitve {
-  transition: opacity 0.3s;
+  transition: opacity 0.5s;
 }
 
 @keyframes open {

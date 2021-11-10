@@ -1,69 +1,84 @@
 <template>
-  <div class="container-change-password">
-    <!-- パスワード変更フォーム -->
-    <div class="block-input">
-      <label class="block-input__label" for="current_password"
-        >現在のパスワード</label
-      >
-      <input
-        class="block-input__input"
-        type="password"
-        name="current_password"
-        v-model="currentPassword"
-      />
-    </div>
-    <ValidationMessage
-      class="container-change-password__validation"
-      :messages="currentPasswdMessage"
-      v-show="currentPasswdMessage.length"
-    />
-    <div class="block-input">
-      <label class="block-input__label" for="new_password"
-        >新しいパスワード</label
-      >
-      <input
-        class="block-input__input"
-        type="password"
-        name="new_password"
-        v-model="newPassword"
-      />
-    </div>
-    <ValidationMessage
-      class="container-change-password__validation"
-      :messages="newPasswdMessage"
-      v-show="newPasswdMessage.length"
-    />
-    <div class="block-input">
-      <label class="block-input__label" for="current_password"
-        >確認用パスワード</label
-      >
-      <input
-        class="block-input__input"
-        type="password"
-        name="current_password"
-        v-model="cfmPassword"
-      />
-    </div>
-    <ValidationMessage
-      class="container-change-password__validation"
-      :messages="cfmPasswdMessage"
-      v-show="cfmPasswdMessage.length"
-    />
+  <div class="block-change-password">
+    <ContentTitle title="パスワードの変更" :showMenuFunc="showMenuFunc" />
+    <Content>
+      <div class="container-change-password">
+        <!-- パスワード変更フォーム -->
+        <div class="block-input">
+          <label class="block-input__label" for="current_password"
+            >現在のパスワード</label
+          >
+          <input
+            class="block-input__input"
+            type="password"
+            name="current_password"
+            v-model="currentPassword"
+          />
+        </div>
+        <ValidationMessage
+          class="container-change-password__validation"
+          :messages="currentPasswdMessage"
+          v-show="currentPasswdMessage.length"
+        />
+        <div class="block-input">
+          <label class="block-input__label" for="new_password"
+            >新しいパスワード</label
+          >
+          <input
+            class="block-input__input"
+            type="password"
+            name="new_password"
+            v-model="newPassword"
+          />
+        </div>
+        <ValidationMessage
+          class="container-change-password__validation"
+          :messages="newPasswdMessage"
+          v-show="newPasswdMessage.length"
+        />
+        <div class="block-input">
+          <label class="block-input__label" for="current_password"
+            >確認用パスワード</label
+          >
+          <input
+            class="block-input__input"
+            type="password"
+            name="current_password"
+            v-model="cfmPassword"
+          />
+        </div>
+        <ValidationMessage
+          class="container-change-password__validation"
+          :messages="cfmPasswdMessage"
+          v-show="cfmPasswdMessage.length"
+        />
 
-    <!-- ボタン -->
-    <button class="container-change-password__btn" @click="changePassword">
-      保存
-    </button>
+        <!-- ボタン -->
+        <button class="container-change-password__btn" @click="changePassword">
+          保存
+        </button>
+      </div>
+    </Content>
   </div>
 </template>
 
 
 <script>
+import ContentTitle from "@/components/ContentTitle";
+import Content from "@/components/Content";
 import ValidationMessage from "@/components/ValidationMessage";
 
 export default {
+  props: {
+    showMenuFunc: {
+      type: Function,
+      default: () => {},
+    },
+  },
   components: {
     ValidationMessage,
+    ContentTitle,
+    Content,
   },
   data() {
     return {
@@ -159,7 +174,6 @@ export default {
   width: 80%;
   margin: 0 auto;
   padding: 10px 20px 20px;
-  background: #fff;
 }
 
 /* ラベル要素 */
@@ -182,6 +196,7 @@ export default {
   flex-grow: 3;
   width: 100%;
   height: 20px;
+  box-sizing: border-box;
   border: 1px solid gray;
   border-radius: 4px;
 }
