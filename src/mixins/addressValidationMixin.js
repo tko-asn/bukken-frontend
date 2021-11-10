@@ -5,7 +5,7 @@ export default {
     };
   },
   methods: {
-    addressValidation({
+    async addressValidation({
       postalCode,
       postalCodeA,
       postalCodeB,
