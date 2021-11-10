@@ -74,10 +74,7 @@
           <div :class="{ 'item-content': true, container__scroll: isScroll }">
             <transition name="fade" mode="out-in" appear>
               <router-view
-                :isMe="isMe"
-                :userId="id"
-                :follow="follow"
-                :follower="follower"
+                :userIdProps="id"
                 :selfIntroduction="displayedSelfIntroduction"
               />
             </transition>
@@ -157,11 +154,11 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
 import ModalWindow from "@/components/ModalWindow";
 import DeleteAccount from "@/components/DeleteAccount";
 import authInfoMixin from "@/mixins/authInfoMixin";
 import apiClient from "@/axios";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: {
@@ -292,21 +289,14 @@ export default {
   },
   mixins: [authInfoMixin],
   computed: {
-    // ログインユーザーのフォローしているユーザーのリスト
-    ...mapGetters("follows", ["follow", "follower"]),
+    ...mapGetters("followeeId", ["followeeId"]),
     // 自分のページかどうか判定
     isMe() {
-      if (this.userId === this.id) {
-        return true;
-      }
-      return false;
+      return this.userId === this.id;
     },
     // フォローしているユーザーか判定
     isYourFavoriteUser() {
-      if (!this.isMe && this.follow.find((el) => el.follow.id === this.id)) {
-        return true;
-      }
-      return false;
+      return this.followeeId.some((el) => el === this.id);
     },
     isScroll() {
       // コンテンツリストにスクロールバーを表示しないルート
@@ -360,7 +350,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions("follows", ["followUser", "unfollowUser"]),
+    ...mapActions("followeeId", ["createFolloweeId", "deleteFolloweeId"]),
     // サイドメニューの表示・非表示
     showMenuItem(item) {
       // マイページでもユーザーページでも表示
@@ -403,25 +393,20 @@ export default {
       this.showWindow = true;
     },
     // ユーザーをフォロー
-    following() {
+    async following() {
       if (!this.isLoggedIn) {
-        // ログインしていなければログインページへ
         this.$router.push("/login");
-        return;
+      } else {
+        await this.createFolloweeId({ followId: this.id, userId: this.userId });
       }
-      this.followUser(this.userInfo);
     },
-    // ユーザーのフォローを解除
-    unfollowing() {
+    // フォロー解除
+    async unfollowing() {
       if (!this.isLoggedIn) {
         this.$router.push("/login");
-        return;
+      } else {
+        await this.deleteFolloweeId({ followId: this.id, userId: this.userId });
       }
-
-      // followリストからユーザーのidを使ってフォローデータを検索
-      const targetObj = this.follow.find((el) => el.follow.id === this.id);
-
-      this.unfollowUser(targetObj.id);
     },
   },
   beforeRouteEnter(to, from, next) {
