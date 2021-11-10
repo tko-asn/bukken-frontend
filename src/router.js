@@ -35,8 +35,10 @@ const Follow = () =>
   import(/* webpackChankName: 'Follow' */ "./components/Follow");
 const Follower = () =>
   import(/* webpackChankName: 'Follower' */ "./components/Follower");
-const AnswerList = () =>
-  import(/* webpackChankName: 'AnswerList' */ "./components/AnswerList");
+const AnswerListContent = () =>
+  import(
+    /* webpackChankName: 'AnswerListContent' */ "./components/AnswerListContent"
+  );
 
 Vue.use(VueRouter);
 
@@ -80,7 +82,7 @@ const router = new VueRouter({
         { path: "follower/list", component: Follower, name: "followerList" },
         {
           path: "answers/:answerType",
-          component: AnswerList,
+          component: AnswerListContent,
           name: "answerList",
           props: true,
         },
