@@ -162,6 +162,10 @@ https://github.com/tko-asn/bukken-api
 <br>
 
 #### ユーザーの回答画面
+###### ユーザーの回答
+![image](https://user-images.githubusercontent.com/83702606/141115175-f9ab4be3-e11a-417a-899b-3d6ab6434ff5.png)
+###### いいねした回答
+![image](https://user-images.githubusercontent.com/83702606/141115232-17d86025-de3f-4188-b8bb-1970eedec49b.png)
 
 - ユーザーの回答一覧が閲覧できます
 - 回答をクリックするとその回答がついた質問のページへ移動します
