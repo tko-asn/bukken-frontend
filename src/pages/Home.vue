@@ -91,7 +91,7 @@
                         }"
                       >
                         <div class="item-icon">
-                          <img class="item-icon__img" :src="obj.iconURL" />
+                          <img class="item-icon__img" :src="obj.icon_url" />
                         </div>
                         <p class="list__username">
                           {{ obj.username }}
