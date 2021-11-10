@@ -212,6 +212,7 @@ import Pagination from "@/components/Pagination";
 import apiClient from "@/axios";
 import { mapGetters, mapMutations } from "vuex";
 import followData from "@/mixins/followData";
+import widthMixin from "@/mixins/widthMixin";
 
 export default {
   components: {
@@ -222,7 +223,7 @@ export default {
     PostFilter,
     Pagination,
   },
-  mixins: [followData],
+  mixins: [followData, widthMixin],
   data() {
     return {
       total: 0,
@@ -252,7 +253,6 @@ export default {
         followee: { name: "フォロー", type: "followee" },
         follower: { name: "フォロワー", type: "follower" },
       },
-      width: window.innerWidth,
       showFolloweeList: false,
       showFollowerList: false,
       showAppOverview: false, // 概要の表示・非表示
@@ -273,12 +273,6 @@ export default {
       this.getFollowers(1),
     ]);
     this.setIsLoading(false);
-  },
-  mounted() {
-    // 画面幅の変更を感知
-    window.addEventListener("resize", () => {
-      this.width = window.innerWidth;
-    });
   },
   computed: {
     ...mapGetters("auth", ["userId", "isLoggedIn"]),

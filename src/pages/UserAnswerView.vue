@@ -46,6 +46,7 @@
 import AnswerList from "@/components/AnswerList";
 import apiClient from "@/axios";
 import { mapGetters } from "vuex";
+import widthMixin from "@/mixins/widthMixin";
 
 export default {
   props: {
@@ -53,6 +54,7 @@ export default {
     userId: String,
   },
   components: { AnswerList },
+  mixins: [widthMixin],
   data() {
     return {
       sideMenu: [
@@ -61,19 +63,12 @@ export default {
       ],
       type: this.answerType,
       userData: {},
-      width: window.innerWidth,
     };
   },
   async created() {
     const { data } = await apiClient.get("/users/" + this.userId + "/");
     this.userData = data;
     this.$store.commit("home/setIsLoading", false);
-  },
-  mounted() {
-    // 画面幅の変更を感知
-    window.addEventListener("resize", () => {
-      this.width = window.innerWidth;
-    });
   },
   computed: {
     ...mapGetters("home", ["showSideMenu"]),
