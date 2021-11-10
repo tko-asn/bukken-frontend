@@ -78,6 +78,7 @@ https://github.com/tko-asn/bukken-api
 - サイドメニューの「フォロー」から以下のユーザーのリストを閲覧できます
   - フォローしているユーザー
   - フォロワー
+<br>
 
 #### 質問詳細画面
 ###### ログインしていない場合
@@ -102,6 +103,7 @@ https://github.com/tko-asn/bukken-api
 - 以下の条件を満たす場合回答へのコメントを作成・編集・削除することができます
   - 質問がログインユーザー自身のものである場合
   - コメントのついた回答がログインユーザー自身のものである場合
+<br>
 
 #### 質問投稿画面
 ![image](https://user-images.githubusercontent.com/83702606/139508293-47acd492-54d8-41e7-8db0-b199eee2a07c.png)
@@ -114,6 +116,7 @@ https://github.com/tko-asn/bukken-api
   - 質問内容
   - 対象物件の所在地（必須）
   - 質問のカテゴリー
+<br>
 
 #### ユーザー表示画面
 ###### マイページ
@@ -134,6 +137,8 @@ https://github.com/tko-asn/bukken-api
   - ユーザーアイコン
   - ユーザー名
   - プロフィール
+  - ユーザーの回答
+  - ユーザーがいいねした回答
   - ユーザーのフォローしているユーザー
   - ユーザーのフォロワー
   - メールアドレス（マイページの場合）
@@ -146,6 +151,7 @@ https://github.com/tko-asn/bukken-api
 - 他のユーザーのページの場合以下の機能が利用できます
   - フォロー機能
   - ユーザーの質問表示機能（ユーザーの質問画面に移動）
+<br>
 
 #### ユーザーの質問画面
 ![image](https://user-images.githubusercontent.com/83702606/139509290-085e9494-7ebf-4a91-a713-7745faaf6c02.png)
@@ -153,6 +159,16 @@ https://github.com/tko-asn/bukken-api
 - ユーザーの質問一覧が閲覧できます
 - ヘッダーの検索バーから質問を検索できます
 - 上部のフィルターからユーザーの質問をフィルタリングできます
+<br>
+
+#### ユーザーの回答画面
+
+- ユーザーの回答一覧が閲覧できます
+- 回答をクリックするとその回答がついた質問のページへ移動します
+- 回答の種類は以下です
+  - ユーザーの回答
+  - （ユーザーが）いいねした回答
+<br>
 
 #### ユーザー編集画面
 ![image](https://user-images.githubusercontent.com/83702606/139508605-187ef3b6-34f6-4659-845a-494a337a80bf.png)
@@ -163,6 +179,7 @@ https://github.com/tko-asn/bukken-api
   - ユーザー名
   - ユーザーアイコン
   - 自己紹介
+<br>
 
 #### ログイン画面
 ![image](https://user-images.githubusercontent.com/83702606/139508687-debceead-937f-4f99-a93f-a6b25b7a408e.png)
@@ -170,6 +187,7 @@ https://github.com/tko-asn/bukken-api
 - 以下の情報でログインできます
   - ユーザー名またはメールアドレス
   - パスワード
+<br>
  
 #### 新規登録画面
 ![image](https://user-images.githubusercontent.com/83702606/139508706-115a0694-4d81-4462-adca-12297309996b.png)
