@@ -49,7 +49,7 @@
         v-show="$route.params.answerType === 'answer'"
         :to="{
           name: 'userAnswer',
-          params: { userId, answerType: 'answer' },
+          params: { userId: userIdProps, answerType: 'answer' },
         }"
         >ユーザーの回答一覧へ</router-link
       >
@@ -58,7 +58,7 @@
         v-show="$route.params.answerType === 'like'"
         :to="{
           name: 'userAnswer',
-          params: { userId, answerType: 'like' },
+          params: { userId: userIdProps, answerType: 'like' },
         }"
         >いいねした回答一覧へ</router-link
       >
@@ -75,7 +75,7 @@ export default {
   components: { Pagination },
   props: {
     answerType: String,
-    userId: String,
+    userIdProps: String,
     pagination: {
       type: Boolean,
       default: false,
@@ -101,9 +101,9 @@ export default {
     async getAnswers(page) {
       let route;
       if (this.answerType === "answer") {
-        route = "/answers/user/" + this.userId + "/" + page + "/";
+        route = "/answers/user/" + this.userIdProps + "/" + page + "/";
       } else if (this.answerType === "like") {
-        route = "/answers/liked/answer/" + this.userId + "/" + page + "/";
+        route = "/answers/liked/answer/" + this.userIdProps + "/" + page + "/";
       }
       const { data } = await apiClient.get(route);
       this.answers = data.answers;

@@ -101,12 +101,6 @@
 export default {
   props: {
     total: Number, // 総ページ数
-    userId: {
-      // 取得する投稿の投稿者ID
-      type: String,
-      required: false,
-      default: "",
-    },
     paginationFunc: {
       type: Function,
       default: () => {},
@@ -159,7 +153,6 @@ export default {
 .list-pagination {
   display: flex;
   justify-content: center;
-  padding-bottom: 30px;
   list-style: none;
   margin: 0;
   padding: 20px 0;
@@ -169,11 +162,11 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 50px;
+  min-width: 30px;
+  height: 40px;
   margin: 0 5px;
   border: 1px solid gray;
-  box-shadow: 0 2px 2px rgb(90, 90, 90);
+  box-shadow: 0 2px 2px rgb(184, 181, 181);
   border-radius: 5px;
   background: #fff;
   color: rgb(101, 102, 102);
@@ -193,7 +186,7 @@ export default {
 }
 
 .item-page__link--direction {
-  width: 80px;
+  width: 60px;
 }
 
 @media screen and (max-width: 1024px) {

@@ -35,7 +35,7 @@
     <!-- 回答一覧 -->
     <AnswerList
       class="container__answer-list"
-      :userId="userId"
+      :userIdProps="userId"
       :answerType="type"
       :pagination="true"
     />
