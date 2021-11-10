@@ -132,13 +132,18 @@ export default {
     },
     // 投稿を作成
     async createPost() {
+      this.isDisabled = true;
       // バリデーション実行
+      await this.addressValidation(this.addressData).catch((err) => {
+        this.isDisabled = false;
+        throw new Error(err);
+      });
       this.validate();
-      this.addressValidation(this.addressData);
 
       // バリデーションメッセージの有無を確認
       Object.keys(this.validations).forEach((key) => {
         if (this.validations[key].length) {
+          this.isDisabled = false;
           throw new Error("Invalid"); // 処理を中断
         }
       });

@@ -157,7 +157,13 @@
                 class="form-answer__validation"
                 :messages="answerValidations"
               />
-              <button class="form-answer__btn" @click="postAnswer">回答</button>
+              <button 
+                class="form-answer__btn" 
+                @click="postAnswer" 
+                :disabled="isDisabled.postAnswer"
+              >
+                回答
+              </button>
             </template>
             <!-- 既に回答している場合 -->
             <p class="form-answer__text form-answer__text--answered" v-else>
@@ -187,6 +193,7 @@
                 <button
                   class="form-answer__btn form-answer__btn--half_edit"
                   @click="updatePost"
+                  :disabled="isDisabled.updatePost"
                 >
                   編集
                 </button>
@@ -202,7 +209,8 @@
               />
               <button
                 class="form-answer__btn form-answer__btn--delete"
-                :disabled="deletePostText !== '削除'"
+                :disabled="
+                  deletePostText !== '削除' || isDisabled.deletePost"
                 @click="deletePost"
               >
                 削除
@@ -318,7 +326,11 @@
               >
                 キャンセル
               </button>
-              <button class="form-answer__btn" @click="editAnswer(answer.id)">
+              <button 
+                class="form-answer__btn" 
+                @click="editAnswer(answer.id)"
+                :disabled="isDisabled.editAnswer" 
+              >
                 保存
               </button>
             </div>
@@ -344,6 +356,7 @@
               <button
                 class="form-answer__btn form-answer__btn--delete"
                 @click="deleteAnswer(answer.id)"
+                :disabled="isDisabled.deleteAnswer"
               >
                 削除
               </button>
@@ -369,6 +382,7 @@
               <button
                 class="form-comment__btn"
                 @click="createComment(answer.id)"
+                :disabled="isDisabled.createComment"
               >
                 コメントする
               </button>
@@ -407,6 +421,7 @@
                     <button
                       class="form-comment__btn form-comment__btn--delete"
                       @click="deleteComment(comment.id)"
+                      :disabled="isDisabled.deleteComment"
                     >
                       削除
                     </button>
@@ -435,6 +450,7 @@
                       <button
                         class="form-comment__btn"
                         @click="editComment(comment.id)"
+                        :disabled="isDisabled.editComment"
                       >
                         保存
                       </button>
@@ -577,6 +593,16 @@ export default {
       isFullDisplay: false, // コメントを全表示するかどうか
       deletePostText: "", // 投稿削除文
       favoritePostList: [],
+      isDisabled: {
+        postAnswer: false,
+        createComment: false,
+        updatePost: false,
+        editAnswer: false,
+        editComment: false,
+        deletePost: false,
+        deleteAnswer: false,
+        deleteComment: false,
+      },
     };
   },
   created() {
@@ -755,6 +781,7 @@ export default {
     },
     // 投稿を編集する
     async updatePost() {
+      this.isDisabled.updatePost = true;
       // 住所に変更がある場合
       if (
         this.editAddressData.postalCode !== this.post.address.postalCode ||
@@ -762,7 +789,10 @@ export default {
         this.editAddressData.buildingName !== this.post.address.buildingName
       ) {
         // バリデーションを実行
-        this.addressValidation(this.editAddressData);
+        await this.addressValidation(this.editAddressData).catch((err) => {
+          this.isDisabled.updatePost = false;
+          throw new Error(err);
+        });
         const { data } = await apiClient.post(
           // 住所のIDを取得
           "/addresses/find/or/create/",
@@ -805,10 +835,11 @@ export default {
       this.editCategory = false;
 
       this.isEditingPost = false;
+      this.isDisabled.updatePost = false;
     },
     // 回答を投稿する
     async postAnswer() {
-      // ログインしていなければログインページへ
+      this.isDisabled.postAnswer = true;
       if (!this.isLoggedIn) {
         this.$router.push("/login");
         return;
@@ -820,6 +851,7 @@ export default {
       // 回答のバリデーション
       if (!this.newAnswer) {
         this.answerValidations.push("回答を入力してください");
+        this.isDisabled.postAnswer = false;
         return;
       }
 
@@ -841,12 +873,18 @@ export default {
 
       // フォームの文章を初期化
       this.newAnswer = "";
+      this.isDisabled.postAnswer = false;
     },
     // 投稿を削除
     deletePost() {
+      this.isDisabled.deletePost = true;
       apiClient.delete("/posts/delete/" + this.post.id + "/")
         .then(() => {
+          this.isDisabled.deletePost = false;
           this.$router.replace("/");
+        })
+        .catch(() => {
+          this.isDisabled.deletePost = false;
         });
     },
     // 回答にいいねする
@@ -881,12 +919,14 @@ export default {
     },
     // 回答を編集
     async editAnswer(answerId) {
+      this.isDisabled.editAnswer = true;
       this.editAnswerData[answerId].validations = [];
 
       if (!this.editAnswerData[answerId].content) {
         this.editAnswerData[answerId].validations.push(
           "回答を入力してください"
         );
+        this.isDisabled.editAnswer = false;
         return;
       }
 
@@ -901,9 +941,11 @@ export default {
 
       // 回答編集フォームを閉じる
       this.editAnswerData[answerId].isEditing = false;
+      this.isDisabled.editAnswer = false;
     },
     // 回答を削除
     async deleteAnswer(answerId) {
+      this.isDisabled.deleteAnswer = true;
       await apiClient.delete("/answers/destroy/" + answerId + "/");
 
       // 回答を更新
@@ -912,12 +954,16 @@ export default {
 
       // 編集用データを削除
       delete this.editAnswerData[answerId];
+      this.isDisabled.deleteAnswer = false;
     },
     // コメントを作成
     async createComment(answerId) {
+      this.isDisabled.createComment = true;
+
       this.commentValidations = [];
       if (!this.newComments[answerId]) {
         this.commentValidations.push("コメントを入力してください");
+        this.isDisabled.createComment = false;
         return;
       }
 
@@ -937,14 +983,18 @@ export default {
 
       // コメントフォームを初期化
       this.newComments[answerId] = "";
+
+      this.isDisabled.createComment = false;
     },
     async editComment(commentId) {
+      this.isDisabled.editComment = true;
       this.editCommentData[commentId].validations = [];
 
       if (!this.editCommentData[commentId].content) {
         this.editCommentData[commentId].validations.push(
           "コメントを入力してください"
         );
+        this.isDisabled.editComment = false;
         return;
       }
 
@@ -959,8 +1009,10 @@ export default {
 
       // フォームを閉じる
       this.editCommentData[commentId].isEditing = false;
+      this.isDisabled.editComment = false;
     },
     async deleteComment(commentId) {
+      this.isDisabled.deleteComment = true;
       await apiClient.delete("/comments/delete/" + commentId + "/");
 
       // 回答を更新
@@ -969,6 +1021,7 @@ export default {
 
       // 編集用データを削除
       delete this.editCommentData[commentId];
+      this.isDisabled.deleteComment = false;
     },
     // コメントの編集用データを作成
     setEditCommentData(answers) {
@@ -1303,8 +1356,14 @@ ul {
   opacity: 0.8;
 }
 
-.form-answer__btn:hover {
+.form-answer__btn:hover,
+.form-comment__btn:hover {
   opacity: 0.8;
+}
+
+.form-answer__btn:disabled,
+.form-comment__btn:disabled {
+  opacity: 0.6;
 }
 
 .form-answer__btn--half_cancel {
@@ -1390,10 +1449,6 @@ ul {
 
 .form-comment__validation {
   font-size: 0.8em;
-}
-
-.form-comment__btn:hover {
-  opacity: 0.8;
 }
 
 /* コメント表示欄 */
