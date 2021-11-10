@@ -63,8 +63,9 @@
                   href=""
                   class="list__link"
                   @click.prevent="toggleUser(menuObj.type)"
-                  >{{ menuObj.name }}</a
                 >
+                  {{ menuObj.name }}
+                </a>
                 <!-- ドロップダウンメニュー -->
                 <transition name="open">
                   <ul
@@ -85,27 +86,36 @@
                         :to="{
                           name: 'userView',
                           params: {
-                            id: followsObjKey(menuObj.type, obj).id,
+                            id: obj.id,
                           },
                         }"
                       >
                         <div class="item-icon">
-                          <img
-                            class="item-icon__img"
-                            :src="followsObjKey(menuObj.type, obj).iconURL"
-                          />
+                          <img class="item-icon__img" :src="obj.iconURL" />
                         </div>
                         <p class="list__username">
-                          {{ followsObjKey(menuObj.type, obj).username }}
+                          {{ obj.username }}
                         </p>
                       </router-link>
                     </li>
+                    <router-link
+                      class="list__link list__link--small"
+                      :to="{
+                        name: moreUserLinkName(menuObj.type),
+                        params: { id: userId },
+                      }"
+                      v-if="followTotal[menuObj.type] > 1"
+                    >
+                      もっとみる
+                      <fa-icon class="list__icon" icon="angle-double-right" />
+                    </router-link>
                     <a
                       class="list__link list__link--small"
                       href=""
                       @click.prevent="closeUserList(menuObj.type)"
-                      >閉じる</a
-                    >
+                      >閉じる
+                      <fa-icon class="list__icon" icon="chevron-up" />
+                    </a>
                   </ul>
                 </transition>
               </li>
@@ -201,6 +211,7 @@ import PostFilter from "@/components/PostFilter";
 import Pagination from "@/components/Pagination";
 import apiClient from "@/axios";
 import { mapGetters, mapMutations } from "vuex";
+import followData from "@/mixins/followData";
 
 export default {
   components: {
@@ -211,6 +222,7 @@ export default {
     PostFilter,
     Pagination,
   },
+  mixins: [followData],
   data() {
     return {
       total: 0,
@@ -255,7 +267,11 @@ export default {
     };
   },
   async created() {
-    await this.getLatestPosts(1);
+    await Promise.all([
+      this.getLatestPosts(1),
+      this.getFollowees(1),
+      this.getFollowers(1),
+    ]);
     this.setIsLoading(false);
   },
   mounted() {
@@ -267,7 +283,7 @@ export default {
   computed: {
     ...mapGetters("auth", ["userId", "isLoggedIn"]),
     ...mapGetters("home", ["showSideMenu", "isLoading"]),
-    ...mapGetters("follows", ["follow", "follower"]),
+    ...mapGetters("followeeId", ["followeeId"]),
   },
   methods: {
     ...mapMutations("home", ["toggleSideMenu", "hideSideMenu", "setIsLoading"]),
@@ -286,13 +302,9 @@ export default {
       this.postObj.favorites.page = page;
     },
     async getFolloweePosts(page) {
-      const followsId = [];
-      for (const obj of this.$store.getters["follows/follow"]) {
-        followsId.push(obj.follow.id);
-      }
       const { data } = await apiClient.post(
         "/posts/followee/page/" + page + "/",
-        { followsId }
+        { followsId: this.followeeId }
       );
       this.postObj.followee.posts = data.posts;
       this.total = data.total;
@@ -342,11 +354,7 @@ export default {
 
           // followeeで絞り込み
         } else if (this.activeMenu === "followee") {
-          const followsId = []; // フォローしているユーザーのIDの配列
-          for (const obj of this.$store.getters["follows/follow"]) {
-            followsId.push(obj.follow.id);
-          }
-          payload.params.authorId = followsId;
+          payload.params.authorId = this.followeeId;
 
           // お気に入りの投稿表示中の絞り込み
         } else if (this.activeMenu === "favorites") {
@@ -382,20 +390,15 @@ export default {
     followsList(type) {
       // フォローしているユーザー一覧を取得する場合
       if (type === "followee") {
-        return this.follow;
+        return this.followees;
 
         // フォロワー一覧を取得する場合
       } else if (type === "follower") {
-        return this.follower;
+        return this.followers;
       }
     },
-    // フォローデータの種類を判定しデータの属性の値を返す
-    followsObjKey(type, obj) {
-      if (type === "followee") {
-        return obj.follow;
-      } else if (type === "follower") {
-        return obj.user;
-      }
+    moreUserLinkName(type) {
+      return type === "followee" ? "followList" : "followerList";
     },
     // ユーザーのドロップダウンメニューを閉じる
     closeUserList(userType) {
@@ -497,6 +500,10 @@ a {
 .list__link--small {
   height: 35px;
   font-size: 0.8em;
+}
+
+.list__icon {
+  margin-left: 5px;
 }
 
 .list__username {

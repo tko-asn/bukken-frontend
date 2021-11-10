@@ -1,37 +1,42 @@
 <template>
-  <FollowsList :followsList="followerList" />
+  <div class="block-follower">
+    <FollowsList :followsList="followers" />
+    <Pagination
+      class="block-follower__pagination"
+      :total="followTotal.follower"
+      :pageNumber="followPage.follower"
+      :paginationFunc="pagination"
+    />
+  </div>
 </template>
 
 <script>
 import FollowsList from "@/components/FollowsList";
+import Pagination from "@/components/Pagination";
+import followData from "@/mixins/followData";
 
 export default {
   components: {
     FollowsList,
+    Pagination,
   },
+  mixins: [followData],
   props: {
-    isMe: Boolean, // ログインユーザーかどうか
-    userId: String,
-    follower: Array, // ログインユーザーのフォロワーリスト
+    userIdProps: String,
   },
   created() {
-    if (!this.isMe) {
-      // 他のユーザーのフォロワーリストを取得
-      this.$store
-        .dispatch("follows/getFollower", { followId: this.userId, isMe: false })
-        .then((followerList) => {
-          this.followerList = followerList; // 他のユーザーのフォロワーデータの場合はdataに保存
-        });
-    } else {
-      // ログインユーザーのフォロワーリストをセット
-      this.followerList = this.follower;
-    }
+    this.getFollowers(1, this.userIdProps);
   },
-  data() {
-    return {
-      // 他のユーザーのフォロワーデータのリスト
-      followerList: [],
-    };
+  methods: {
+    pagination(page) {
+      this.getFollowers(page, this.userIdProps);
+    },
   },
 };
 </script>
+
+<style scoped>
+.block-follower__pagination {
+  padding: 5px 0;
+}
+</style>
