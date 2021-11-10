@@ -1,5 +1,5 @@
 import apiClient from "@/axios";
-import store from "@/store";
+import store from "@/store/index";
 
 const state = {
   // 認証情報
@@ -19,7 +19,6 @@ const getters = {
   username: (state) => state.username,
   iconURL: (state) => state.iconURL,
   selfIntroduction: (state) => state.selfIntroduction,
-  favoriteUsers: (state) => state.favoriteUsers,
 };
 
 const mutations = {
@@ -60,7 +59,7 @@ const mutations = {
 
 const actions = {
   // ログイン
-  async login({ commit, state }, payload) {
+  async login({ state, commit }, payload) {
     // APIを実行
     const { data } = await apiClient
       .post("/auth/login/", payload)
@@ -72,13 +71,7 @@ const actions = {
     // id, username, email, selfIntroduciton, iconURLを保存
     commit("set", data);
 
-    await Promise.all([
-      store.dispatch("follows/getFollow", { userId: state.userId, isMe: true }), // フォローデータ
-      store.dispatch("follows/getFollower", {
-        followId: state.userId,
-        isMe: true,
-      }), // フォロワーデータ
-    ]);
+    await store.dispatch("followeeId/getFolloweeId", state.userId);
   },
   // サインアップ
   signUp({ dispatch }, payload) {
@@ -88,7 +81,7 @@ const actions = {
       .catch((err) => Promise.reject(err));
   },
   // トークンの検証
-  async verify({ commit, state }) {
+  async verify({ state, commit }) {
     // APIを実行
     const { data } = await apiClient
       .get("/auth/verify/")
@@ -97,13 +90,7 @@ const actions = {
     // ユーザー情報をセット(stateが初期化されている状態でトークンが残っている場合)
     commit("set", data);
 
-    await Promise.all([
-      store.dispatch("follows/getFollow", { userId: state.userId, isMe: true }), // フォローデータ
-      store.dispatch("follows/getFollower", {
-        followId: state.userId,
-        isMe: true,
-      }), // フォロワーデータ
-    ]);
+    await store.dispatch("followeeId/getFolloweeId", state.userId);
   },
   // ログアウト
   logout({ commit }) {
