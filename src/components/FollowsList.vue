@@ -4,24 +4,21 @@
     <template v-if="followsList.length">
       <li
         class="container-follows-list__item"
-        v-for="followsObj in followsList"
-        :key="followsObj.id"
+        v-for="user in followsList"
+        :key="user.id"
       >
         <router-link
           class="block-follows"
           :to="{
             name: 'userView',
-            params: { id: followsObj[userProperty].id },
+            params: { id: user.id },
           }"
         >
           <div class="item-icon">
-            <img
-              class="item-icon__img"
-              :src="followsObj[userProperty].iconURL"
-            />
+            <img class="item-icon__img" :src="user.icon_url" />
           </div>
           <p class="block-follows__username">
-            {{ followsObj[userProperty].username }}
+            {{ user.username }}
           </p>
         </router-link>
       </li>
@@ -49,14 +46,6 @@ export default {
       // フォロワーを表示するページの場合
       return "フォロワーはいません";
     },
-    userProperty() {
-      // フォロワーを表示する場合
-      if (this.$route.name === "followList") {
-        return "follow";
-      }
-      // フォローしているユーザーを表示する場合
-      return "user";
-    },
   },
 };
 </script>
@@ -66,14 +55,15 @@ export default {
 .container-follows-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 5px;
+  border-bottom: 1px solid silver;
 }
 
 /* ユーザー表示部分 */
 .block-follows {
   display: flex;
   align-items: center;
-  height: 60px;
+  height: 50px;
   padding: 0 10px;
   white-space: nowrap;
   overflow: hidden;
@@ -86,15 +76,17 @@ export default {
 }
 
 /* アイコン */
+.item-icon,
+.item-icon__img {
+  width: 40px;
+  height: 40px;
+}
+
 .item-icon {
-  width: 50px;
-  height: 50px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 50px;
-  height: 50px;
   object-fit: cover;
 }
 
@@ -103,7 +95,6 @@ export default {
   margin-left: 30px;
   overflow: hidden;
   color: rgb(83, 81, 81);
-  font-size: 1.2em;
   letter-spacing: 2px;
 }
 

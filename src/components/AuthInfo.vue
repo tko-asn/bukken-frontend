@@ -1,33 +1,50 @@
 <template>
-  <div class="container-auth-info">
-    <!-- メールアドレス -->
-    <div class="block-email">
-      <label for="email" class="block-email__label">メールアドレス</label>
-      <input
-        class="block-email__input"
-        type="text"
-        name="email"
-        v-model="userEmail"
-      />
-    </div>
-    <ValidationMessage
-      :messages="emailMessages"
-      v-show="emailMessages.length"
-    />
-    <button class="container-auth-info__btn" @click="changeEmail">保存</button>
-    <router-link
-      :to="{ name: 'changePassword' }"
-      class="container-auth-info__link"
-      >パスワードの変更</router-link
-    >
+  <div class="block-auth-info">
+    <ContentTitle title="認証情報" :showMenuFunc="showMenuFunc" />
+    <Content>
+      <div class="container-auth-info">
+        <!-- メールアドレス -->
+        <div class="block-email">
+          <label for="email" class="block-email__label">メールアドレス</label>
+          <input
+            class="block-email__input"
+            type="text"
+            name="email"
+            v-model="userEmail"
+          />
+        </div>
+        <ValidationMessage
+          :messages="emailMessages"
+          v-show="emailMessages.length"
+        />
+        <button class="container-auth-info__btn" @click="changeEmail">
+          保存
+        </button>
+        <router-link
+          :to="{ name: 'changePassword' }"
+          class="container-auth-info__link"
+          >パスワードの変更</router-link
+        >
+      </div>
+    </Content>
   </div>
 </template>
 
 <script>
+import ContentTitle from "@/components/ContentTitle";
+import Content from "@/components/Content";
 import ValidationMessage from "@/components/ValidationMessage";
 
 export default {
+  props: {
+    showMenuFunc: {
+      type: Function,
+      default: () => {},
+    },
+  },
   components: {
+    ContentTitle,
+    Content,
     ValidationMessage,
   },
   data() {
@@ -78,7 +95,6 @@ export default {
   width: 80%;
   margin: 0 auto;
   padding: 20px;
-  background: #fff;
 }
 
 /* フォーム部分 */

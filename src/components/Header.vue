@@ -106,6 +106,7 @@
 <script>
 import SubMenu from "@/components/SubMenu";
 import authInfoMixin from "@/mixins/authInfoMixin";
+import widthMixin from "@/mixins/widthMixin";
 import { mapGetters, mapMutations } from "vuex";
 
 export default {
@@ -116,19 +117,12 @@ export default {
     return {
       logo: require("@/assets/BUKKEN_logo.png"),
       noSubMenuRoute: ["home"],
-      width: window.innerWidth,
     };
   },
   computed: {
     ...mapGetters("home", ["showSideMenu"]),
   },
-  mounted() {
-    // 画面幅の変更を感知
-    window.addEventListener("resize", () => {
-      this.width = window.innerWidth;
-    });
-  },
-  mixins: [authInfoMixin],
+  mixins: [authInfoMixin, widthMixin],
   methods: {
     ...mapMutations("home", ["toggleSideMenu", "hideSideMenu"]),
     // プルダウンメニュー展開
