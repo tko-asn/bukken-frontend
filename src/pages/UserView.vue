@@ -302,7 +302,6 @@ export default {
       this.displayedSelfIntroduction = this.selfIntroduction;
       this.displayedIconURL = this.iconURL;
     }
-    this.$store.commit("home/setIsLoading", false);
   },
   methods: {
     ...mapActions("followeeId", ["createFolloweeId", "deleteFolloweeId"]),
@@ -408,10 +407,6 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     this.showSideMenu = false;
-    next();
-  },
-  beforeRouteLeave(to, from, next) {
-    this.$store.commit("home/setIsLoading", true);
     next();
   },
 };
