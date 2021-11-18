@@ -3,9 +3,7 @@
   <div class="container-post-list">
     <!-- 投稿がある場合 -->
     <transition name="fade" mode="out-in" appear>
-      <div class="container-post-list__loader" v-if="isLoading">
-        <vue-loaders name="ball-spin-fade-loader" color="black" scale="1" />
-      </div>
+      <Loader v-if="isLoading" />
       <transition-group
         name="fadeGroup"
         class="container-post-list__block-posts"
@@ -61,15 +59,21 @@
 </template>
 
 <script>
+import Loader from "@/components/Loader";
 import addressData from "@/mixins/addressData";
-import { mapGetters } from "vuex";
 
 export default {
   props: {
     postList: Array, // 投稿リスト
+    isLoading: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  components: {
+    Loader,
   },
   computed: {
-    ...mapGetters("home", ["isLoading"]),
     // 投稿リストの要素数が奇数か判定
     isOdd() {
       return this.postList.length % 2 !== 0;
