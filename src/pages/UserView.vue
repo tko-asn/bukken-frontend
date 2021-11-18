@@ -288,7 +288,7 @@ export default {
     if (!this.isMe) {
       // ユーザーの情報を取得
       apiClient
-        .get("/users/" + this.id + "/")
+        .get(`/users/${this.id}/`)
         .then(({ data }) => {
           this.displayedUsername = data.username;
           this.displayedSelfIntroduction = data.self_introduction;
@@ -390,7 +390,7 @@ export default {
       if (!this.isMe) {
         // 自分以外のユーザーのidの場合
         apiClient
-          .get("/users/" + val + "/")
+          .get(`/users/${val}/`)
           .then(({ data }) => {
             this.displayedUsername = data.username;
             this.displayedSelfIntroduction = data.self_introduction;

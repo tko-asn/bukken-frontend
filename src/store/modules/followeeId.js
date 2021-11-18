@@ -23,7 +23,7 @@ const mutations = {
 const actions = {
   async getFolloweeId({ commit }, userId) {
     const { data } = await apiClient.get(
-      "/users/follow/id/list/" + userId + "/"
+      `/users/follow/id/list/${userId}/`
     );
     commit(
       "setFolloweeId",
@@ -35,7 +35,7 @@ const actions = {
     commit("addFolloweeId", params.followId);
   },
   async deleteFolloweeId({ commit }, { followId, userId }) {
-    await apiClient.delete("/follows/delete/" + followId + "/" + userId + "/");
+    await apiClient.delete(`/follows/delete/${followId}/${userId}/`);
     commit("removeFolloweeId", followId);
   },
 };

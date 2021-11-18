@@ -605,7 +605,7 @@ export default {
     if (this.isLoggedIn) {
       this.getFavoritePostList();
     }
-    apiClient.get("/posts/post/" + this.postId + "/").then(({ data }) => {
+    apiClient.get(`/posts/post/${this.postId}/`).then(({ data }) => {
       this.post = data; // 対象の投稿データをセット
 
       // コメントの初期値を作成
@@ -768,7 +768,7 @@ export default {
     async deleteFavoritePost() {
       // お気に入りの投稿を削除
       await apiClient
-        .delete("/posts/" + this.postId + "/remove/favorite/" + this.userId + "/");
+        .delete(`/posts/${this.postId}/remove/favorite/${this.userId}/`);
       await this.getFavoritePostList();
     },
     // 投稿者のページへ移動
@@ -780,7 +780,7 @@ export default {
     },
     async getFavoritePostList() {
       const { data } = await apiClient.get(
-        "/posts/favorite/user/" + this.userId + "/id/list/"
+        `/posts/favorite/user/${this.userId}/id/list/`
       );
       this.favoritePostList = data;
     },
@@ -820,13 +820,13 @@ export default {
 
       // 投稿を編集
       await apiClient.patch(
-        "/posts/update/" + this.post.id + "/",
+        `/posts/update/${this.post.id}/`,
         this.editPostData
       );
 
       if (this.editCategory) {
         // 投稿のカテゴリーを全削除
-        await apiClient.delete("/posts/" + this.post.id + "/remove/categories");
+        await apiClient.delete(`/posts/${this.post.id}/remove/categories/`);
         // カテゴリーのIDのリストを取得
         const { data } = await apiClient.post(
           "/categories/find/or/create/",
@@ -845,7 +845,7 @@ export default {
       }
 
       // 投稿内容を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
 
       // フラグを初期化
@@ -882,7 +882,7 @@ export default {
       await apiClient.post("/answers/create/", params);
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
 
       // 回答の編集用データを更新
@@ -893,7 +893,7 @@ export default {
     // 投稿を削除
     deletePost() {
       this.isDisabled.deletePost = true;
-      apiClient.delete("/posts/delete/" + this.post.id + "/")
+      apiClient.delete(`/posts/delete/${this.post.id}/`)
         .then(() => {
           this.isDisabled.deletePost = false;
           this.$router.replace("/");
@@ -918,18 +918,18 @@ export default {
       await apiClient.post("/answers/add/like/", params);
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
     },
     // 回答のいいねを外す
     async dislike(answerId) {
       // いいねを削除
       await apiClient.delete(
-        "/answers/remove/like/" + answerId + "/user/" + this.userId + "/"
+        `/answers/remove/like/${answerId}/user/${this.userId}/`
       );
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
     },
     // 回答を編集
@@ -945,10 +945,10 @@ export default {
         return;
       }
 
-      await apiClient.patch("/answers/update/" + answerId + "/", params);
+      await apiClient.patch(`/answers/update/${answerId}/`, params);
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
       this.setEditAnswerData(this.post.answers);
 
@@ -959,10 +959,10 @@ export default {
     // 回答を削除
     async deleteAnswer(answerId) {
       this.isDisabled.deleteAnswer = true;
-      await apiClient.delete("/answers/destroy/" + answerId + "/");
+      await apiClient.delete(`/answers/destroy/${answerId}/`);
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
 
       // 編集用データを削除
@@ -988,7 +988,7 @@ export default {
       await apiClient.post("/comments/create/", params);
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
 
       // 編集用データを更新
@@ -1014,10 +1014,10 @@ export default {
       const params = {
         content: this.editCommentData[commentId].content,
       };
-      await apiClient.patch("/comments/update/" + commentId + "/", params);
+      await apiClient.patch(`/comments/update/${commentId}/`, params);
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
 
       // フォームを閉じる
@@ -1026,10 +1026,10 @@ export default {
     },
     async deleteComment(commentId) {
       this.isDisabled.deleteComment = true;
-      await apiClient.delete("/comments/delete/" + commentId + "/");
+      await apiClient.delete(`/comments/delete/${commentId}/`);
 
       // 回答を更新
-      const { data } = await apiClient.get("/posts/post/" + this.postId + "/");
+      const { data } = await apiClient.get(`/posts/post/${this.postId}/`);
       this.post = data;
 
       // 編集用データを削除
@@ -1075,7 +1075,7 @@ export default {
   watch: {
     postId(val) {
       // サイドバーからページをpostIdを切り替えたとき
-      apiClient.get("/posts/post/" + val + "/").then(({ data }) => {
+      apiClient.get(`/posts/post/${val}/`).then(({ data }) => {
         this.post = data; // 対象の投稿データをセット
         this.setEditCommentData(this.post.answers);
         this.setEditAnswerData(this.post.answers);

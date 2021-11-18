@@ -282,14 +282,14 @@ export default {
   methods: {
     ...mapMutations("home", ["toggleSideMenu", "hideSideMenu", "setIsLoading"]),
     async getLatestPosts(page) {
-      const { data } = await apiClient.get("/posts/page/" + page + "/");
+      const { data } = await apiClient.get(`/posts/page/${page}/`);
       this.postObj.home.posts = data.posts;
       this.total = data.total;
       this.postObj.home.page = page;
     },
     async getFavoritePosts(page) {
       const { data } = await apiClient.get(
-        "/posts/favorite/user/" + this.userId + "/page/" + page + "/"
+        `/posts/favorite/user/${this.userId}/page/${page}/`
       );
       this.postObj.favorites.posts = data.posts;
       this.total = data.total;
@@ -297,7 +297,7 @@ export default {
     },
     async getFolloweePosts(page) {
       const { data } = await apiClient.post(
-        "/posts/followee/page/" + page + "/",
+        `/posts/followee/page/${page}/`,
         { followsId: this.followeeId }
       );
       this.postObj.followee.posts = data.posts;
@@ -306,7 +306,7 @@ export default {
     },
     async getMyPosts(page) {
       const { data } = await apiClient.get(
-        "/posts/" + this.userId + "/page/" + page + "/"
+        `/posts/${this.userId}/page/${page}/`
       );
       this.postObj.myPosts.posts = data.posts;
       this.total = data.total;
@@ -314,7 +314,7 @@ export default {
     },
     async getFilteredPosts(page, conditions = {}) {
       const { data } = await apiClient.get(
-        "/posts/filter/query/page/" + page + "/",
+        `/posts/filter/query/page/${page}/`,
         conditions
       );
 
@@ -324,7 +324,7 @@ export default {
     },
     async getSearchedPosts(page, conditions = {}) {
       const { data } = await apiClient.get(
-        "/posts/search/query/page/" + page + "/",
+        `/posts/search/query/page/${page}/`,
         conditions
       );
       this.postObj.search.posts = data.posts;
