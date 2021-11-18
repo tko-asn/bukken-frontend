@@ -146,8 +146,6 @@ export default {
     },
     // 絞り込み
     async filter() {
-      this.$store.commit("home/setIsLoading", true);
-
       this.switchType("filter");
       const params = {
         categories: this.selectedCategories,
@@ -158,8 +156,6 @@ export default {
         paramsSerializer: (params) => qs.stringify(params),
       };
       await this.filterPosts(1, filter);
-
-      this.$store.commit("home/setIsLoading", false);
     },
     // フィルターの開閉
     toggleFilter() {
