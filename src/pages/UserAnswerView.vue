@@ -68,7 +68,6 @@ export default {
   async created() {
     const { data } = await apiClient.get(`/users/${this.userId}/`);
     this.userData = data;
-    this.$store.commit("home/setIsLoading", false);
   },
   computed: {
     ...mapGetters("home", ["showSideMenu"]),
@@ -77,10 +76,6 @@ export default {
     switchAnswerType(type) {
       this.type = type;
     },
-  },
-  beforeRouteLeave(to, from, next) {
-    this.$store.commit("home/setIsLoading", true);
-    next();
   },
 };
 </script>

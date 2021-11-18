@@ -1,11 +1,9 @@
 const state = {
   showSideMenu: false, // SP・タブレット状態でのメニューの表示切り替え
-  isLoading: true,
 };
 
 const getters = {
   showSideMenu: state => state.showSideMenu,
-  isLoading: state => state.isLoading,
 };
 
 const mutations = {
@@ -16,9 +14,6 @@ const mutations = {
   // SP・タブレット状態のでのサイドメニューの非表示
   hideSideMenu(state) {
     state.showSideMenu = false;
-  },
-  setIsLoading(state, boolean) {
-    state.isLoading = boolean;
   },
 };
 
