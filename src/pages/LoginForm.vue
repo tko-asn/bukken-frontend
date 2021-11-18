@@ -248,6 +248,7 @@ export default {
   background: rgb(16, 211, 65);
   color: #fff;
   letter-spacing: 3px;
+  cursor: pointer;
 }
 
 .form-login__btn-login:hover {
