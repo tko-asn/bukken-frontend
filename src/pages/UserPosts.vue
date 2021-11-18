@@ -69,7 +69,7 @@ export default {
   created() {
     Promise.all([
       this.getPosts(1), // ユーザーの投稿のリストを取得
-      apiClient.get("/users/" + this.userId + "/"), // ユーザーデータを取得
+      apiClient.get(`/users/${this.userId}/`), // ユーザーデータを取得
     ]).then((values) => {
       this.userData = values[1].data;
       this.$store.commit("home/setIsLoading", false);
@@ -79,9 +79,9 @@ export default {
     async getPosts(page, payload = {}) {
       let route = "/posts/" + this.userId + "/page/" + page + "/";
       if (this.postType === "filter") {
-        route = "/posts/filter/query/page/" + page + "/";
+        route = `/posts/filter/query/page/${page}/`;
       } else if (this.postType === "search") {
-        route = "/posts/search/query/page/" + page + "/";
+        route = `/posts/search/query/page/${page}/`;
       }
       // フィルタリング・検索条件に変更があった場合
       if ("params" in payload) {

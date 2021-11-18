@@ -101,9 +101,9 @@ export default {
     async getAnswers(page) {
       let route;
       if (this.answerType === "answer") {
-        route = "/answers/user/" + this.userIdProps + "/" + page + "/";
+        route = `/answers/user/${this.userIdProps}/${page}/`;
       } else if (this.answerType === "like") {
-        route = "/answers/liked/answer/" + this.userIdProps + "/" + page + "/";
+        route = `/answers/liked/answer/${this.userIdProps}/${page}/`;
       }
       const { data } = await apiClient.get(route);
       this.answers = data.answers;

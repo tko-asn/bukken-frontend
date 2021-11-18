@@ -106,7 +106,7 @@ const actions = {
   editAuthInfo({ commit, state }, authInfo) {
     // emailかpasswordの編集（どちらか）
     return apiClient
-      .patch("/users/change/" + state.userId + "/", authInfo)
+      .patch(`/users/change/${state.userId}/`, authInfo)
       .then(() => {
         // emailの変更の場合
         if (authInfo.email) {
@@ -124,22 +124,20 @@ const actions = {
 
     // paramsがFormDataの場合（アイコンに変更があった場合）
     if (!params.username) {
-      url = "/users/profile/" + state.userId + "/edit/";
+      url = `/users/profile/${state.userId}/edit/`;
       headers = { "Content-Type": "multipart/form-data" }; // multerを使用
       mutation = "setProfile";
 
       // paramsがFormDataではない場合（アイコンに変更がなかった場合）
     } else {
-      url = "/users/profile/" + state.userId + "/edit/noicon/";
+      url = `/users/profile/${state.userId}/edit/noicon/`;
       headers = { "Content-Type": "application/json" }; // 通常通り
       mutation = "setProfileNoIcon";
     }
 
     // APIを実行
     return apiClient
-      .patch(url, params, {
-        headers, // headersをセット
-      })
+      .patch(url, params, { headers })
       .then(({ data }) => {
         // vuexの値を更新
         commit(mutation, data);
@@ -149,7 +147,7 @@ const actions = {
   // アカウント閉鎖
   delete({ dispatch, state }) {
     return apiClient
-      .delete("/users/delete/" + state.userId + "/")
+      .delete(`/users/delete/${state.userId}/`)
       .then(() => dispatch("logout")); // 成功したらログアウト
   },
 };
