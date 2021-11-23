@@ -5,22 +5,10 @@
     <h1 class="form-post__title">質問投稿</h1>
 
     <!-- タイトル -->
-    <input
-      class="form-post__input-title"
-      type="text"
-      placeholder="タイトル"
-      @keydown.enter.prevent
-      v-model="title"
-    />
+    <LargeInput placeholder="タイトル" v-model="title" />
 
     <!-- 物件名 -->
-    <input
-      class="form-post__input-property"
-      type="text"
-      placeholder="物件名"
-      @keydown.enter.prevent
-      v-model="property"
-    />
+    <LargeInput placeholder="物件名" v-model="property" />
 
     <ValidationMessage
       class="form-post__validation"
@@ -29,14 +17,12 @@
     />
 
     <!-- 内容 -->
-    <textarea
-      name="text"
-      class="form-post__input-text"
-      cols="30"
-      rows="8"
+    <TextArea
+      elementId="textarea-post-form"
       placeholder="質問内容"
+      height="200px"
       v-model="text"
-    ></textarea>
+    />
 
     <!-- 所在地のフォーム -->
     <div class="item-form">
@@ -63,9 +49,14 @@
     </div>
 
     <!-- ボタン -->
-    <button class="form-post__btn" @click="createPost" :disabled="isDisabled">
-      投稿
-    </button>
+    <div class="form-post__btn">
+      <LargeButton
+        btnValue="投稿"
+        width="40%"
+        :isDisabled="isDisabled"
+        @click="createPost"
+      />
+    </div>
   </form>
 </template>
 
@@ -75,6 +66,9 @@ import ValidationMessage from "@/components/ValidationMessage";
 import CategoryForm from "@/components/CategoryForm";
 import Tag from "@/components/Tag";
 import AddressForm from "@/components/AddressForm";
+import LargeInput from "@/components/LargeInput";
+import LargeButton from "@/components/LargeButton";
+import TextArea from "@/components/TextArea";
 import addressValidationMixin from "@/mixins/addressValidationMixin";
 
 export default {
@@ -83,6 +77,9 @@ export default {
     Tag,
     CategoryForm,
     AddressForm,
+    LargeInput,
+    LargeButton,
+    TextArea,
   },
   data() {
     return {
@@ -221,30 +218,13 @@ export default {
   color: rgb(58, 65, 61);
 }
 
-/* 入力部分 */
-[class*="input"] {
-  height: 30px;
-  margin-top: 20px;
-  padding: 5px 10px;
-  border: 2px solid rgb(143, 142, 142);
-  border-radius: 4px;
-  font-size: 1.1em;
-}
-
-/* 内容入力欄 */
-.form-post__input-text {
-  height: 300px;
-  padding: 10px;
-  font-size: 1.4em;
-}
-
 .item-form {
   display: flex;
   flex-direction: column;
 }
 
 .item-form__title {
-  margin: 30px 0 0;
+  margin: 10px 0 0;
   font-size: 1.3em;
   letter-spacing: 2px;
 }
@@ -255,27 +235,9 @@ export default {
   color: rgb(78, 77, 77);
 }
 
-/* ボタン */
 .form-post__btn {
-  width: 40%;
-  height: 50px;
-  margin: 10px auto;
-  border: none;
-  border-radius: 3px;
-  background: rgb(126, 79, 170);
-  color: #fff;
-  font-size: 1.2em;
-}
-
-.form-post__btn:hover {
-  background: rgb(173, 110, 231);
-  cursor: pointer;
-}
-
-.form-post__btn:disabled {
-  background: rgba(151, 100, 199, 0.877);
-  color: rgb(194, 188, 188);
-  cursor: default;
+  display: flex;
+  justify-content: center;
 }
 
 /* アニメーション */

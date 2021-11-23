@@ -1,10 +1,11 @@
 <template>
   <div class="block-answer-form">
-    <textarea
-      class="block-answer-form__textarea"
+    <TextArea
+      elementId="textarea-answer-form"
       placeholder="回答を投稿する"
+      height="130px"
       v-model="answerObj.content"
-    ></textarea>
+    />
     <ValidationMessage
       class="block-answer-form__validation"
       :messages="validations"
@@ -30,38 +31,40 @@
         v-model="answerObj.evaluation"
       />悪い
     </div>
-    <button
-      class="block-answer-form__btn"
+    <MiddleButton
+      btnValue="回答"
       @click="buttonFunc(answerObj)"
-      :disabled="isDisabled"
+      :isDisabled="isDisabled"
       v-if="!isTwoButton"
-    >
-      回答
-    </button>
+    />
     <div class="block-answer-form__two-button" v-else>
-      <button
-        class="block-answer-form__btn block-answer-form__btn--cancel"
+      <MiddleButton
+        btnValue="キャンセル"
         @click="cancelFunc(answerId, false, { cancel: true })"
-      >
-        キャンセル
-      </button>
-      <button
-        class="block-answer-form__btn"
+        btnColor="cancel"
+        width="45%"
+      />
+      <MiddleButton
+        btnValue="保存"
         @click="buttonFunc(answerObj, answerId)"
-        :disabled="isDisabled.editAnswer"
-      >
-        保存
-      </button>
+        :isDisabled="isDisabled"
+        btnColor="edit"
+        width="45%"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import ValidationMessage from "@/components/ValidationMessage";
+import MiddleButton from "@/components/MiddleButton";
+import TextArea from "@/components/TextArea";
 
 export default {
   components: {
     ValidationMessage,
+    MiddleButton,
+    TextArea,
   },
   props: {
     buttonFunc: {
@@ -111,15 +114,6 @@ export default {
   padding-top: 10px;
 }
 
-.block-answer-form__textarea {
-  height: 130px;
-  padding: 10px;
-  border-color: silver;
-  border-radius: 3px;
-  font-size: 1.1em;
-  letter-spacing: 2px;
-}
-
 .block-answer-form__validation {
   margin: 0;
 }
@@ -137,24 +131,8 @@ export default {
   margin-left: 10px;
 }
 
-.block-answer-form__btn {
-  height: 40px;
-  margin: 20px 0;
-  border: none;
-  border-radius: 5px;
-  background: rgb(172, 21, 192);
-  color: white;
-  letter-spacing: 2px;
-  cursor: pointer;
-}
-
 .block-answer-form__two-button {
   display: flex;
-  justify-content: flex-end;
-}
-
-.block-answer-form__btn--cancel {
-  background: rgb(167, 165, 165);
-  margin-right: 5px;
+  justify-content: space-around;
 }
 </style>

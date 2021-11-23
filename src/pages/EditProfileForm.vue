@@ -19,25 +19,21 @@
           type="file"
           @change="changeFile"
         />
-        <input
-          class="container-form__input-username"
-          type="text"
-          placeholder="ユーザー名"
-          v-model="newData.username"
-        />
+        <SmallInput placeholder="ユーザー名" v-model="newData.username" />
         <div class="block-validation" v-show="usernameMessage.length">
           <ValidationMessage :messages="usernameMessage" />
         </div>
-        <textarea
+        <TextArea
+          elementId="textarea-edit-profile"
           class="container-form__input-self-introduction"
-          cols="20"
-          rows="10"
-          placeholder="自己紹介文"
+          placeholder="自己紹介"
           v-model="newData.self_introduction"
-        ></textarea>
-        <button class="container-form__btn-input" @click="editProfile">
-          保存
-        </button>
+        />
+        <SmallButton
+          btnValue="保存"
+          @click="editProfile"
+          :isDisabled="isDisabled"
+        />
       </div>
     </form>
   </div>
@@ -47,10 +43,16 @@
 import Compressor from "compressorjs";
 import authInfoMixin from "@/mixins/authInfoMixin";
 import ValidationMessage from "@/components/ValidationMessage";
+import SmallInput from "@/components/SmallInput";
+import SmallButton from "@/components/SmallButton";
+import TextArea from "@/components/TextArea";
 
 export default {
   components: {
     ValidationMessage,
+    SmallInput,
+    SmallButton,
+    TextArea,
   },
   data() {
     return {
@@ -63,6 +65,7 @@ export default {
         self_introduction: "", // DBのカラム名に合わせる
       },
       usernameMessage: [], // ユーザー名のバリデーションメッセージ
+      isDisabled: false,
     };
   },
   mixins: [authInfoMixin],
@@ -96,6 +99,8 @@ export default {
       });
     },
     editProfile() {
+      this.isDisabled = true;
+
       this.usernameMessage = [];
       let params;
       // アイコン画像に変更がない場合
@@ -126,6 +131,7 @@ export default {
           });
         })
         .catch((err) => {
+          this.isDisabled = false;
           if (err.response.data.message === "Duplicate") {
             err.response.data.fields.forEach((field) => {
               if (field === "username") {
@@ -153,7 +159,7 @@ export default {
 <style scoped>
 /* ページ全体 */
 .container {
-  padding: 70px 0 20px;
+  padding: 60px 0 20px;
 }
 
 .form-edit-profile {
@@ -191,52 +197,30 @@ export default {
   background: rgb(58, 202, 70);
 }
 
-/* 入力部分 */
+.item-icon,
+.item-icon__img {
+  width: 130px;
+  height: 130px;
+}
+
 .item-icon {
-  width: 150px;
-  height: 150px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 150px;
-  height: 150px;
   object-fit: cover;
-}
-
-[class*="input"] {
-  width: 100%;
-  margin: 10px 0;
-  border: 0.5px solid rgb(172, 170, 170);
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
-.container-form__input-username {
-  height: 30px;
-  padding: 0 10px;
-}
-
-.container-form__input-self-introduction {
-  padding: 10px 10px;
-}
-
-.container-form__btn-input {
-  height: 35px;
-  margin-top: 10px;
-  border: 1px solid #fff;
-  border-radius: 5px;
-  background: rgb(15, 207, 25);
-  color: #fff;
-}
-
-.container-form__btn-input:hover {
-  background: rgb(30, 250, 41);
-  cursor: pointer;
 }
 
 .block-validation {
   width: 100%;
+}
+
+.container-form__input-icon {
+  margin: 10px 0 5px;
+}
+
+.container-form__input-self-introduction {
+  border: 1px solid silver;
 }
 
 @keyframes slideUp {
@@ -256,22 +240,12 @@ export default {
 }
 
 @media screen and (max-width: 599px) {
-  .item-icon,
-  .item-icon__img {
-    width: 150px;
-    height: 150px;
-  }
-
-  [class*="input"] {
-    width: 90%;
-  }
-
   .container {
-    padding: 50px 0 0;
+    padding: 80px 0 0;
   }
 
   .form-edit-profile {
-    width: 100%;
+    width: 95%;
   }
 }
 </style>

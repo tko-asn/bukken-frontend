@@ -1,15 +1,14 @@
 <template>
   <div class="block-change-password">
     <ContentTitle title="パスワードの変更" :showMenuFunc="showMenuFunc" />
-    <Content>
+    <Content :isScroll="true">
       <div class="container-change-password">
         <!-- パスワード変更フォーム -->
         <div class="block-input">
           <label class="block-input__label" for="current_password"
             >現在のパスワード</label
           >
-          <input
-            class="block-input__input"
+          <SmallInput
             type="password"
             name="current_password"
             v-model="currentPassword"
@@ -24,8 +23,7 @@
           <label class="block-input__label" for="new_password"
             >新しいパスワード</label
           >
-          <input
-            class="block-input__input"
+          <SmallInput
             type="password"
             name="new_password"
             v-model="newPassword"
@@ -37,13 +35,12 @@
           v-show="newPasswdMessage.length"
         />
         <div class="block-input">
-          <label class="block-input__label" for="current_password"
+          <label class="block-input__label" for="cfm_password"
             >確認用パスワード</label
           >
-          <input
-            class="block-input__input"
+          <SmallInput
             type="password"
-            name="current_password"
+            name="cfm_password"
             v-model="cfmPassword"
           />
         </div>
@@ -54,9 +51,11 @@
         />
 
         <!-- ボタン -->
-        <button class="container-change-password__btn" @click="changePassword">
-          保存
-        </button>
+        <SmallButton
+          btnValue="保存"
+          @click="changePassword"
+          :isDisabled="isDisabled"
+        />
       </div>
     </Content>
   </div>
@@ -67,6 +66,8 @@
 import ContentTitle from "@/components/ContentTitle";
 import Content from "@/components/Content";
 import ValidationMessage from "@/components/ValidationMessage";
+import SmallInput from "@/components/SmallInput";
+import SmallButton from "@/components/SmallButton";
 
 export default {
   props: {
@@ -79,6 +80,8 @@ export default {
     ValidationMessage,
     ContentTitle,
     Content,
+    SmallInput,
+    SmallButton,
   },
   data() {
     return {
@@ -89,10 +92,13 @@ export default {
       currentPasswdMessage: [],
       newPasswdMessage: [],
       cfmPasswdMessage: [],
+      isDisabled: false,
     };
   },
   methods: {
     changePassword() {
+      this.isDisabled = true;
+
       // バリデーションメッセージの初期化
       this.currentPasswdMessage = [];
       this.newPasswdMessage = [];
@@ -106,6 +112,7 @@ export default {
         this.newPasswdMessage.length ||
         this.cfmPasswdMessage.length
       ) {
+        this.isDisabled = false;
         return;
       }
 
@@ -123,6 +130,7 @@ export default {
           });
         })
         .catch((err) => {
+          this.isDisabled = false;
           // 現在のパスワードが違う場合
           if (err.response.data.message === "Invalid current password") {
             this.currentPasswdMessage.push(
@@ -189,26 +197,11 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
-.block-input__input {
-  flex-grow: 3;
-  width: 100%;
-  height: 20px;
-  box-sizing: border-box;
-  border: 1px solid gray;
-  border-radius: 4px;
-}
-
-/* ボタン */
-.container-change-password__btn {
-  margin-top: 20px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  background: green;
-  color: white;
-  cursor: pointer;
+.container-change-password__validation {
+  padding: 0;
+  font-size: 0.8em;
 }
 </style>

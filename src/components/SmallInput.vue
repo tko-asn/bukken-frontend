@@ -1,13 +1,18 @@
 <template>
   <input
-    class="input-auth"
+    class="input-small"
     :type="type"
     :placeholder="placeholder"
+    :name="name"
+    :style="itemWidth"
+    @keydown.enter.prevent
     v-model="inputedValue"
   />
 </template>
 
 <script>
+import ItemWidthMixin from "@/mixins/ItemWidthMixin";
+
 export default {
   props: {
     type: {
@@ -22,7 +27,12 @@ export default {
       type: String,
       default: "",
     },
+    name: {
+      type: String,
+      default: "",
+    },
   },
+  mixins: [ItemWidthMixin],
   computed: {
     inputedValue: {
       get() {
@@ -37,18 +47,18 @@ export default {
 </script>
 
 <style scoped>
-.input-auth {
+.input-small {
   display: block;
-  width: 85%;
   height: 30px;
   margin-top: 5px;
   padding: 0 5px;
   border: 1px solid silver;
+  box-sizing: border-box;
   border-radius: 5px;
 }
 
 @media screen and (max-width: 599px) {
-  .input-auth {
+  .input-small {
     padding: 0 10px;
     font-size: 1em;
     letter-spacing: 1.5px;
