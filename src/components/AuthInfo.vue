@@ -6,20 +6,20 @@
         <!-- メールアドレス -->
         <div class="block-email">
           <label for="email" class="block-email__label">メールアドレス</label>
-          <input
-            class="block-email__input"
-            type="text"
-            name="email"
-            v-model="userEmail"
+          <SmallInput name="email" v-model="userEmail" />
+        </div>
+        <div class="item-validation">
+          <ValidationMessage
+            :messages="emailMessages"
+            v-show="emailMessages.length"
           />
         </div>
-        <ValidationMessage
-          :messages="emailMessages"
-          v-show="emailMessages.length"
+        <SmallButton
+          class="container-auth-info__btn"
+          btnValue="保存"
+          @click="changeEmail"
+          :isDisabled="isDisabled"
         />
-        <button class="container-auth-info__btn" @click="changeEmail">
-          保存
-        </button>
         <router-link
           :to="{ name: 'changePassword' }"
           class="container-auth-info__link"
@@ -34,6 +34,8 @@
 import ContentTitle from "@/components/ContentTitle";
 import Content from "@/components/Content";
 import ValidationMessage from "@/components/ValidationMessage";
+import SmallInput from "@/components/SmallInput";
+import SmallButton from "@/components/SmallButton";
 
 export default {
   props: {
@@ -46,11 +48,14 @@ export default {
     ContentTitle,
     Content,
     ValidationMessage,
+    SmallInput,
+    SmallButton,
   },
   data() {
     return {
       userEmail: "",
       emailMessages: [],
+      isDisabled: false,
     };
   },
   created() {
@@ -59,7 +64,14 @@ export default {
   },
   methods: {
     changeEmail() {
+      this.isDisabled = true;
       this.emailMessages = [];
+
+      if (!this.userEmail) {
+        this.emailMessages.push("メールアドレスを入力してください。");
+        this.isDisabled = false;
+        return;
+      }
 
       // データはオブジェクトで送信
       this.$store
@@ -71,6 +83,7 @@ export default {
           }); // マイページへ
         })
         .catch((err) => {
+          this.isDisabled = false;
           if (err.response.data.message === "Duplicate") {
             err.response.data.fields.forEach((field) => {
               if (field === "email") {
@@ -94,7 +107,7 @@ export default {
   align-items: center;
   width: 80%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 0 10px;
 }
 
 /* フォーム部分 */
@@ -112,33 +125,22 @@ export default {
   letter-spacing: 1px;
 }
 
-/* input要素 */
-.block-email__input {
-  flex-grow: 3;
-  width: 95%;
-  height: 20px;
-  border: 1px solid silver;
-  border-radius: 4px;
-}
-
-/* 保存ボタン */
-.container-auth-info__btn {
-  margin-top: 20px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 3px;
-  background: green;
-  color: white;
-  cursor: pointer;
-}
-
 /* パスワード変更のリンク */
 .container-auth-info__link {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  margin: 15px 10px 0;
+  margin: 0 10px;
   text-decoration: none;
   font-size: 0.8em;
+}
+
+.item-validation {
+  width: 100%;
+  font-size: 0.9em;
+}
+
+.container-auth-info__btn {
+  margin-top: 20px;
 }
 </style>

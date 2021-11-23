@@ -3,68 +3,69 @@
   <form @submit.prevent="signUp" class="form-sign-up">
     <!-- タイトル -->
     <AuthFormTitle title="Sign Up" />
+    <div class="form-sign-up__items">
+      <!-- ユーザー名 -->
+      <SmallInput placeholder="ユーザー名" v-model="username" />
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="usernameMessage"
+        />
+      </div>
 
-    <!-- ユーザー名 -->
-    <AuthInput placeholder="ユーザー名" v-model="username" />
-    <div class="item-validation">
-      <ValidationMessage
-        class="item-validation__validation"
-        :messages="usernameMessage"
+      <!-- メールアドレス -->
+      <SmallInput placeholder="メールアドレス" v-model="email" />
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="emailMessage"
+        />
+      </div>
+
+      <!-- パスワード -->
+      <SmallInput type="password" placeholder="パスワード" v-model="password" />
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="passwordMessage"
+        />
+      </div>
+
+      <!-- 確認用パスワード -->
+      <SmallInput
+        type="password"
+        placeholder="確認用パスワード"
+        v-model="confirmationPassword"
+      />
+      <div class="item-validation">
+        <ValidationMessage
+          class="item-validation__validation"
+          :messages="cfmMessage"
+        />
+      </div>
+
+      <!-- ボタン -->
+      <SmallButton
+        btnValue="新規登録"
+        @click="signUp"
+        :isDisabled="isDisabled"
       />
     </div>
-
-    <!-- メールアドレス -->
-    <AuthInput placeholder="メールアドレス" v-model="email" />
-    <div class="item-validation">
-      <ValidationMessage
-        class="item-validation__validation"
-        :messages="emailMessage"
-      />
-    </div>
-
-    <!-- パスワード -->
-    <AuthInput type="password" placeholder="パスワード" v-model="password" />
-    <div class="item-validation">
-      <ValidationMessage
-        class="item-validation__validation"
-        :messages="passwordMessage"
-      />
-    </div>
-
-    <!-- 確認用パスワード -->
-    <AuthInput
-      type="password"
-      placeholder="確認用パスワード"
-      v-model="confirmationPassword"
-    />
-    <div class="item-validation">
-      <ValidationMessage
-        class="item-validation__validation"
-        :messages="cfmMessage"
-      />
-    </div>
-
-    <!-- ボタン -->
-    <AuthButton
-      btnValue="新規登録"
-      :authFunc="signUp"
-      :isDisabled="isDisabled"
-    />
   </form>
 </template>
 
 <script>
 import ValidationMessage from "@/components/ValidationMessage";
 import AuthFormTitle from "@/components/AuthFormTitle";
-import AuthInput from "@/components/AuthInput";
-import AuthButton from "@/components/AuthButton";
+import SmallInput from "@/components/SmallInput";
+import SmallButton from "@/components/SmallButton";
 
 export default {
   components: {
     ValidationMessage,
     AuthFormTitle,
-    AuthInput,
-    AuthButton,
+    SmallInput,
+    SmallButton,
   },
   data() {
     return {
@@ -190,13 +191,17 @@ export default {
   align-items: center;
   max-width: 430px;
   margin: 65px auto 0;
+  padding-bottom: 10px;
   border: 2px solid rgb(143, 141, 141);
   border-radius: 7px;
   background: #fff;
 }
 
 .item-validation {
-  width: 87%;
   font-size: 0.8em;
+}
+
+.form-sign-up__items {
+  width: 85%;
 }
 </style>

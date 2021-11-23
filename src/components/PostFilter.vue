@@ -63,9 +63,12 @@
         </section>
 
         <!-- 絞り込みボタン -->
-        <a href="" class="item-filter__btn" @click.prevent="filter">
-          絞り込む
-        </a>
+        <LargeButton
+          class="item-filter__btn"
+          btnValue="絞り込む"
+          @click="filter"
+          width="35%"
+        />
       </div>
     </transition>
   </div>
@@ -73,11 +76,13 @@
 
 <script>
 import AddressForm from "@/components/AddressForm";
+import LargeButton from "@/components/LargeButton";
 import qs from "qs";
 
 export default {
   components: {
     AddressForm,
+    LargeButton,
   },
   props: {
     filterPosts: {
@@ -260,23 +265,7 @@ a {
 }
 
 .item-filter__btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 15%;
-  height: 40px;
-  margin: 20px auto;
-  border-radius: 5px;
-  background: rgb(68, 111, 252);
-  color: white;
-}
-
-.item-filter__btn:hover {
-  opacity: 0.9;
-}
-
-.item-filter__btn:active {
-  opacity: 0.4;
+  margin: 15px auto;
 }
 
 @keyframes open {
@@ -295,12 +284,6 @@ a {
 
 .open-leave-active {
   animation: open 0.2s linear reverse;
-}
-
-@media screen and (max-width: 1024px) {
-  .item-filter__btn {
-    width: 40%;
-  }
 }
 
 @media screen and (max-width: 599px) {
