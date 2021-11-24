@@ -8,28 +8,6 @@
           <p class="block-content__title">
             {{ post.title }}
           </p>
-          <!-- 物件情報 -->
-          <div class="item-property">
-            <h4 class="item-property__title">対象物件</h4>
-            <div class="item-proprety__body--no_editing">
-              <!-- 物件名 -->
-              <p class="item-property__text">{{ post.property }}</p>
-              <!-- 物件住所 -->
-              <p class="item-property__text">
-                {{ "〒" + postalCodeA(post) + "-" + postalCodeB(post) }}
-                <span>{{ addressData(post) }}</span>
-              </p>
-              <a
-                class="item-property__link-map"
-                :href="
-                  'https://maps.google.co.jp/maps/search/' + addressData(post)
-                "
-                target="_blank"
-                rel="noopener noreferrer"
-                >地図を表示</a
-              >
-            </div>
-          </div>
           <p class="block-content__updated-at">
             {{ datetime(post.createdAt) }}
             <span
@@ -73,6 +51,29 @@
               <!-- ユーザー名 -->
               <p class="item-bottom__username">
                 {{ postUserData("username") }}
+              </p>
+            </div>
+          </div>
+          <!-- 物件情報 -->
+          <div class="item-property item-property--no_editing">
+            <div class="item-property__body--no_editing">
+              <!-- 物件名 -->
+              <h4 class="item-property__title">物件</h4>
+              <p class="item-property__text">
+                {{ post.property }}
+              </p>
+              <div class="item-property__map" ref="map" v-if="showMap"></div>
+              <!-- 物件住所 -->
+              <p class="item-property__text item-property__text--top_space">
+                <span class="item-property__postal-code">
+                  {{ "〒" + postalCodeA(post) + "-" + postalCodeB(post) }}
+                </span>
+                <span class="item-property__span">
+                  {{ prefecture(post) + municipality(post) + townName(post) }}
+                </span>
+                <span class="item-property__span">
+                  {{ buildingName(post) }}
+                </span>
               </p>
             </div>
           </div>
@@ -595,6 +596,7 @@ export default {
         deleteAnswer: false,
         deleteComment: false,
       },
+      showMap: true,
     };
   },
   created() {
@@ -624,6 +626,9 @@ export default {
       this.editAddressData.postalCodeA = this.postalCodeA(this.post);
       this.editAddressData.postalCodeB = this.postalCodeB(this.post);
     });
+  },
+  mounted() {
+    this.getPropertyMap();
   },
   computed: {
     ...mapGetters("auth", ["isLoggedIn", "userId"]),
@@ -1073,6 +1078,28 @@ export default {
     switchPostEditMode(boolean) {
       this.isEditingPost = boolean;
     },
+    getPropertyMap() {
+      let timer = setInterval(() => {
+        if (window.google && this.post) {
+          clearInterval(timer);
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ address: this.addressData(this.post) }, (results, status) => {
+            if (status === window.google.maps.GeocoderStatus.OK) {
+              const map = new window.google.maps.Map(this.$refs.map, {
+                center: results[0].geometry.location,
+                zoom: 15,
+              });
+              new window.google.maps.Marker({
+                position: results[0].geometry.location,
+                map,
+              });
+            } else {
+              this.showMap = false;
+            }
+          });
+        }
+      }, 500);
+    },
   },
   watch: {
     postId(val) {
@@ -1094,6 +1121,11 @@ export default {
         this.isEditingPost = false;
       });
     },
+    isEditingPost(val) {
+      if (!val) {
+        this.getPropertyMap();
+      }
+    }
   },
 };
 </script>
@@ -1183,6 +1215,11 @@ ul {
 }
 
 /* 物件情報 */
+.item-property--no_editing {
+  border-top: 1px solid silver;
+  padding: 10px 0 20px;
+}
+
 .item-property__title {
   margin: 5px 0 0;
 }
@@ -1190,6 +1227,28 @@ ul {
 .item-property__text {
   overflow-wrap: break-word;
   margin: 0;
+  font-size: 0.9em;
+}
+
+.item-property__text--top_space {
+  margin-top: 10px;
+  font-size: 0.8em;
+}
+
+.item-property__postal-code {
+  display: block;
+}
+
+.item-property__span {
+  display: inline-block;
+}
+
+.item-property__map {
+  width: 260px;
+  height: 180px;
+  margin-top: 10px;
+  border: 1px solid gray;
+  background: silver;
 }
 
 /* 投稿日時 */
@@ -1505,6 +1564,10 @@ ul {
   .container__list-side-post {
     display: none;
   }
+
+  .item-property__map {
+    height: 200px;
+  }
 }
 
 @media screen and (max-width: 599px) {
@@ -1543,6 +1606,11 @@ ul {
 
   .container__item-post-details {
     padding-top: 0;
+  }
+
+  .item-property__map {
+    width: 100%;
+    height: 180px;
   }
 }
 </style>
