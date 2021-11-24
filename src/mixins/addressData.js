@@ -8,13 +8,27 @@ export default {
     postalCodeB(post) {
       return post.address?.["postalCode"].slice(3);
     },
+    // 都道府県
+    prefecture(post) {
+      return post.address?.["prefecture"];
+    },
+    // 市区町村
+    municipality(post) {
+      return post.address?.["municipality"];
+    },
+    townName(post) {
+      return post.address?.["townName"];
+    },
+    buildingName(post) {
+      return post.address?.["buildingName"];
+    },
     // 住所のデータを連結して返す
     addressData(post) {
       return (
-        post.address?.["prefecture"] +
-        post.address?.["municipality"] +
-        post.address?.["townName"] +
-        post.address?.["buildingName"]
+        this.prefecture(post) +
+        this.municipality(post) +
+        this.townName(post) +
+        this.buildingName(post)
       );
     },
   },
