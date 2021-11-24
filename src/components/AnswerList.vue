@@ -1,9 +1,7 @@
 <template>
   <div class="block-answer-list">
     <transition name="fade" mode="out-in" appear>
-      <div class="block-answer-list__spin" v-if="isLoading">
-        <vue-loaders name="ball-spin-fade-loader" color="black" scale="1" />
-      </div>
+      <Loader v-if="isLoading" />
       <transition-group
         name="fadeGroup"
         class="block-answer-list__list-answer"
@@ -69,10 +67,13 @@
 <script>
 import apiClient from "@/axios";
 import Pagination from "./Pagination.vue";
-import { mapGetters } from "vuex";
+import Loader from "./Loader.vue";
 
 export default {
-  components: { Pagination },
+  components: { 
+    Pagination,
+    Loader,
+  },
   props: {
     answerType: String,
     userIdProps: String,
@@ -89,26 +90,27 @@ export default {
         answer: 1,
         like: 1,
       },
+      isLoading: true,
     };
   },
   async created() {
     this.getAnswers(1);
-  },
-  computed: {
-    ...mapGetters("home", ["isLoading"]),
+    this.isLoading = false;
   },
   methods: {
     async getAnswers(page) {
+      this.isLoading = true;
       let route;
       if (this.answerType === "answer") {
-        route = "/answers/user/" + this.userIdProps + "/" + page + "/";
+        route = `/answers/user/${this.userIdProps}/${page}/`;
       } else if (this.answerType === "like") {
-        route = "/answers/liked/answer/" + this.userIdProps + "/" + page + "/";
+        route = `/answers/liked/answer/${this.userIdProps}/${page}/`;
       }
       const { data } = await apiClient.get(route);
       this.answers = data.answers;
       this.total = data.total;
       this.page[this.answerType] = page;
+      this.isLoading = false;
     },
     detailPage(postId) {
       this.$router.push({ name: "postDetails", params: { postId } });
@@ -131,7 +133,7 @@ export default {
   list-style: none;
   display: flex;
   justify-content: center;
-  padding: 20px 0 0;
+  padding: 30px 0 0;
   flex-wrap: wrap;
 }
 

@@ -3,8 +3,7 @@
   <div class="item-self-intro">
     <ContentTitle title="プロフィール" :showMenuFunc="showMenuFunc" />
     <Content :isScroll="true">
-      <p class="item-self-intro__text" v-if="selfIntroduction">
-        {{ selfIntroduction }}
+      <p class="item-self-intro__text" v-if="selfIntroduction">{{ selfIntroduction }}
       </p>
       <p class="item-self-intro__text item-self-intro__text--no_text" v-else>
         自己紹介は<span>ありません</span>
@@ -35,7 +34,8 @@ export default {
 <style scoped>
 .item-self-intro__text {
   margin: 10px 0;
-  padding: 10px 5px;
+  padding: 10px;
+  white-space: pre-wrap;
 }
 
 .item-self-intro__text--no_text {

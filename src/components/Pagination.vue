@@ -11,7 +11,7 @@
             'item-page__link--disabled': pageNumber === 1,
             'item-page__link--end': pageNumber === 1,
           }"
-          @click.prevent="movePage(pageNumber - 1)"
+          @click.prevent="paginationFunc(pageNumber - 1)"
         >
           前へ
         </a>
@@ -25,7 +25,7 @@
             'item-page__link--current': num === pageNumber,
             'item-page__link--disabled': num === pageNumber,
           }"
-          @click.prevent="movePage(num)"
+          @click.prevent="paginationFunc(num)"
           v-show="displayPageButton(num)"
         >
           {{ num }}
@@ -41,7 +41,7 @@
             'item-page__link--disabled': total === pageNumber,
             'item-page__link--end': total === pageNumber,
           }"
-          @click.prevent="movePage(pageNumber + 1)"
+          @click.prevent="paginationFunc(pageNumber + 1)"
         >
           次へ
         </a>
@@ -57,7 +57,7 @@
             'item-page__link--current': num === pageNumber,
             'item-page__link--disabled': num === pageNumber,
           }"
-          @click.prevent="movePage(num)"
+          @click.prevent="paginationFunc(num)"
           v-show="displayPageButton(num)"
           v-for="num in total"
           :key="num"
@@ -75,7 +75,7 @@
             'item-page__link--disabled': pageNumber === 1,
             'item-page__link--end': pageNumber === 1,
           }"
-          @click.prevent="movePage(pageNumber - 1)"
+          @click.prevent="paginationFunc(pageNumber - 1)"
         >
           前へ
         </a>
@@ -88,7 +88,7 @@
             'item-page__link--disabled': total === pageNumber,
             'item-page__link--end': total === pageNumber,
           }"
-          @click.prevent="movePage(pageNumber + 1)"
+          @click.prevent="paginationFunc(pageNumber + 1)"
         >
           次へ
         </a>
@@ -130,12 +130,6 @@ export default {
       } else if (num > this.pageNumber) {
         return num <= this.pageNumber + 2;
       }
-    },
-    // ページ移動
-    async movePage(page) {
-      this.$store.commit("home/setIsLoading", true);
-      await this.paginationFunc(page);
-      this.$store.commit("home/setIsLoading", false);
     },
   },
 };

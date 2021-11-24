@@ -2,35 +2,33 @@
   <!-- フォーム -->
   <div class="block-address">
     <!-- 郵便番号 -->
-    <input
-      type="text"
-      class="block-address__input-postal-code-a"
-      placeholder="xxx"
-      @keydown.enter.prevent
-      v-model="postalCodeA"
-      maxlength="3"
-      @input="
-        $emit('addressData', {
-          postalCode: $event.target.value + postalCodeB,
-          postalCodeA: $event.target.value,
-        })
-      "
-    />
-    <span class="block-address__span">-</span>
-    <input
-      type="text"
-      class="block-address__input-postal-code-b"
-      placeholder="xxxx"
-      @keydown.enter.prevent
-      v-model="postalCodeB"
-      maxlength="4"
-      @input="
-        $emit('addressData', {
-          postalCode: postalCodeA + $event.target.value,
-          postalCodeB: $event.target.value,
-        })
-      "
-    />
+    <div class="block-address__postal-code">
+      <MiddleInput
+        width="45px"
+        placeholder="xxx"
+        v-model="postalCodeA"
+        :maxLength="3"
+        @input="
+          $emit('addressData', {
+            postalCode: $event + postalCodeB,
+            postalCodeA: $event,
+          })
+        "
+      />
+      <span class="block-address__span">-</span>
+      <MiddleInput
+        width="55px"
+        placeholder="xxxx"
+        v-model="postalCodeB"
+        :maxLength="4"
+        @input="
+          $emit('addressData', {
+            postalCode: postalCodeA + $event,
+            postalCodeB: $event,
+          })
+        "
+      />
+    </div>
 
     <!-- バリデーションメッセージ -->
     <ValidationMessage :messages="validations" v-show="validations.length" />
@@ -38,60 +36,42 @@
     <!-- 都道府県と市区町村が存在する場合 -->
     <template v-if="prefecture && municipality">
       <!-- 都道府県・市区町村 -->
-      <ul class="item-address">
-        <li class="item-address__list">
-          <input
-            type="text"
-            class="item-address__input-prefecture"
-            v-model="prefecture"
-            readonly
-          />
-        </li>
-        <li class="item-address__list">
-          <input
-            type="text"
-            class="item-address__input-municipality"
-            v-model="municipality"
-            readonly
-          />
-        </li>
-        <template v-if="optionInput">
-          <li class="item-address__list">
-            <input
-              class="item-address__input-town-name"
-              type="text"
-              placeholder="町名・番地"
-              @keydown.enter.prevent
-              v-model="townName"
-              @input="$emit('addressData', { townName: $event.target.value })"
-            />
-          </li>
-          <li class="item-address__list">
-            <input
-              class="item-address__input-building-name"
-              type="text"
-              placeholder="アパート・マンション名"
-              @keydown.enter.prevent
-              v-model="buildingName"
-              @input="
-                $emit('addressData', { buildingName: $event.target.value })
-              "
-            />
-          </li>
-        </template>
-      </ul>
+      <MiddleInput :readonly="true" v-model="prefecture" :width="inputWidth" />
+      <MiddleInput
+        :readonly="true"
+        v-model="municipality"
+        :width="inputWidth"
+      />
+      <template v-if="optionInput">
+        <MiddleInput
+          placeholder="町名・番地"
+          v-model="townName"
+          :width="inputWidth"
+          @input="$emit('addressData', { townName: $event })"
+        />
+        <MiddleInput
+          placeholder="アパート・マンション名"
+          v-model="buildingName"
+          :width="inputWidth"
+          @input="$emit('addressData', { buildingName: $event })"
+        />
+      </template>
     </template>
   </div>
 </template>
 
 <script>
 import ValidationMessage from "@/components/ValidationMessage";
+import MiddleInput from "@/components/MiddleInput";
+import widthMixin from "@/mixins/widthMixin";
 const YubinBango = require("yubinbango-core2");
 
 export default {
   components: {
     ValidationMessage,
+    MiddleInput,
   },
+  mixins: [widthMixin],
   props: {
     optionInput: {
       // 町名・番地・アパート・マンション名を表示するかどうか
@@ -112,6 +92,11 @@ export default {
           buildingName: "",
         };
       },
+    },
+  },
+  computed: {
+    inputWidth() {
+      return this.width >= 600 ? "70%" : "100%";
     },
   },
   data() {
@@ -164,51 +149,14 @@ export default {
 </script>
 
 <style scoped>
-/* 入力フォームすべて */
-[class*="input"] {
-  height: 20px;
-  padding: 5px 10px;
-  border: 2px solid rgb(143, 142, 142);
-  border-radius: 4px;
-  font-size: 1.1em;
-}
-
-/* リストの間 */
-.item-address__list {
-  margin-top: 15px;
-}
-
 .block-address__span {
   padding: 0 5px;
+  color: rgb(143, 142, 142);
+  font-weight: bold;
 }
 
-.block-address__input-postal-code-a {
-  width: 30px;
-}
-
-.block-address__input-postal-code-b {
-  width: 50px;
-}
-
-.item-address {
+.block-address__postal-code {
   display: flex;
-  flex-direction: column;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-[class*="item-address__input"] {
-  width: 70%;
-}
-
-[class*="item-address__input"]:read-only {
-  background: rgb(216, 214, 214);
-}
-
-@media screen and (max-width: 599px) {
-  [class*="item-address__input"] {
-    width: 80%;
-  }
+  align-items: center;
 }
 </style>

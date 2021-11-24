@@ -24,7 +24,7 @@ export default {
       if (userId || this.isLoggedIn) {
         const id = userId || this.userId;
         const { data } = await apiClient.get(
-          "/users/follow/" + id + "/" + page + "/"
+          `/users/follow/${id}/${page}/`
         );
         this.followees = data.users;
         this.followTotal.followee = data.total;
@@ -35,7 +35,7 @@ export default {
       if (userId || this.isLoggedIn) {
         const id = userId || this.userId;
         const { data } = await apiClient.get(
-          "/users/follower/" + id + "/" + page + "/"
+          `/users/follower/${id}/${page}/`
         );
         this.followers = data.users;
         this.followTotal.follower = data.total;

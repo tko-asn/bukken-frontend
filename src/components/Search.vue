@@ -33,8 +33,6 @@ export default {
   },
   methods: {
     async search() {
-      this.$store.commit("home/setIsLoading", true);
-
       this.switchType("search");
       const params = {
         keyword: this.keyword,
@@ -44,8 +42,6 @@ export default {
         paramsSerializer: (params) => qs.stringify(params),
       };
       await this.searchPosts(1, search);
-
-      this.$store.commit("home/setIsLoading", false);
     },
   },
   watch: {

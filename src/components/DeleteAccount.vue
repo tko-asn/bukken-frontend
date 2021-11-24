@@ -15,27 +15,29 @@
         >「完全に削除」と入力して下さい。</span
       >
     </p>
-    <input
-      class="block-delete-account__input"
-      type="text"
-      placeholder="完全に削除"
-      v-model="deleteText"
-    />
+    <MiddleInput placeholder="完全に削除" v-model="deleteText" />
     <!-- ボタン -->
     <div class="item-btn">
-      <button
-        class="item-btn__btn"
+      <LargeButton
+        btnValue="アカウントを閉鎖"
+        :isDisabled="isDisabled"
+        btnColor="delete"
+        width="180px"
         @click="deleteAccount"
-        :disabled="isDisabled"
-      >
-        アカウントを閉鎖
-      </button>
+      />
     </div>
   </div>
 </template>
 
 <script>
+import LargeButton from "@/components/LargeButton";
+import MiddleInput from "@/components/MiddleInput";
+
 export default {
+  components: {
+    LargeButton,
+    MiddleInput,
+  },
   data() {
     return {
       deleteText: "", // アカウント閉鎖確認用
@@ -67,14 +69,6 @@ export default {
   padding-top: 30px;
 }
 
-.block-delete-account__input {
-  width: 70%;
-  height: 40px;
-  margin-top: 10px;
-  padding-left: 10px;
-  font-size: 1.1em;
-}
-
 .block-delete-account__text {
   font-size: 0.9em;
 }
@@ -94,21 +88,6 @@ export default {
   justify-content: flex-end;
 }
 
-.item-btn__btn {
-  margin-top: 30px;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(247, 18, 10, 0.829);
-  color: #fff;
-  font-size: 1.1em;
-  cursor: pointer;
-}
-
-.item-btn__btn:disabled {
-  opacity: 0.6;
-}
-
 @media screen and (max-width: 599px) {
   .block-delete-account {
     text-align: center;
@@ -121,11 +100,6 @@ export default {
 
   .item-btn {
     justify-content: center;
-  }
-
-  .block-delete-account__input {
-    width: 90%;
-    height: 30px;
   }
 }
 </style>

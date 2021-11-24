@@ -184,7 +184,10 @@
           :switchType="switchPostType"
           v-show="$route.name === 'home'"
         />
-        <router-view :postList="postObj[postType].posts" />
+        <router-view 
+          :postList="postObj[postType].posts" 
+          :isLoading="isLoading" 
+        />
         <!-- ページネーション -->
         <transition name="fade">
           <Pagination
@@ -264,6 +267,7 @@ export default {
         filter: this.getFilteredPosts,
         search: this.getSearchedPosts,
       },
+      isLoading: true,
     };
   },
   async created() {
@@ -272,24 +276,24 @@ export default {
       this.getFollowees(1),
       this.getFollowers(1),
     ]);
-    this.setIsLoading(false);
+    this.isLoading = false;
   },
   computed: {
     ...mapGetters("auth", ["userId", "isLoggedIn"]),
-    ...mapGetters("home", ["showSideMenu", "isLoading"]),
+    ...mapGetters("home", ["showSideMenu"]),
     ...mapGetters("followeeId", ["followeeId"]),
   },
   methods: {
-    ...mapMutations("home", ["toggleSideMenu", "hideSideMenu", "setIsLoading"]),
+    ...mapMutations("home", ["toggleSideMenu", "hideSideMenu"]),
     async getLatestPosts(page) {
-      const { data } = await apiClient.get("/posts/page/" + page + "/");
+      const { data } = await apiClient.get(`/posts/page/${page}/`);
       this.postObj.home.posts = data.posts;
       this.total = data.total;
       this.postObj.home.page = page;
     },
     async getFavoritePosts(page) {
       const { data } = await apiClient.get(
-        "/posts/favorite/user/" + this.userId + "/page/" + page + "/"
+        `/posts/favorite/user/${this.userId}/page/${page}/`
       );
       this.postObj.favorites.posts = data.posts;
       this.total = data.total;
@@ -297,7 +301,7 @@ export default {
     },
     async getFolloweePosts(page) {
       const { data } = await apiClient.post(
-        "/posts/followee/page/" + page + "/",
+        `/posts/followee/page/${page}/`,
         { followsId: this.followeeId }
       );
       this.postObj.followee.posts = data.posts;
@@ -306,7 +310,7 @@ export default {
     },
     async getMyPosts(page) {
       const { data } = await apiClient.get(
-        "/posts/" + this.userId + "/page/" + page + "/"
+        `/posts/${this.userId}/page/${page}/`
       );
       this.postObj.myPosts.posts = data.posts;
       this.total = data.total;
@@ -314,7 +318,7 @@ export default {
     },
     async getFilteredPosts(page, conditions = {}) {
       const { data } = await apiClient.get(
-        "/posts/filter/query/page/" + page + "/",
+        `/posts/filter/query/page/${page}/`,
         conditions
       );
 
@@ -324,7 +328,7 @@ export default {
     },
     async getSearchedPosts(page, conditions = {}) {
       const { data } = await apiClient.get(
-        "/posts/search/query/page/" + page + "/",
+        `/posts/search/query/page/${page}/`,
         conditions
       );
       this.postObj.search.posts = data.posts;
@@ -336,11 +340,14 @@ export default {
       if (this.$route.name !== "home") {
         this.$router.push("/");
       }
+      this.isLoading = true;
       await this.getPostMethods[type](this.postObj[type].page);
       this.activeMenu = this.postType = type;
+      this.isLoading = false;
     },
     // ページネーション・フィルタリング・検索
     async getPosts(page, payload = {}) {
+      this.isLoading = true;
       if ("params" in payload) {
         // myPostsで絞り込み
         if (this.activeMenu === "myPosts") {
@@ -365,6 +372,7 @@ export default {
       } else {
         await this.getPostMethods[this.postType](page);
       }
+      this.isLoading = false;
     },
     switchPostType(type) {
       this.postType = type;
@@ -421,11 +429,6 @@ export default {
     if (to.name === "home") {
       this.getLatestPosts(1);
     }
-    next();
-  },
-  beforeRouteLeave(to, from, next) {
-    // isLoadingを初期化
-    this.$store.commit("home/setIsLoading", true);
     next();
   },
 };

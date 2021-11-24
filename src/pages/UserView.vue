@@ -288,7 +288,7 @@ export default {
     if (!this.isMe) {
       // ユーザーの情報を取得
       apiClient
-        .get("/users/" + this.id + "/")
+        .get(`/users/${this.id}/`)
         .then(({ data }) => {
           this.displayedUsername = data.username;
           this.displayedSelfIntroduction = data.self_introduction;
@@ -302,7 +302,6 @@ export default {
       this.displayedSelfIntroduction = this.selfIntroduction;
       this.displayedIconURL = this.iconURL;
     }
-    this.$store.commit("home/setIsLoading", false);
   },
   methods: {
     ...mapActions("followeeId", ["createFolloweeId", "deleteFolloweeId"]),
@@ -390,7 +389,7 @@ export default {
       if (!this.isMe) {
         // 自分以外のユーザーのidの場合
         apiClient
-          .get("/users/" + val + "/")
+          .get(`/users/${val}/`)
           .then(({ data }) => {
             this.displayedUsername = data.username;
             this.displayedSelfIntroduction = data.self_introduction;
@@ -408,10 +407,6 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     this.showSideMenu = false;
-    next();
-  },
-  beforeRouteLeave(to, from, next) {
-    this.$store.commit("home/setIsLoading", true);
     next();
   },
 };

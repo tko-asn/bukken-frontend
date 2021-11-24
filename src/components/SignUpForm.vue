@@ -1,19 +1,11 @@
 <template>
-  <div class="container">
-    <!-- サインアップフォーム -->
-    <form @submit.prevent="signUp" class="form-sign-up">
-      <!-- ラベル -->
-      <p class="form-sign-up__title">Sign Up</p>
-
+  <!-- サインアップフォーム -->
+  <form @submit.prevent="signUp" class="form-sign-up">
+    <!-- タイトル -->
+    <AuthFormTitle title="Sign Up" />
+    <div class="form-sign-up__items">
       <!-- ユーザー名 -->
-      <input
-        class="form-sign-up__input-username"
-        type="text"
-        placeholder="ユーザー名"
-        v-model="username"
-      />
-
-      <!-- ユーザー名のバリデーションメッセージ -->
+      <SmallInput placeholder="ユーザー名" v-model="username" />
       <div class="item-validation">
         <ValidationMessage
           class="item-validation__validation"
@@ -22,14 +14,7 @@
       </div>
 
       <!-- メールアドレス -->
-      <input
-        class="form-sign-up__input-email"
-        type="text"
-        placeholder="メールアドレス"
-        v-model="email"
-      />
-
-      <!-- メールアドレスのバリデーションメッセージ -->
+      <SmallInput placeholder="メールアドレス" v-model="email" />
       <div class="item-validation">
         <ValidationMessage
           class="item-validation__validation"
@@ -38,14 +23,7 @@
       </div>
 
       <!-- パスワード -->
-      <input
-        class="form-sign-up__input-password"
-        type="password"
-        placeholder="パスワード"
-        v-model="password"
-      />
-
-      <!-- パスワードのバリデーションメッセージ -->
+      <SmallInput type="password" placeholder="パスワード" v-model="password" />
       <div class="item-validation">
         <ValidationMessage
           class="item-validation__validation"
@@ -54,14 +32,11 @@
       </div>
 
       <!-- 確認用パスワード -->
-      <input
-        class="form-sign-up__input-cfm-password"
+      <SmallInput
         type="password"
         placeholder="確認用パスワード"
         v-model="confirmationPassword"
       />
-
-      <!-- 確認用パスワードのバリデーションメッセージ -->
       <div class="item-validation">
         <ValidationMessage
           class="item-validation__validation"
@@ -70,25 +45,27 @@
       </div>
 
       <!-- ボタン -->
-      <button ref="sign_up_button" class="form-sign-up__btn-sign-up">
-        新規作成
-      </button>
-    </form>
-
-    <!-- ログインフォームのリンク -->
-    <div class="block-login">
-      <p class="block-login__text">アカウントをお持ちの場合</p>
-      <router-link class="block-login__link" to="/login">ログイン</router-link>
+      <SmallButton
+        btnValue="新規登録"
+        @click="signUp"
+        :isDisabled="isDisabled"
+      />
     </div>
-  </div>
+  </form>
 </template>
 
 <script>
 import ValidationMessage from "@/components/ValidationMessage";
+import AuthFormTitle from "@/components/AuthFormTitle";
+import SmallInput from "@/components/SmallInput";
+import SmallButton from "@/components/SmallButton";
 
 export default {
   components: {
     ValidationMessage,
+    AuthFormTitle,
+    SmallInput,
+    SmallButton,
   },
   data() {
     return {
@@ -101,13 +78,13 @@ export default {
       emailMessage: [],
       passwordMessage: [],
       cfmMessage: [],
+      isDisabled: false,
     };
   },
   methods: {
     signUp() {
       // 登録ボタンを無効化
-      const buttonElement = this.$refs.sign_up_button;
-      buttonElement.disabled = true;
+      this.isDisabled = true;
 
       // バリデーションメッセージを初期化
       this.usernameMessage = [];
@@ -126,7 +103,7 @@ export default {
         this.cfmMessage.length
       ) {
         // ボタンを有効化
-        buttonElement.disabled = false;
+        this.isDisabled = false;
         return;
       }
 
@@ -145,7 +122,7 @@ export default {
         })
         .catch((err) => {
           // 登録ボタンを有効化
-          buttonElement.disabled = false;
+          this.isDisabled = false;
           if (err.response.data.message === "Duplicate") {
             err.response.data.fields.forEach((field) => {
               if (field === "username") {
@@ -208,129 +185,23 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  padding: 120px 0 0;
-  animation: fadeIn 0.8s;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* サインアップフォーム */
 .form-sign-up {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 450px;
-  margin: 0 auto;
-  border: 4px solid rgb(143, 141, 141);
+  max-width: 430px;
+  margin: 65px auto 0;
+  padding-bottom: 10px;
+  border: 2px solid rgb(143, 141, 141);
   border-radius: 7px;
   background: #fff;
 }
 
-/* フォームラベル */
-.form-sign-up__title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  font-size: 1.6em;
-  letter-spacing: 6px;
-}
-
-.form-sign-up__title:after {
-  content: "";
-  display: block;
-  width: 90%;
-  height: 4px;
-  background: #0fc;
-}
-
-/* 入力欄 */
-[class*="input"] {
-  width: 85%;
-  height: 35px;
-  padding: 0 10px;
-  border: 1px solid silver;
-  border-radius: 5px;
-  font-size: 1.1em;
-}
-
-.form-sign-up::placeholder {
-  color: rgb(170, 167, 167);
-  letter-spacing: 3px;
-}
-
-/* ボタン */
-.form-sign-up__btn-sign-up {
-  width: 90%;
-  height: 40px;
-  margin: 10px 0 30px;
-  border-width: 0px;
-  border-radius: 5px;
-  background: rgb(16, 211, 65);
-  color: #fff;
-  letter-spacing: 3px;
-}
-
-.form-sign-up__btn-sign-up:hover {
-  background: rgb(22, 236, 75);
-}
-
-.form-sign-up__btn-sign-up:disabled {
-  opacity: 0.4;
-}
-
-/* ログインフォームへのリンク部分 */
-.block-login {
-  height: 100px;
-  color: gray;
-  letter-spacing: 2px;
-  text-align: center;
-}
-
-.block-login__text {
-  margin: 20px 0 8px;
+.item-validation {
   font-size: 0.8em;
 }
 
-.block-login__link {
-  color: rgb(52, 189, 161);
-  text-decoration: none;
-}
-
-/* バリデーションメッセージ */
-.item-validation {
-  width: 90%;
-  padding-bottom: 2px;
-}
-
-@media screen and (max-width: 599px) {
-  .container {
-    padding-top: 95px;
-  }
-
-  [class*="input"] {
-    font-size: 1em;
-    letter-spacing: 1.5px;
-  }
-
-  .block-login {
-    padding-bottom: 30px;
-  }
-
-  .block-login__text {
-    margin-top: 30px;
-  }
-
-  .form-sign-up__btn-sign-up {
-    margin-top: 10px;
-  }
+.form-sign-up__items {
+  width: 85%;
 }
 </style>

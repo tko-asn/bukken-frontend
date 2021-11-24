@@ -3,10 +3,8 @@ import VueRouter from "vue-router";
 import store from "@/store";
 
 const Home = () => import(/* webpackChankName: 'Home' */ "./pages/Home");
-const LoginForm = () =>
-  import(/* webpackChankName: 'LoginForm' */ "./pages/LoginForm");
-const SignUpForm = () =>
-  import(/* webpackChankName: 'SignUpForm' */ "./pages/SignUpForm");
+const UserAuthForm = () =>
+  import(/* webpackChankName: 'UserAuthForm' */ "./pages/UserAuthForm");
 const UserView = () =>
   import(/* webpackChankName: 'UserView' */ "./pages/UserView");
 const EditProfileForm = () =>
@@ -39,6 +37,10 @@ const AnswerListContent = () =>
   import(
     /* webpackChankName: 'AnswerListContent' */ "./components/AnswerListContent"
   );
+const LoginForm = () =>
+  import(/* webpackChankName: 'LoginForm' */ "./components/LoginForm");
+const SignUpForm = () =>
+  import(/* webpackChankName: 'SignUpForm' */ "./components/SignUpForm");
 
 Vue.use(VueRouter);
 
@@ -58,8 +60,14 @@ const router = new VueRouter({
         },
       ],
     },
-    { path: "/login", component: LoginForm, name: "login" },
-    { path: "/signup", component: SignUpForm, name: "signUp" },
+    {
+      path: "/",
+      component: UserAuthForm,
+      children: [
+        { path: "login", component: LoginForm, name: "login" },
+        { path: "signup", component: SignUpForm, name: "signUp" },
+      ],
+    },
     {
       path: "/user/:id",
       component: UserView,
