@@ -15,7 +15,6 @@
       >
         {{ userData.username }}
       </router-link>
-      の投稿
     </h2>
     <!-- 投稿フィルター -->
     <PostFilter
@@ -24,7 +23,12 @@
       :switchType="switchPostType"
     />
 
-    <PostList :postList="postList" :isLoading="isLoading" />
+    <PostList
+      :class="{ 'container__item--pc': width >= 1025 }"
+      :postList="postList"
+      :isLoading="isLoading"
+    />
+
     <transition name="fadePagination">
       <Pagination
         :total="total"
@@ -44,6 +48,7 @@ import PostFilter from "@/components/PostFilter";
 import Pagination from "@/components/Pagination";
 import Header from "@/components/Header";
 import Search from "@/components/Search";
+import widthMixin from "@/mixins/widthMixin";
 
 export default {
   components: {
@@ -56,6 +61,7 @@ export default {
   props: {
     userId: String, // ユーザーのID
   },
+  mixins: [widthMixin],
   data() {
     return {
       postList: [], // 表示する投稿
@@ -107,8 +113,13 @@ export default {
 <style scoped>
 /* コンテナ */
 .container {
-  width: 80%;
+  width: 60%;
   padding: 50px 0;
+  margin: 0 auto;
+}
+
+.container__item--pc {
+  width: 80%;
   margin: 0 auto;
 }
 
@@ -116,12 +127,18 @@ export default {
 .container__title {
   margin-bottom: 0;
   padding-left: 10px;
+  overflow: hidden;
   font-size: 1.7em;
 }
 
 /* ユーザー名のリンク */
 .container__link-username {
+  display: inline-block;
+  width: 100%;
   text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 投稿が存在しない場合 */
@@ -153,6 +170,10 @@ export default {
 @media screen and (max-width: 599px) {
   .container__title {
     text-align: center;
+  }
+
+  .container {
+    width: 90%;
   }
 }
 </style>

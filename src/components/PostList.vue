@@ -12,7 +12,7 @@
       >
         <!-- 投稿 -->
         <section
-          class="section-post section-post--exist"
+          class="section-post"
           v-for="post in postList"
           :key="post.id"
           @click="moveToPostPage(post.id)"
@@ -23,7 +23,7 @@
           </h3>
 
           <!-- 投稿者 -->
-          <div class="section-post__author">
+          <div class="block-author">
             <div class="item-icon">
               <img class="item-icon__img" :src="post.user.icon_url" />
             </div>
@@ -33,21 +33,38 @@
           </div>
 
           <!-- 物件情報 -->
-          <section class="block-property">
+          <div class="block-property">
             <h4 class="block-property__title">物件名</h4>
             <p class="section-post__sub-title section-post__sub-title--nowrap">
               {{ post.property }}
             </p>
             <h4 class="block-property__title">所在地</h4>
-            <p class="section-post__sub-title">
+            <p
+              :class="{
+                'section-post__sub-title': true,
+                'section-post__sub-title--nowrap': width >= 600,
+              }"
+            >
               {{ "〒" + postalCodeA(post) + "-" + postalCodeB(post)
               }}<span>{{ addressData(post) }}</span>
             </p>
-          </section>
-        </section>
+          </div>
 
-        <!-- セクションを左揃えにするための空の要素 -->
-        <div class="section-post" v-show="isOdd" key="emptyPost"></div>
+          <!-- カテゴリー -->
+          <div
+            class="block-category"
+            v-if="post.categories.length"
+            v-show="width >= 600"
+          >
+            <span
+              class="block-category__span"
+              v-for="category in post.categories"
+              :key="category.id"
+            >
+              {{ category.firstCategory }}/{{ category.secondCategory }}
+            </span>
+          </div>
+        </section>
       </transition-group>
 
       <!-- 投稿がない場合 -->
@@ -61,6 +78,7 @@
 <script>
 import Loader from "@/components/Loader";
 import addressData from "@/mixins/addressData";
+import widthMixin from "@/mixins/widthMixin";
 
 export default {
   props: {
@@ -73,13 +91,7 @@ export default {
   components: {
     Loader,
   },
-  computed: {
-    // 投稿リストの要素数が奇数か判定
-    isOdd() {
-      return this.postList.length % 2 !== 0;
-    },
-  },
-  mixins: [addressData],
+  mixins: [addressData, widthMixin],
   methods: {
     moveToPostPage(id) {
       this.$router.push({ name: "postDetails", params: { postId: id } });
@@ -98,8 +110,9 @@ export default {
 /* 投稿リストの投稿ブロック */
 .container-post-list__block-posts {
   display: flex;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
+  flex-direction: column;
+  width: 95%;
+  margin: 0 auto;
 }
 
 /* ロード中 */
@@ -109,22 +122,19 @@ export default {
 
 /* 投稿 */
 .section-post {
-  width: 40%;
   max-height: 270px;
-  margin-bottom: 30px;
   padding: 10px;
   overflow: hidden;
-}
-
-.section-post--exist {
-  border: 2px solid rgb(189, 187, 187);
-  border-radius: 5px;
-  box-shadow: 0 3px 4px rgb(70, 69, 69);
+  border: 1px solid rgb(189, 187, 187);
   background: #fff;
   cursor: pointer;
 }
 
-.section-post--exist:hover {
+.section-post + .section-post {
+  margin-top: 20px;
+}
+
+.section-post:hover {
   filter: brightness(90%);
 }
 
@@ -138,9 +148,20 @@ export default {
   font-size: 1.1em;
 }
 
+.block-category {
+  width: 100%;
+  padding: 5px 0;
+  overflow-wrap: break-word;
+}
+
+.block-category__span {
+  margin-right: 5px;
+  color: gray;
+  font-size: 0.8em;
+}
+
 /* 投稿者表示部分 */
-.section-post__author {
-  max-height: 40px;
+.block-author {
   display: flex;
   white-space: nowrap;
   overflow: hidden;
@@ -148,29 +169,30 @@ export default {
   margin: 10px 0;
 }
 
+.item-icon,
+.item-icon__img {
+  width: 20px;
+  height: 20px;
+}
+
 .item-icon {
-  width: 35px;
-  height: 35px;
-  margin-right: 10px;
+  margin-right: 5px;
   background: silver;
 }
 
 .item-icon__img {
-  width: 35px;
-  height: 35px;
   object-fit: cover;
 }
 
 .section-post__sub-title {
   margin: 0;
-  overflow-wrap: break-word;
+  overflow: hidden;
   color: rgb(78, 76, 76);
   font-size: 0.9em;
 }
 
 .section-post__sub-title--nowrap {
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -221,18 +243,6 @@ export default {
   }
   to {
     transform: translateY(0);
-  }
-}
-
-@media screen and (max-width: 1024px) {
-  .section-post {
-    width: 40%;
-  }
-}
-
-@media screen and (max-width: 599px) {
-  .section-post {
-    width: 85%;
   }
 }
 </style>
