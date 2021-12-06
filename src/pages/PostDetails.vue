@@ -1601,7 +1601,7 @@ ul {
   }
 
   .block-content__updated-at {
-    margin: 5px 0 0;
+    margin: 5px 0;
   }
 
   .container__item-post-details {
