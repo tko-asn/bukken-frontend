@@ -1080,7 +1080,7 @@ export default {
     },
     getPropertyMap() {
       let timer = setInterval(() => {
-        if (window.google && this.post) {
+        if (window.google && this.addressData(this.post)) {
           clearInterval(timer);
           const geocoder = new window.google.maps.Geocoder();
           geocoder.geocode({ address: this.addressData(this.post) }, (results, status) => {
