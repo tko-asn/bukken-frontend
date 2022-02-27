@@ -219,7 +219,7 @@
               :style="evaluationWidth(2)"
             ></span>
           </div>
-          <p class="block-rate__help">※ 評価：普通は比率に含まれません</p>
+          <p class="block-rate__help">※ 評価:普通は比率に含まれません</p>
         </div>
         <p class="block-content__title">{{ answerLength }}件の回答</p>
         <section
@@ -524,8 +524,25 @@
       </div>
     </div>
 
-    <!-- サイドメニュー -->
-    <SidePostList class="container__list-side-post" />
+    <!-- PC・タブレットのサイドメニュー -->
+    <div 
+      :class="[
+        width >= 600 ? 
+        'container__list-side-post--pc' : 
+        'container__list-side-post--sp'
+      ]"
+    >
+      <SidePostList  
+        :posts="latestPosts" 
+        title="最新の質問"
+        v-if="latestPosts.length"
+      />
+      <SidePostList 
+        :posts="favoritePostRanking" 
+        title="人気の投稿"
+        v-if="favoritePostRanking.length"
+      />
+    </div>
   </div>
 </template>
 
@@ -546,6 +563,7 @@ import TextArea from "@/components/TextArea";
 import moment from "moment";
 import addressValidationMixin from "@/mixins/addressValidationMixin";
 import addressData from "@/mixins/addressData";
+import widthMixin from "@/mixins/widthMixin";
 
 export default {
   props: {
@@ -564,7 +582,7 @@ export default {
     MiddleInput,
     TextArea,
   },
-  mixins: [addressValidationMixin, addressData],
+  mixins: [addressValidationMixin, addressData, widthMixin],
   data() {
     return {
       post: {},
@@ -597,35 +615,33 @@ export default {
         deleteComment: false,
       },
       showMap: true,
+      latestPosts: [],
+      favoritePostRanking: [],
     };
   },
-  created() {
+  async created() {
     // ユーザーのお気に入りの投稿のidリスト取得
     if (this.isLoggedIn) {
       this.getFavoritePostList();
     }
-    apiClient.get(`/posts/post/${this.postId}/`).then(({ data }) => {
-      this.post = data; // 対象の投稿データをセット
 
-      // コメントの初期値を作成
-      this.post.answers.forEach((el) => {
-        this.newComments[el.id] = "";
-      });
+    const values = await Promise.all([
+      apiClient.get(`/posts/post/${this.postId}/`),
+      apiClient.get("/posts/page/1/"),
+      apiClient.get("/posts/favorite/post/ranking/1"),
+    ]);
 
-      // コメントの編集用データの初期値を作成
-      this.setEditCommentData(this.post.answers);
-      // 回答の編集用データの初期値を作成
-      this.setEditAnswerData(this.post.answers);
+    this.latestPosts = values[1].data.posts; // 最新の投稿
+    this.favoritePostRanking = values[2].data.posts; // お気に入りの投稿ランキング
 
-      // 編集用データ
-      this.editPostData.title = data.title;
-      this.editPostData.text = data.text;
-      this.editPostData.property = data.property;
-      this.editAddressData = { ...data.address };
-      this.editCategoryData = [...data.categories];
-      this.editAddressData.postalCodeA = this.postalCodeA(this.post);
-      this.editAddressData.postalCodeB = this.postalCodeB(this.post);
+    // 投稿の詳細を取得
+    this.post = values[0].data;
+    // コメントの初期値を作成
+    this.post.answers.forEach((el) => {
+      this.newComments[el.id] = "";
     });
+    // 編集用データをセット
+    this.setEditingData(this.post);
   },
   mounted() {
     this.getPropertyMap();
@@ -1080,7 +1096,7 @@ export default {
     },
     getPropertyMap() {
       let timer = setInterval(() => {
-        if (window.google && this.post) {
+        if (window.google && this.addressData(this.post)) {
           clearInterval(timer);
           const geocoder = new window.google.maps.Geocoder();
           geocoder.geocode({ address: this.addressData(this.post) }, (results, status) => {
@@ -1100,26 +1116,31 @@ export default {
         }
       }, 500);
     },
+    setEditingData(postData) {
+      // コメントの編集用データの初期値を作成
+      this.setEditCommentData(postData.answers);
+      // 回答の編集用データの初期値を作成
+      this.setEditAnswerData(postData.answers);
+
+      // 編集用データ
+      this.editPostData.title = postData.title;
+      this.editPostData.text = postData.text;
+      this.editPostData.property = postData.property;
+      this.editAddressData = { ...postData.address };
+      this.editCategoryData = [...postData.categories];
+      this.editAddressData.postalCodeA = this.postalCodeA(postData);
+      this.editAddressData.postalCodeB = this.postalCodeB(postData);
+    },
   },
   watch: {
-    postId(val) {
-      // サイドバーからページをpostIdを切り替えたとき
-      apiClient.get(`/posts/post/${val}/`).then(({ data }) => {
-        this.post = data; // 対象の投稿データをセット
-        this.setEditCommentData(this.post.answers);
-        this.setEditAnswerData(this.post.answers);
-
-        // 編集用データ
-        this.editPostData.title = data.title;
-        this.editPostData.text = data.text;
-        this.editPostData.property = data.property;
-        this.editAddressData = { ...data.address };
-        this.editCategoryData = [...data.categories];
-        this.editAddressData.postalCodeA = this.postalCodeA(this.post);
-        this.editAddressData.postalCodeB = this.postalCodeB(this.post);
-
-        this.isEditingPost = false;
-      });
+    async postId(val) {
+      const values = await Promise.all([
+        apiClient.get(`/posts/post/${val}/`), // サイドバーからpostIdを切り替えたとき
+        this.getPropertyMap(),
+      ]);
+      this.post = values[0].data;
+      this.setEditingData(this.post);
+      this.isEditingPost = false;
     },
     isEditingPost(val) {
       if (!val) {
@@ -1151,7 +1172,7 @@ ul {
 
 /* 投稿詳細部分 */
 .container__item-post-details {
-  max-width: 700px;
+  min-width: 400px;
   width: 50%;
   margin-right: 50px;
   padding-top: 25px;
@@ -1549,20 +1570,25 @@ ul {
   cursor: pointer;
 }
 
+.container__list-side-post--pc {
+  width: 25%;
+  min-width: 185px;
+  margin-left: 10px;
+}
+
+.container__list-side-post--sp {
+  width: 90%;
+  padding: 0 0 40px;
+}
+
 @media screen and (max-width: 1024px) {
   .container {
-    width: 80%;
-    flex-direction: column;
+    width: 100%;
+    justify-content: space-around;
   }
 
   .container__item-post-details {
-    max-width: none;
-    width: 100%;
     margin: 0;
-  }
-
-  .container__list-side-post {
-    display: none;
   }
 
   .item-property__map {
@@ -1572,7 +1598,8 @@ ul {
 
 @media screen and (max-width: 599px) {
   .container {
-    width: 100%;
+    align-items: center;
+    flex-direction: column;
   }
 
   .block-content__title {
@@ -1601,10 +1628,12 @@ ul {
   }
 
   .block-content__updated-at {
-    margin: 5px 0 0;
+    margin: 5px 0;
   }
 
   .container__item-post-details {
+    width: 100%;
+    min-width: 0;
     padding-top: 0;
   }
 

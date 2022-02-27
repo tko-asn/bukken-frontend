@@ -3,17 +3,21 @@
     <nav class="block-side__nav">
       <ul class="block-side__list">
         <li class="item">
-          <h3 class="item__title">最新の質問</h3>
+          <h3 class="item__title">{{ title }}</h3>
         </li>
-        <li v-for="post in posts" :key="post.id" class="item">
+        <li
+          v-for="(post, index) in posts"
+          :key="post.id"
+          class="item"
+          v-show="isHalf ? index < 5 : true"
+        >
           <a
             href=""
             class="item__link"
             @click.prevent="moveToPostPage(post.id)"
           >
-            <p class="item__text">
-              {{ post.property }}
-            </p>
+            <p class="item__text">{{ post.title }}</p>
+            <p class="item__text item__text--small">{{ post.property }}</p>
           </a>
         </li>
       </ul>
@@ -22,17 +26,20 @@
 </template>
 
 <script>
-import apiClient from "@/axios";
-
 export default {
-  data() {
-    return {
-      posts: [],
-    };
-  },
-  async created() {
-    const { data } = await apiClient.get("/posts/page/1/");
-    this.posts = data.posts;
+  props: {
+    posts: {
+      type: Array,
+      default: () => [],
+    },
+    title: {
+      type: String,
+      default: "",
+    },
+    isHalf: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     // 投稿のページへ移動
@@ -49,7 +56,6 @@ export default {
 <style scoped>
 /* サイドメニュー */
 .block-side {
-  width: 25%;
   animation: scaleUp 0.5s;
 }
 
@@ -74,17 +80,26 @@ export default {
 }
 
 .item__link {
-  display: flex;
-  align-items: center;
+  display: block;
   height: 40px;
-  border-bottom: 2px solid rgb(194, 193, 193);
+  padding: 3px 5px;
+  border-bottom: 1px solid rgb(194, 193, 193);
   color: rgb(105, 104, 104);
   text-decoration: none;
 }
 
+.item__link:hover {
+  background: rgb(209, 209, 209);
+}
+
 .item__text {
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.item__text--small {
+  font-size: 0.8em;
 }
 </style>

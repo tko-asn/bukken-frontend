@@ -184,9 +184,9 @@
           :switchType="switchPostType"
           v-show="$route.name === 'home'"
         />
-        <router-view 
-          :postList="postObj[postType].posts" 
-          :isLoading="isLoading" 
+        <router-view
+          :postList="postObj[postType].posts"
+          :isLoading="isLoading"
         />
         <!-- ページネーション -->
         <transition name="fade">
@@ -300,10 +300,9 @@ export default {
       this.postObj.favorites.page = page;
     },
     async getFolloweePosts(page) {
-      const { data } = await apiClient.post(
-        `/posts/followee/page/${page}/`,
-        { followsId: this.followeeId }
-      );
+      const { data } = await apiClient.post(`/posts/followee/page/${page}/`, {
+        followsId: this.followeeId,
+      });
       this.postObj.followee.posts = data.posts;
       this.total = data.total;
       this.postObj.followee.page = page;
@@ -569,7 +568,8 @@ a {
 }
 
 .container-main {
-  width: 90%;
+  width: 70%;
+  height: 100%;
   margin: 0 auto;
 }
 
@@ -656,6 +656,12 @@ a {
 
   .nav--tablet_sp {
     display: block;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .container-main {
+    width: 90%;
   }
 }
 </style>
