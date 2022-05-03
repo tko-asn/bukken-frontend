@@ -1,19 +1,24 @@
 <template>
-  <input
+  <BaseInput
     class="input-small"
     :type="type"
     :placeholder="placeholder"
     :name="name"
-    :style="itemWidth"
-    @keydown.enter.prevent
     v-model="inputedValue"
+    borderWidth="0.5px"
+    borderColor="silver"
+    :width="width"
   />
 </template>
 
 <script>
+import BaseInput from "@/components/BaseInput";
 import ItemWidthMixin from "@/mixins/ItemWidthMixin";
 
 export default {
+  components: {
+    BaseInput,
+  },
   props: {
     type: {
       type: String,
@@ -48,20 +53,12 @@ export default {
 
 <style scoped>
 .input-small {
-  display: block;
-  height: 30px;
   margin-top: 5px;
-  padding: 0 5px;
-  border: 1px solid silver;
-  box-sizing: border-box;
-  border-radius: 5px;
 }
 
 @media screen and (max-width: 599px) {
   .input-small {
     padding: 0 10px;
-    font-size: 1em;
-    letter-spacing: 1.5px;
   }
 }
 </style>
