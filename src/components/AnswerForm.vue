@@ -31,24 +31,25 @@
         v-model="answerObj.evaluation"
       />悪い
     </div>
-    <MiddleButton
+    <MediumButton
       btnValue="回答"
       @click="buttonFunc(answerObj)"
       :isDisabled="isDisabled"
+      :background="NORMAL"
       v-if="!isTwoButton"
     />
     <div class="block-answer-form__two-button" v-else>
-      <MiddleButton
+      <MediumButton
         btnValue="キャンセル"
         @click="cancelFunc(answerId, false, { cancel: true })"
-        btnColor="cancel"
+        :background="CANCEL"
         width="45%"
       />
-      <MiddleButton
+      <MediumButton
         btnValue="保存"
         @click="buttonFunc(answerObj, answerId)"
         :isDisabled="isDisabled"
-        btnColor="edit"
+        :background="AUTH"
         width="45%"
       />
     </div>
@@ -57,15 +58,17 @@
 
 <script>
 import ValidationMessage from "@/components/ValidationMessage";
-import MiddleButton from "@/components/MiddleButton";
+import MediumButton from "@/components/MediumButton";
 import TextArea from "@/components/TextArea";
+import getColorsMixin from "@/mixins/getColorsMixin";
 
 export default {
   components: {
     ValidationMessage,
-    MiddleButton,
+    MediumButton,
     TextArea,
   },
+  mixins: [getColorsMixin],
   props: {
     buttonFunc: {
       type: Function,
