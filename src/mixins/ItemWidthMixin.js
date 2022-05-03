@@ -5,9 +5,4 @@ export default {
       default: "100%",
     },
   },
-  computed: {
-    itemWidth() {
-      return `width: ${this.width};`;
-    },
-  },
 };

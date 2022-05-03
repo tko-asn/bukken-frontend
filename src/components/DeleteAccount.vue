@@ -15,13 +15,13 @@
         >「完全に削除」と入力して下さい。</span
       >
     </p>
-    <MiddleInput placeholder="完全に削除" v-model="deleteText" />
+    <MediumInput placeholder="完全に削除" v-model="deleteText" />
     <!-- ボタン -->
     <div class="item-btn">
       <LargeButton
         btnValue="アカウントを閉鎖"
         :isDisabled="isDisabled"
-        btnColor="delete"
+        :background="DELETE"
         width="180px"
         @click="deleteAccount"
       />
@@ -31,13 +31,15 @@
 
 <script>
 import LargeButton from "@/components/LargeButton";
-import MiddleInput from "@/components/MiddleInput";
+import MediumInput from "@/components/MediumInput";
+import getColorsMixin from "@/mixins/getColorsMixin";
 
 export default {
   components: {
     LargeButton,
-    MiddleInput,
+    MediumInput,
   },
+  mixins: [getColorsMixin],
   data() {
     return {
       deleteText: "", // アカウント閉鎖確認用

@@ -107,7 +107,7 @@
           <div class="item-property">
             <h4 class="item-property__title">物件情報</h4>
             <div class="item-property__body--editing">
-              <MiddleInput
+              <MediumInput
                 v-model="editPostData.property"
                 placeholder="物件名"
               />
@@ -159,24 +159,25 @@
           <!-- ログイン済みかつ自分の質問の場合 -->
           <template v-else-if="isLoggedIn && isYourPost">
             <!-- 編集モードでない場合 -->
-            <MiddleButton
+            <MediumButton
               btnValue="投稿を編集する"
               v-if="!isEditingPost"
+              :background="NORMAL"
               @click="switchPostEditMode(true)"
             />
             <!-- 編集モード -->
             <template v-else>
               <div class="form-answer__block-btn">
-                <MiddleButton
+                <MediumButton
                   btnValue="キャンセル"
-                  btnColor="cancel"
+                  :background="CANCEL"
                   width="45%"
                   @click="switchPostEditMode(false)"
                 />
-                <MiddleButton
+                <MediumButton
                   btnValue="編集"
                   @click="updatePost"
-                  btnColor="edit"
+                  :background="AUTH"
                   width="45%"
                   :isDisabled="isDisabled.updatePost"
                 />
@@ -185,11 +186,11 @@
               <p class="form-answer__text form-answer__text--delete">
                 「削除」と入力してください
               </p>
-              <MiddleInput placeholder="削除" v-model="deletePostText" />
-              <MiddleButton
+              <MediumInput placeholder="削除" v-model="deletePostText" />
+              <MediumButton
                 btnValue="削除"
                 @click="deletePost"
-                btnColor="delete"
+                :background="DELETE"
                 :isDisabled="deletePostText !== '削除' || isDisabled.deletePost"
               />
             </template>
@@ -200,7 +201,7 @@
             <p class="form-answer__text">
               回答するにはログインする必要があります
             </p>
-            <MiddleButton btnValue="今すぐログイン" @click="postAnswer" />
+            <MediumButton :background="NORMAL" btnValue="今すぐログイン" @click="postAnswer" />
           </template>
         </div>
       </article>
@@ -349,18 +350,18 @@
             <p class="form-answer__content block-content__text">{{ answer.content }}
             </p>
             <div class="form-answer__block-btn">
-              <MiddleButton
+              <MediumButton
                 btnValue="キャンセル"
                 @click="
                   switchEditAnswerData(answer.id, false, { deleteAns: false })
                 "
-                btnColor="cancel"
+                :background="CANCEL"
                 width="45%"
               />
-              <MiddleButton
+              <MediumButton
                 btnValue="削除"
                 @click="deleteAnswer(answer.id)"
-                btnColor="delete"
+                :background="DELETE"
                 :isDisabled="isDisabled.deleteAnswer"
                 width="45%"
               />
@@ -391,7 +392,7 @@
                 btnValue="コメントする"
                 @click="createComment(answer.id)"
                 :isDisabled="isDisabled.createComment"
-                btnColor="info"
+                :background="INFO"
               />
             </div>
             <!-- コメント一覧 -->
@@ -416,7 +417,7 @@
                   >
                     <SmallButton
                       btnValue="キャンセル"
-                      btnColor="cancel"
+                      :background="CANCEL"
                       width="100px"
                       @click="
                         switchEditCommentData(comment.id, false, {
@@ -428,7 +429,7 @@
                     <SmallButton
                       class="form-comment__btn-right"
                       btnValue="削除"
-                      btnColor="delete"
+                      :background="DELETE"
                       width="45px"
                       @click="deleteComment(comment.id)"
                       :isDisabled="isDisabled.deleteComment"
@@ -448,7 +449,7 @@
                     <div class="form-comment__edit">
                       <SmallButton
                         btnValue="キャンセル"
-                        btnColor="cancel"
+                        :background="CANCEL"
                         width="100px"
                         @click="
                           switchEditCommentData(comment.id, false, {
@@ -556,14 +557,15 @@ import CategoryForm from "@/components/CategoryForm";
 import AnswerForm from "@/components/AnswerForm";
 import Tag from "@/components/Tag";
 import LargeInput from "@/components/LargeInput";
-import MiddleInput from "@/components/MiddleInput";
-import MiddleButton from "@/components/MiddleButton";
+import MediumInput from "@/components/MediumInput";
+import MediumButton from "@/components/MediumButton";
 import SmallButton from "@/components/SmallButton";
 import TextArea from "@/components/TextArea";
 import moment from "moment";
 import addressValidationMixin from "@/mixins/addressValidationMixin";
 import addressData from "@/mixins/addressData";
 import widthMixin from "@/mixins/widthMixin";
+import getColorsMixin from "@/mixins/getColorsMixin";
 
 export default {
   props: {
@@ -576,13 +578,13 @@ export default {
     CategoryForm,
     Tag,
     AnswerForm,
-    MiddleButton,
+    MediumButton,
     SmallButton,
     LargeInput,
-    MiddleInput,
+    MediumInput,
     TextArea,
   },
-  mixins: [addressValidationMixin, addressData, widthMixin],
+  mixins: [addressValidationMixin, addressData, widthMixin, getColorsMixin],
   data() {
     return {
       post: {},

@@ -1,18 +1,23 @@
 <template>
-  <button
-    :class="['btn-small', btnColor]"
-    :disabled="isDisabled"
+  <BaseButton
+    class="btn-small"
+    :background="background"
+    :isDisabled="isDisabled"
+    :value="btnValue"
     @click="$emit('click')"
-    :style="itemWidth"
-  >
-    {{ btnValue }}
-  </button>
+    :width="width"
+  />
 </template>
 
 <script>
+import BaseButton from "@/components/BaseButton";
 import ItemWidthMixin from "@/mixins/ItemWidthMixin";
+import { AUTH } from "@/utils/colors";
 
 export default {
+  components: {
+    BaseButton,
+  },
   props: {
     isDisabled: {
       type: Boolean,
@@ -22,9 +27,9 @@ export default {
       type: String,
       default: "",
     },
-    btnColor: {
+    background: {
       type: String,
-      default: "auth",
+      default: AUTH,
     },
   },
   mixins: [ItemWidthMixin],
@@ -33,38 +38,6 @@ export default {
 
 <style scoped>
 .btn-small {
-  display: block;
-  height: 30px;
   margin: 10px 0;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  letter-spacing: 3px;
-  cursor: pointer;
-}
-
-.btn-small:hover {
-  opacity: 0.8;
-}
-
-.btn-small:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.auth {
-  background: rgb(16, 211, 65);
-}
-
-.info {
-  background: rgb(19, 126, 214);
-}
-
-.cancel {
-  background: rgb(167, 165, 165);
-}
-
-.delete {
-  background: rgb(231, 39, 39);
 }
 </style>

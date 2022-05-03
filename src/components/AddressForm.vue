@@ -3,7 +3,7 @@
   <div class="block-address">
     <!-- 郵便番号 -->
     <div class="block-address__postal-code">
-      <MiddleInput
+      <MediumInput
         width="45px"
         placeholder="xxx"
         v-model="postalCodeA"
@@ -16,7 +16,7 @@
         "
       />
       <span class="block-address__span">-</span>
-      <MiddleInput
+      <MediumInput
         width="55px"
         placeholder="xxxx"
         v-model="postalCodeB"
@@ -36,20 +36,20 @@
     <!-- 都道府県と市区町村が存在する場合 -->
     <template v-if="prefecture && municipality">
       <!-- 都道府県・市区町村 -->
-      <MiddleInput :readonly="true" v-model="prefecture" :width="inputWidth" />
-      <MiddleInput
+      <MediumInput :readonly="true" v-model="prefecture" :width="inputWidth" />
+      <MediumInput
         :readonly="true"
         v-model="municipality"
         :width="inputWidth"
       />
       <template v-if="optionInput">
-        <MiddleInput
+        <MediumInput
           placeholder="町名・番地"
           v-model="townName"
           :width="inputWidth"
           @input="$emit('addressData', { townName: $event })"
         />
-        <MiddleInput
+        <MediumInput
           placeholder="アパート・マンション名"
           v-model="buildingName"
           :width="inputWidth"
@@ -62,14 +62,14 @@
 
 <script>
 import ValidationMessage from "@/components/ValidationMessage";
-import MiddleInput from "@/components/MiddleInput";
+import MediumInput from "@/components/MediumInput";
 import widthMixin from "@/mixins/widthMixin";
 const YubinBango = require("yubinbango-core2");
 
 export default {
   components: {
     ValidationMessage,
-    MiddleInput,
+    MediumInput,
   },
   mixins: [widthMixin],
   props: {

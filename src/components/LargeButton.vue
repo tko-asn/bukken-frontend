@@ -1,18 +1,27 @@
 <template>
-  <button
-    :class="['btn-large', btnColor]"
-    :disabled="isDisabled"
-    :style="itemWidth"
+  <BaseButton
+    class="btn-large"
+    :background="background"
+    :isDisabled="isDisabled"
+    :value="btnValue"
     @click="$emit('click')"
-  >
-    {{ btnValue }}
-  </button>
+    :width="width"
+    height="45px"
+    borderRadius="3px"
+    letterSpacing="0px"
+    fontSize="1.1em"
+  />
 </template>
 
 <script>
+import BaseButton from "@/components/BaseButton";
 import ItemWidthMixin from "@/mixins/ItemWidthMixin";
+import { NORMAL } from "@/utils/colors";
 
 export default {
+  components: {
+    BaseButton,
+  },
   props: {
     btnValue: {
       type: String,
@@ -22,9 +31,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    btnColor: {
+    background: {
       type: String,
-      default: "normal",
+      default: NORMAL,
     },
   },
   mixins: [ItemWidthMixin],
@@ -33,11 +42,7 @@ export default {
 
 <style scoped>
 .btn-large {
-  display: block;
-  height: 45px;
   margin: 15px 0;
-  border: none;
-  border-radius: 3px;
   color: #fff;
   font-size: 1.1em;
   cursor: pointer;
@@ -50,13 +55,5 @@ export default {
 .btn-large:disabled {
   opacity: 0.6;
   cursor: default;
-}
-
-.normal {
-  background: rgb(126, 79, 170);
-}
-
-.delete {
-  background: rgba(247, 18, 10, 0.9);
 }
 </style>

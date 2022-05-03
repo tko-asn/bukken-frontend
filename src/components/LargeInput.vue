@@ -1,15 +1,23 @@
 <template>
-  <input
+  <BaseInput
     class="input-large"
-    type="text"
     :placeholder="placeholder"
     v-model="inputedValue"
-    @keydown.enter.prevent
+    borderColor="rgb(143, 142, 142)"
+    borderWidth="2px"
+    height="40px"
+    fontSize="1.1em"
+    letterSpacing="3px"
   />
 </template>
 
 <script>
+import BaseInput from "@/components/BaseInput";
+
 export default {
+  components: {
+    BaseInput,
+  },
   props: {
     placeholder: {
       type: String,
@@ -35,14 +43,6 @@ export default {
 
 <style scoped>
 .input-large {
-  display: block;
-  width: 100%;
-  height: 40px;
   margin: 10px 0;
-  border: 2px solid rgb(143, 142, 142);
-  box-sizing: border-box;
-  border-radius: 5px;
-  font-size: 1.2em;
-  letter-spacing: 3px;
 }
 </style>

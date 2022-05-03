@@ -53,7 +53,7 @@
           <!-- カテゴリー -->
           <div
             class="block-category"
-            v-if="post.categories.length"
+            v-if="post.categories && post.categories.length"
             v-show="width >= 600"
           >
             <span
@@ -82,7 +82,10 @@ import widthMixin from "@/mixins/widthMixin";
 
 export default {
   props: {
-    postList: Array, // 投稿リスト
+    postList: { // 投稿リスト
+      type: Array,
+      default: () => [],
+    },
     isLoading: {
       type: Boolean,
       default: true,

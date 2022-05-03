@@ -52,7 +52,6 @@
     <div class="form-post__btn">
       <LargeButton
         btnValue="投稿"
-        width="40%"
         :isDisabled="isDisabled"
         @click="createPost"
       />
@@ -236,8 +235,8 @@ export default {
 }
 
 .form-post__btn {
-  display: flex;
-  justify-content: center;
+  margin: 0 auto;
+  width: 200px;
 }
 
 /* アニメーション */
